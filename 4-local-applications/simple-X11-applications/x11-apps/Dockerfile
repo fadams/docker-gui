@@ -16,7 +16,8 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-# Run xeyes in a container.
+# An image to run x11-apps, a miscellaneous assortment of X applications that
+# ship with the X Window System.
 # This image uses the simple approach of sharing the host's X11 socket with
 # the container and using xhost to grant the container access to the X Server.
 # This method requires the container and display to be on the same host, but
@@ -32,13 +33,13 @@ RUN apt-get update && \
 	x11-apps && \
 	rm -rf /var/lib/apt/lists/*
 
-ENTRYPOINT ["xeyes"]
+CMD ["xlogo"]
 
 #-------------------------------------------------------------------------------
 # Example usage
 # 
 # Build the image
-# docker build -t xeyes .
+# docker build -t x11-apps .
 #
 # To run:
 #
@@ -46,6 +47,6 @@ ENTRYPOINT ["xeyes"]
 # docker run --rm \
 #     -e DISPLAY=unix$DISPLAY \
 #     -v /tmp/.X11-unix:/tmp/.X11-unix \
-#     xeyes
+#     x11-apps
 # xhost -local:root # Remove local:root to the X Server access list.
 
