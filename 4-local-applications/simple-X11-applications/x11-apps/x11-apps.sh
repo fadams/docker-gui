@@ -19,11 +19,16 @@
 #
 
 ################################################################################
-# This image uses the simple approach of sharing the host's X11 socket with
-# the container and using xhost to grant the container access to the X Server.
-# This method requires the container and display to be on the same host, but
-# gives performance that is equivalent to running the application directly
-# (i.e. not in a container) on the host.
+# This script uses the simple approach of sharing the host's X11 socket with
+# the container. This method requires the container and display to be on the
+# same host, but gives performance that is equivalent to running the application
+# directly (i.e. not in a container) on the host.
+# This script creates an additional .Xauthority file based on the user's but
+# with a wildcard hostname to avoid having to set the container's hostname.
+# This script uses the -u option of docker run to reduce the priviledges of the
+# container to that of the user running the script, bind mounting /etc/passwd
+# read only isn't strictly necessary but allows the container to map the user's
+# ID to name to avoid seeing "I have no name!" when launching a shell.
 ################################################################################
 
 if [ $# != 0 ] && ([ $1 == "-h" ] || [ $1 == "--help" ])
@@ -56,9 +61,18 @@ then
     exit 0
 fi
 
-xhost +local:root # Add local:root to the X Server access list.
+# Create .Xauthority.docker file with wildcarded hostname.
+XAUTH=${XAUTHORITY:-$HOME/.Xauthority}
+DOCKER_XAUTHORITY=${XAUTH}.docker
+cp --preserve=all $XAUTH $DOCKER_XAUTHORITY
+xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY nmerge -
+
 docker run --rm \
+    -u $(id -u) \
+    -v /etc/passwd:/etc/passwd:ro \
     -e DISPLAY=unix$DISPLAY \
     -v /tmp/.X11-unix:/tmp/.X11-unix \
+    -e XAUTHORITY=$DOCKER_XAUTHORITY \
+    -v $DOCKER_XAUTHORITY:$DOCKER_XAUTHORITY \
     x11-apps $@
-xhost -local:root # Remove local:root to the X Server access list.
+

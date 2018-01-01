@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -16,37 +17,22 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-# An image to run x11-apps, a miscellaneous assortment of X applications that
-# ship with the X Window System.
-# This image uses the simple approach of sharing the host's X11 socket with
-# the container and using xhost or Xauthority to authenticate with the X Server.
+
+################################################################################
+# This script uses the simple approach of sharing the host's X11 socket with
+# the container and using xhost to grant the container access to the X Server.
 # This method requires the container and display to be on the same host, but
 # gives performance that is equivalent to running the application directly
 # (i.e. not in a container) on the host.
+# This script uses the -u option of docker run to reduce the priviledges of the
+# container to that of the user running the script.
+################################################################################
 
-FROM debian:stretch-slim
-
-# Install xeyes
-RUN apt-get update && \
-    # Add the packages used
-    apt-get install -y --no-install-recommends \
-	x11-apps && \
-	rm -rf /var/lib/apt/lists/*
-
-CMD ["xlogo"]
-
-#-------------------------------------------------------------------------------
-# Example usage
-# 
-# Build the image
-# docker build -t x11-apps .
-#
-# To run:
-#
-# xhost +local: # Add non-network local connections to the X Server ACL.
-# docker run --rm \
-#     -e DISPLAY=unix$DISPLAY \
-#     -v /tmp/.X11-unix:/tmp/.X11-unix \
-#     x11-apps $@
-# xhost -local: # Remove non-network local connections from the X Server ACL.
+xhost +local: # Add non-network local connections to the X Server ACL.
+docker run --rm \
+    -u $(id -u) \
+    -e DISPLAY=unix$DISPLAY \
+    -v /tmp/.X11-unix:/tmp/.X11-unix \
+    x11-apps
+xhost -local: # Remove non-network local connections from the X Server ACL.
 
