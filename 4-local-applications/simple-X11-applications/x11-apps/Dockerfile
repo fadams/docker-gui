@@ -26,7 +26,7 @@
 
 FROM debian:stretch-slim
 
-# Install xeyes
+# Install x11-apps
 RUN apt-get update && \
     # Add the packages used
     apt-get install -y --no-install-recommends \
