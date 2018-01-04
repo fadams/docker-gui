@@ -25,13 +25,24 @@
 # directly (i.e. not in a container) on the host.
 # This script creates an additional .Xauthority file based on the user's but
 # with a wildcard hostname to avoid having to set the container's hostname.
+# This script uses the -u option of docker run to reduce the priviledges of the
+# container to that of the user running the script, bind mounting /etc/passwd
+# read only isn't strictly necessary but allows the container to map the user's
+# ID to name to avoid seeing "I have no name!" when launching a shell.
 ################################################################################
 
+# Create .Xauthority.docker file with wildcarded hostname.
+XAUTH=${XAUTHORITY:-$HOME/.Xauthority}
+DOCKER_XAUTHORITY=${XAUTH}.docker
+cp --preserve=all $XAUTH $DOCKER_XAUTHORITY
+xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY nmerge -
+
 docker run --rm \
-    -h $(hostname) \
+    -u $(id -u) \
+    -v /etc/passwd:/etc/passwd:ro \
     -e DISPLAY=unix$DISPLAY \
     -v /tmp/.X11-unix:/tmp/.X11-unix \
-    -e XAUTHORITY=$XAUTHORITY \
-    -v $XAUTHORITY:$XAUTHORITY \
+    -e XAUTHORITY=$DOCKER_XAUTHORITY \
+    -v $DOCKER_XAUTHORITY:$DOCKER_XAUTHORITY \
     x11-apps
 
