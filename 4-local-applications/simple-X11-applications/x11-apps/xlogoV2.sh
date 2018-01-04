@@ -23,8 +23,8 @@
 # the container. This method requires the container and display to be on the
 # same host, but gives performance that is equivalent to running the application
 # directly (i.e. not in a container) on the host.
-# This script creates an additional .Xauthority file based on the user's but
-# with a wildcard hostname to avoid having to set the container's hostname.
+# This script uses the user's .Xauthority file which is hostname specific, so we
+# have to set the container's hostname to that of the host running the X Server.
 ################################################################################
 
 docker run --rm \
