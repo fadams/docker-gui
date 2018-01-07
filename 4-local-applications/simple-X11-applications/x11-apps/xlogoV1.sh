@@ -29,7 +29,7 @@
 xhost +local: # Add non-network local connections to the X Server ACL.
 docker run --rm \
     -e DISPLAY=unix$DISPLAY \
-    -v /tmp/.X11-unix:/tmp/.X11-unix \
+    -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
     x11-apps
 xhost -local: # Remove non-network local connections from the X Server ACL.
 

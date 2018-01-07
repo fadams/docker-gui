@@ -30,8 +30,8 @@
 docker run --rm \
     -h $(hostname) \
     -e DISPLAY=unix$DISPLAY \
-    -v /tmp/.X11-unix:/tmp/.X11-unix \
+    -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
     -e XAUTHORITY=$XAUTHORITY \
-    -v $XAUTHORITY:$XAUTHORITY \
+    -v $XAUTHORITY:$XAUTHORITY:ro \
     x11-apps
 

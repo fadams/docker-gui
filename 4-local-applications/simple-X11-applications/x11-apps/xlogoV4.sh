@@ -41,8 +41,8 @@ docker run --rm \
     -u $(id -u) \
     -v /etc/passwd:/etc/passwd:ro \
     -e DISPLAY=unix$DISPLAY \
-    -v /tmp/.X11-unix:/tmp/.X11-unix \
+    -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
     -e XAUTHORITY=$DOCKER_XAUTHORITY \
-    -v $DOCKER_XAUTHORITY:$DOCKER_XAUTHORITY \
+    -v $DOCKER_XAUTHORITY:$DOCKER_XAUTHORITY:ro \
     x11-apps
 
