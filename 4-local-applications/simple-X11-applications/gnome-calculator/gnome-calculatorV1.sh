@@ -31,35 +31,13 @@
 # ID to name to avoid seeing "I have no name!" when launching a shell.
 ################################################################################
 
-# Issue connecting to dbus from Docker container.
-#  DBus uses abstract sockets (https://unix.stackexchange.com/questions/206386/what-does-the-symbol-denote-in-the-beginning-of-a-unix-domain-socket-path-in-l),
-# which are network-namespace specific.
-#
-# So the only real way to fix this is to not use a network namespace (i.e.
-# docker run --net=host). Alternatively, you can run a process on the host which
-# proxies access to the socket. I think that's what xdg-app does basically (also
-# for security reasons to act as a filter).
-
-
 # Create .Xauthority.docker file with wildcarded hostname.
 XAUTH=${XAUTHORITY:-$HOME/.Xauthority}
 DOCKER_XAUTHORITY=${XAUTH}.docker
 cp --preserve=all $XAUTH $DOCKER_XAUTHORITY
 xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY nmerge -
 
-#    --net host \
-#    -e DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS \
-#    -v $HOME/.config/dconf/user:$HOME/.config/dconf/user:ro \
-
-# I don't think this is needed - though it is where /var/lib/dbus/machine-id is
-#    -v /var/run/dbus/:/var/run/dbus/ \
-
-#mkdir -p $(id -un)
-mkdir -p $(id -un)/.config/dconf
 docker run --rm \
---net host \
--e DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS \
--v $HOME/.config/dconf/user:$HOME/.config/dconf/user:ro \
     -u $(id -u) \
     -v $PWD/$(id -un):/home/$(id -un) \
     -v /etc/passwd:/etc/passwd:ro \

@@ -29,7 +29,7 @@ FROM debian:stretch-slim
 RUN apt-get update && \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	ca-certificates gnome-calculator && \
+	gnome-calculator && \
 	rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT ["gnome-calculator"]
@@ -38,6 +38,6 @@ ENTRYPOINT ["gnome-calculator"]
 # Example usage
 # 
 # Build the image
-# docker build -t gnome-calculator .
+# docker build -t gnome-calculator -f DockerfileV0 .
 
 
