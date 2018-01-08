@@ -37,6 +37,8 @@ DOCKER_XAUTHORITY=${XAUTH}.docker
 cp --preserve=all $XAUTH $DOCKER_XAUTHORITY
 xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY nmerge -
 
+# Create a directory on the host that we can mount as a
+# "home directory" in the container for the current user. 
 mkdir -p $(id -un)
 docker run --rm \
     -u $(id -u):$(id -u) \
