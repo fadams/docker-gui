@@ -43,19 +43,18 @@ cp --preserve=all $XAUTH $DOCKER_XAUTHORITY
 xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY nmerge -
 
 # Create a directory on the host that we can mount as a
-# "home directory" in the container for the current user.
-UNAME=${SUDO_USER:-$(whoami)}
-install -d -o $UNAME $UNAME/.config/dconf
+# "home directory" in the container for the current user. 
+mkdir -p $(id -un)/.config/dconf
 docker run --rm \
-    --net host \
-    -e DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS \
-    -v $HOME/.config/dconf/user:$HOME/.config/dconf/user:ro \
-    -u $(id -u $UNAME):$(id -u $UNAME) \
-    -v $PWD/$UNAME:$HOME \
-    -v /etc/passwd:/etc/passwd:ro \
-    -e DISPLAY=unix$DISPLAY \
-    -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
-    -e XAUTHORITY=$DOCKER_XAUTHORITY \
-    -v $DOCKER_XAUTHORITY:$DOCKER_XAUTHORITY:ro \
-    gnome-calculator
+   --net host \
+   -e DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS \
+   -v $HOME/.config/dconf/user:$HOME/.config/dconf/user:ro \
+   -u $(id -u):$(id -u) \
+   -v $PWD/$(id -un):/home/$(id -un) \
+   -v /etc/passwd:/etc/passwd:ro \
+   -e DISPLAY=unix$DISPLAY \
+   -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
+   -e XAUTHORITY=$DOCKER_XAUTHORITY \
+   -v $DOCKER_XAUTHORITY:$DOCKER_XAUTHORITY:ro \
+   gnome-calculator
 

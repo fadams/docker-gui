@@ -39,11 +39,10 @@ xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY nmer
 
 # Create a directory on the host that we can mount as a
 # "home directory" in the container for the current user.
-UNAME=${SUDO_USER:-$(whoami)}
-install -d -o $UNAME $UNAME
+mkdir -p $(id -un)
 docker run --rm \
-    -u $(id -u $UNAME):$(id -u $UNAME) \
-    -v $PWD/$UNAME:$HOME \
+    -u $(id -u):$(id -u) \
+    -v $PWD/$(id -un):/home/$(id -un) \
     -v /etc/passwd:/etc/passwd:ro \
     -e DISPLAY=unix$DISPLAY \
     -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
