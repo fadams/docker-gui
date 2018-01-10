@@ -44,13 +44,13 @@ xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY nmer
 
 # Create a directory on the host that we can mount as a
 # "home directory" in the container for the current user. 
-mkdir -p $(id -un)/.config/dconf
+mkdir -p $USER/.config/dconf
 docker run --rm \
     --net host \
     -e DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS \
     -v $HOME/.config/dconf/user:$HOME/.config/dconf/user:ro \
-    -u $(id -u):$(id -u) \
-    -v $PWD/$(id -un):/home/$(id -un) \
+    -u $(id -u $USER):$(id -u $USER) \
+    -v $PWD/$USER:$HOME \
     -v /etc/passwd:/etc/passwd:ro \
     -e DISPLAY=unix$DISPLAY \
     -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
