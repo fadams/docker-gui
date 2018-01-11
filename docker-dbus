@@ -1,0 +1,58 @@
+################################################################################
+# AppArmor profile for Docker applications that use dconf and D-bus.
+# It is based on the info that was gleaned from
+# https://askubuntu.com/questions/485547/contain-docker-engine-with-apparmor
+# and updated with info from the Docker apparmor documentation 
+# https://docs.docker.com/engine/security/apparmor/#understand-the-policies
+# https://github.com/moby/moby/blob/master/profiles/apparmor/template.go
+#
+# The template above refers to the docker-default AppArmor profile and the
+# profile here is simply docker-default plus the addition of dbus-session
+# and dbus-accessibility.
+#
+# To load a new profile into AppArmor for use with containers:
+# sudo apparmor_parser -r -W /path/to/docker-gui/docker-dbus
+#
+# Then, run the custom profile with --security-opt like so:
+# docker run --rm -it --security-opt apparmor=docker-dbus hello-world
+#
+# # stop apparmor
+# $ sudo  /etc/init.d/apparmor stop
+# # unload the profile
+# $ sudo apparmor_parser -R /path/to/profile
+# # start apparmor
+# $ sudo /etc/init.d/apparmor start
+#
+# To persist changes across reboots:
+# sudo cp /path/to/docker-gui/docker-dbus /etc/apparmor.d/.
+# # reboot
+# sudo shutdown -r now
+################################################################################
+
+#include <tunables/global>
+
+profile docker-dbus flags=(attach_disconnected,mediate_deleted) {
+  #include <abstractions/dbus-session>
+  #include <abstractions/dbus-accessibility>
+
+  network,
+  capability,
+  file,
+  umount,
+
+  deny @{PROC}/* w,   # deny write for all files directly in /proc (not in a subdir)
+  # deny write to files not in /proc/<number>/** or /proc/sys/**
+  deny @{PROC}/{[^1-9],[^1-9][^0-9],[^1-9s][^0-9y][^0-9s],[^1-9][^0-9][^0-9][^0-9]*}/** w,
+  deny @{PROC}/sys/[^k]** w,  # deny /proc/sys except /proc/sys/k* (effectively /proc/sys/kernel)
+  deny @{PROC}/sys/kernel/{?,??,[^s][^h][^m]**} w,  # deny everything except shm* in /proc/sys/kernel/
+  deny @{PROC}/sysrq-trigger rwklx,
+  deny @{PROC}/kcore rwklx,
+  deny mount,
+  deny /sys/[^f]*/** wklx,
+  deny /sys/f[^s]*/** wklx,
+  deny /sys/fs/[^c]*/** wklx,
+  deny /sys/fs/c[^g]*/** wklx,
+  deny /sys/fs/cg[^r]*/** wklx,
+  deny /sys/firmware/** rwklx,
+  deny /sys/kernel/security/** rwklx,
+}
