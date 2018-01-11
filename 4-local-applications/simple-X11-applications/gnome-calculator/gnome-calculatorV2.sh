@@ -38,6 +38,12 @@ else
     DOCKER_COMMAND="sudo docker"
 fi
 
+if [[ $DBUS_SESSION_BUS_ADDRESS == *"abstract"* ]]; then
+    DBUS_FLAGS="--net host"
+else
+    DBUS_FLAGS="-v $XDG_RUNTIME_DIR/bus:$XDG_RUNTIME_DIR/bus"
+fi
+
 # Create .Xauthority.docker file with wildcarded hostname.
 XAUTH=${XAUTHORITY:-$HOME/.Xauthority}
 DOCKER_XAUTHORITY=${XAUTH}.docker
@@ -48,7 +54,7 @@ xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY nmer
 # "home directory" in the container for the current user. 
 mkdir -p $(id -un)
 $DOCKER_COMMAND run --rm \
-    --net host \
+    $DBUS_FLAGS \
     -e DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS \
     -u $(id -u):$(id -u) \
     -v $PWD/$(id -un):/home/$(id -un) \

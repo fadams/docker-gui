@@ -29,6 +29,11 @@
 # container to that of the user running the script, bind mounting /etc/passwd
 # read only isn't strictly necessary but allows the container to map the user's
 # ID to name to avoid seeing "I have no name!" when launching a shell.
+# In this script we have added configuration so that the container will work
+# properly with dconf/D-bus:
+#    --net host \
+#    -e DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS \
+#    -v $HOME/.config/dconf/user:$HOME/.config/dconf/user:ro \
 ################################################################################
 
 # If user isn't in docker group prefix docker with sudo 
@@ -58,17 +63,18 @@ xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY nmer
 
 # Create a directory on the host that we can mount as a
 # "home directory" in the container for the current user. 
-mkdir -p $(id -un)
+mkdir -p $(id -un)/.config/dconf
 $DOCKER_COMMAND run --rm \
     $APPARMOR_FLAGS \
     $DBUS_FLAGS \
-    -e DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS \
-    -u $(id -u):$(id -u) \
-    -v $PWD/$(id -un):/home/$(id -un) \
-    -v /etc/passwd:/etc/passwd:ro \
-    -e DISPLAY=unix$DISPLAY \
-    -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
-    -e XAUTHORITY=$DOCKER_XAUTHORITY \
-    -v $DOCKER_XAUTHORITY:$DOCKER_XAUTHORITY:ro \
-    gnome-calculator
+   -e DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS \
+   -v $HOME/.config/dconf/user:$HOME/.config/dconf/user:ro \
+   -u $(id -u):$(id -u) \
+   -v $PWD/$(id -un):/home/$(id -un) \
+   -v /etc/passwd:/etc/passwd:ro \
+   -e DISPLAY=unix$DISPLAY \
+   -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
+   -e XAUTHORITY=$DOCKER_XAUTHORITY \
+   -v $DOCKER_XAUTHORITY:$DOCKER_XAUTHORITY:ro \
+   gnome-calculator
 
