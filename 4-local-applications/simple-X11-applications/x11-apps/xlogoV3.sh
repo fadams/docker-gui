@@ -27,13 +27,20 @@
 # with a wildcard hostname to avoid having to set the container's hostname.
 ################################################################################
 
+# If user isn't in docker group prefix docker with sudo 
+if id -nG $(id -un) | grep -qw docker; then
+    DOCKER_COMMAND=docker
+else
+    DOCKER_COMMAND="sudo docker"
+fi
+
 # Create .Xauthority.docker file with wildcarded hostname.
 XAUTH=${XAUTHORITY:-$HOME/.Xauthority}
 DOCKER_XAUTHORITY=${XAUTH}.docker
 cp --preserve=all $XAUTH $DOCKER_XAUTHORITY
 xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY nmerge -
 
-docker run --rm \
+$DOCKER_COMMAND run --rm \
     -e DISPLAY=unix$DISPLAY \
     -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
     -e XAUTHORITY=$DOCKER_XAUTHORITY \

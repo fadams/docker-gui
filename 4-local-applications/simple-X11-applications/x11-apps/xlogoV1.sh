@@ -26,8 +26,15 @@
 # (i.e. not in a container) on the host.
 ################################################################################
 
+# If user isn't in docker group prefix docker with sudo 
+if id -nG $(id -un) | grep -qw docker; then
+    DOCKER_COMMAND=docker
+else
+    DOCKER_COMMAND="sudo docker"
+fi
+
 xhost +local: # Add non-network local connections to the X Server ACL.
-docker run --rm \
+$DOCKER_COMMAND run --rm \
     -e DISPLAY=unix$DISPLAY \
     -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
     x11-apps

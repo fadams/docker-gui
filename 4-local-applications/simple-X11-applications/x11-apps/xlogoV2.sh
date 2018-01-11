@@ -27,7 +27,14 @@
 # have to set the container's hostname to that of the host running the X Server.
 ################################################################################
 
-docker run --rm \
+# If user isn't in docker group prefix docker with sudo 
+if id -nG $(id -un) | grep -qw docker; then
+    DOCKER_COMMAND=docker
+else
+    DOCKER_COMMAND="sudo docker"
+fi
+
+$DOCKER_COMMAND run --rm \
     -h $(hostname) \
     -e DISPLAY=unix$DISPLAY \
     -v /tmp/.X11-unix:/tmp/.X11-unix:ro \

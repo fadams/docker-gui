@@ -25,6 +25,13 @@
 # authenticate with the X Server the user is running.
 ################################################################################
 
+# If user isn't in docker group prefix docker with sudo 
+if id -nG $(id -un) | grep -qw docker; then
+    DOCKER_COMMAND=docker
+else
+    DOCKER_COMMAND="sudo docker"
+fi
+
 echo "This example should fail with the message:"
 echo "No protocol specified"
 echo "Error: Can't open display: unix:0"
@@ -34,7 +41,7 @@ echo "with the X Server the user is running."
 echo
 echo
 
-docker run --rm \
+$DOCKER_COMMAND run --rm \
     -e DISPLAY=unix$DISPLAY \
     -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
     x11-apps
