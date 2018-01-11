@@ -31,6 +31,13 @@
 # ID to name to avoid seeing "I have no name!" when launching a shell.
 ################################################################################
 
+# If user isn't in docker group prefix docker with sudo 
+if id -nG $(id -un) | grep -qw docker; then
+    DOCKER_COMMAND=docker
+else
+    DOCKER_COMMAND="sudo docker"
+fi
+
 # Create .Xauthority.docker file with wildcarded hostname.
 XAUTH=${XAUTHORITY:-$HOME/.Xauthority}
 DOCKER_XAUTHORITY=${XAUTH}.docker
@@ -40,7 +47,7 @@ xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY nmer
 # Create a directory on the host that we can mount as a
 # "home directory" in the container for the current user. 
 mkdir -p $(id -un)
-docker run --rm \
+$DOCKER_COMMAND run --rm \
     --net host \
     -e DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS \
     -u $(id -u):$(id -u) \
