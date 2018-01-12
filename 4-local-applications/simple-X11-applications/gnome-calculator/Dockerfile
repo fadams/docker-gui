@@ -29,7 +29,7 @@ FROM debian:stretch-slim
 RUN apt-get update && \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	ca-certificates gnome-calculator && \
+	ca-certificates libcanberra-gtk3-module gnome-calculator && \
 	rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT ["gnome-calculator"]
