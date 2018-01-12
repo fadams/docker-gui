@@ -29,7 +29,7 @@ FROM debian:stretch-slim
 RUN apt-get update && \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	gedit gedit-common && \
+	libcanberra-gtk3-module packagekit-gtk3-module gedit gedit-common && \
 	rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT ["gedit"]
