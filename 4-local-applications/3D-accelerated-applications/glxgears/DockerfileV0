@@ -32,7 +32,6 @@ RUN apt-get update && \
 	rm -rf /var/lib/apt/lists/*
 
 ENV LIBGL_DEBUG verbose
-
 ENTRYPOINT ["glxgears"]
 
 #-------------------------------------------------------------------------------
