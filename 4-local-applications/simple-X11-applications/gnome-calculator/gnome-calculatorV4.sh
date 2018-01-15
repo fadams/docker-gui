@@ -69,7 +69,7 @@ $DOCKER_COMMAND run --rm \
     $DBUS_FLAGS \
    -e DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS \
    -v $HOME/.config/dconf/user:$HOME/.config/dconf/user:ro \
-   -u $(id -u):$(id -u) \
+   -u $(id -u):$(id -g) \
    -v $PWD/$(id -un):/home/$(id -un) \
    -v /etc/passwd:/etc/passwd:ro \
    -e DISPLAY=unix$DISPLAY \

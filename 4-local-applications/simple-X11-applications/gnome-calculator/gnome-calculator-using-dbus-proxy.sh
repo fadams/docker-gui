@@ -73,7 +73,7 @@ $DOCKER_COMMAND run --rm \
     $APPARMOR_FLAGS \
     $DBUS_FLAGS \
    -v $HOME/.config/dconf/user:$HOME/.config/dconf/user:ro \
-   -u $(id -u):$(id -u) \
+   -u $(id -u):$(id -g) \
    -v $PWD/$(id -un):/home/$(id -un) \
    -v /etc/passwd:/etc/passwd:ro \
    -e DISPLAY=unix$DISPLAY \

@@ -48,7 +48,7 @@ xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY nmer
 # "home directory" in the container for the current user.
 mkdir -p $(id -un)
 $DOCKER_COMMAND run --rm \
-    -u $(id -u):$(id -u) \
+    -u $(id -u):$(id -g) \
     -v $PWD/$(id -un):/home/$(id -un) \
     -v /etc/passwd:/etc/passwd:ro \
     -e DISPLAY=unix$DISPLAY \
