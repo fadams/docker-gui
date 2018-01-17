@@ -25,7 +25,7 @@
 FROM debian:stretch-slim
 
 # nvidia-docker hooks
-LABEL com.nvidia.volumes.needed="nvidia_driver"
+LABEL com.nvidia.volumes.needed=nvidia_driver
 
 # Install glxgears
 RUN apt-get update && \
@@ -35,7 +35,6 @@ RUN apt-get update && \
 	rm -rf /var/lib/apt/lists/*
 
 ENV LIBGL_DEBUG verbose
-
 ENTRYPOINT ["glxgears"]
 
 #-------------------------------------------------------------------------------
