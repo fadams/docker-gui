@@ -35,11 +35,10 @@
 # and part of the narrative of the book. The point is to see the error messages
 # and understand that there is additional work to do for different GPU types.
 
-# If user isn't in docker group prefix docker with sudo 
-if id -nG $(id -un) | grep -qw docker; then
-    DOCKER_COMMAND=docker
-else
-    DOCKER_COMMAND="sudo docker"
+# If user isn't in docker group prefix docker with sudo
+DOCKER_COMMAND=docker
+if ! (id -nG $(id -un) | grep -qw docker); then
+    DOCKER_COMMAND="sudo $DOCKER_COMMAND"
 fi
 
 # Create .Xauthority.docker file with wildcarded hostname.
@@ -49,7 +48,7 @@ cp --preserve=all $XAUTH $DOCKER_XAUTHORITY
 xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY nmerge -
 
 $DOCKER_COMMAND run --rm \
-    -u $(id -u) \
+    -u $(id -u):$(id -g) \
     -v /etc/passwd:/etc/passwd:ro \
     -e DISPLAY=unix$DISPLAY \
     -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
