@@ -44,6 +44,7 @@ if test -c "/dev/nvidia-modeset"; then
         SRC=$(cat /etc/ld.so.conf.d/x86_64-linux-gnu_GL.conf | grep /lib/)
 
         GPU_FLAGS="--runtime=nvidia "
+        GPU_FLAGS+="--device=/dev/nvidia-modeset "
         GPU_FLAGS+="-e NVIDIA_VISIBLE_DEVICES=all "
         GPU_FLAGS+="-e NVIDIA_DRIVER_CAPABILITIES=graphics "
         GPU_FLAGS+="-v $SRC/libGL.so.1:$DST/libGL.so.1:ro "
