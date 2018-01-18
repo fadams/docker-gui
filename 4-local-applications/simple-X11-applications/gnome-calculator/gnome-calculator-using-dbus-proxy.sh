@@ -31,9 +31,8 @@
 # ID to name to avoid seeing "I have no name!" when launching a shell.
 # In this script we have added configuration so that the container will work
 # properly with dconf/D-bus:
-#    --net host \
-#    -e DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS \
-#    -v $HOME/.config/dconf/user:$HOME/.config/dconf/user:ro \
+#        DBUS_FLAGS="-v $XDG_RUNTIME_DIR/bus:$XDG_RUNTIME_DIR/bus:ro -e NO_AT_BRIDGE=1 -e 
+# DBUS_SESSION_BUS_ADDRESS=unix:path=$XDG_RUNTIME_DIR/bus"
 ################################################################################
 
 # If user isn't in docker group prefix docker with sudo 
@@ -49,6 +48,7 @@ if [[ $DBUS_SESSION_BUS_ADDRESS == *"abstract"* ]]; then
         DBUS_FLAGS="-v $XDG_RUNTIME_DIR/bus:$XDG_RUNTIME_DIR/bus:ro -e NO_AT_BRIDGE=1 -e DBUS_SESSION_BUS_ADDRESS=unix:path=$XDG_RUNTIME_DIR/bus"
     else
         echo "D-bus proxy socket is not bound."
+        exit 1
     fi
 else
     DBUS_FLAGS="-v $XDG_RUNTIME_DIR/bus:$XDG_RUNTIME_DIR/bus:ro -e NO_AT_BRIDGE=1 -e DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS"

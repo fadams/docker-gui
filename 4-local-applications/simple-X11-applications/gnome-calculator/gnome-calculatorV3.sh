@@ -39,7 +39,7 @@ else
 fi
 
 if [[ $DBUS_SESSION_BUS_ADDRESS == *"abstract"* ]]; then
-    DBUS_FLAGS="--net host"
+    DBUS_FLAGS="--net=host"
 else
     DBUS_FLAGS="-v $XDG_RUNTIME_DIR/bus:$XDG_RUNTIME_DIR/bus:ro"
 fi
