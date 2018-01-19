@@ -67,8 +67,10 @@ else
             GPU_FLAGS+="-v $f:$f "
         done
     else
-        # Open Source Mesa GPU
-        GPU_FLAGS="--device=/dev/dri --group-add video"
+        # Open Source Mesa GPU.
+        GPU_FLAGS="--device=/dev/dri "
+        # Adding video group's gid seems more reliable than adding by name.
+        GPU_FLAGS+="--group-add $(cut -d: -f3 < <(getent group video)) "
     fi
 fi
 
