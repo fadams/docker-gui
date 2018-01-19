@@ -25,7 +25,7 @@
 # directly (i.e. not in a container) on the host.
 # This script creates an additional .Xauthority file based on the user's but
 # with a wildcard hostname to avoid having to set the container's hostname.
-# This script uses the -u option of docker run to reduce the priviledges of the
+# This script uses the -u option of docker run to reduce the privileges of the
 # container to that of the user running the script, bind mounting /etc/passwd
 # read only isn't strictly necessary but allows the container to map the user's
 # ID to name to avoid seeing "I have no name!" when launching a shell.
