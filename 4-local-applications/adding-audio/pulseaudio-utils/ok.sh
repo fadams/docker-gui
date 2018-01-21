@@ -27,7 +27,14 @@
 # the container. 
 ################################################################################
 
-docker run --rm -it \
+# If user isn't in docker group prefix docker with sudo 
+if id -nG $(id -un) | grep -qw docker; then
+    DOCKER_COMMAND=docker
+else
+    DOCKER_COMMAND="sudo docker"
+fi
+
+$DOCKER_COMMAND run --rm -it \
     -u $(id -u):$(id -g) \
     -v $PWD/ok.wav:/home/$(id -un)/ok.wav:ro \
     -v /etc/passwd:/etc/passwd:ro \

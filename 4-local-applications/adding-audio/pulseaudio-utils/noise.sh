@@ -27,7 +27,14 @@
 # the container. 
 ################################################################################
 
-docker run --rm \
+# If user isn't in docker group prefix docker with sudo 
+if id -nG $(id -un) | grep -qw docker; then
+    DOCKER_COMMAND=docker
+else
+    DOCKER_COMMAND="sudo docker"
+fi
+
+$DOCKER_COMMAND run --rm \
     -u $(id -u):$(id -g) \
     -e PULSE_SERVER=unix:$XDG_RUNTIME_DIR/pulse/native \
     -v $XDG_RUNTIME_DIR/pulse:$XDG_RUNTIME_DIR/pulse \
