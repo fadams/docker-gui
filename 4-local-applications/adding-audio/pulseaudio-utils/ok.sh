@@ -39,7 +39,7 @@ fi
 # memory. Pulseaudio 10 enables memfd by default, which apparently fixes this.
 # See https://bugs.freedesktop.org/show_bug.cgi?id=92141
 PULSE_VERSION=$(pulseaudio --version | sed 's/[^0-9.]*\([0-9]*\).*/\1/')
-if ([[ $PULSE_VERSION > 6 ]] && [[ $PULSE_VERSION < 10 ]]); then
+if ([[ $PULSE_VERSION -gt 6 ]] && [[ $PULSE_VERSION -lt 10 ]]); then
     PULSE_FLAGS="-e PULSE_CLIENTCONFIG=/etc/pulse/client-noshm.conf"
 fi
 
