@@ -27,9 +27,11 @@ RUN apt-get update && \
     # Add the packages used
     apt-get install -y --no-install-recommends \
 	pulseaudio-utils && \
-	rm -rf /var/lib/apt/lists/*
+	rm -rf /var/lib/apt/lists/* && \
+    cp /etc/pulse/client.conf /etc/pulse/client-noshm.conf && \
+    sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client-noshm.conf
 
-CMD ["pacat", "-vvvv", "/dev/urandom"]
+CMD ["pacat", "-v", "/dev/urandom"]
 
 #-------------------------------------------------------------------------------
 # 

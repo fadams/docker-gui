@@ -34,8 +34,20 @@ else
     DOCKER_COMMAND="sudo docker"
 fi
 
+# For pulseaudio versions 7 to 9 there is a bug whereby shm files get "cleaned
+# up" incorrectly in containers, so force those versions to disable shared
+# memory. Pulseaudio 10 enables memfd by default, which apparently fixes this.
+# See https://bugs.freedesktop.org/show_bug.cgi?id=92141
+PULSE_VERSION=$(pulseaudio --version | sed 's/[^0-9.]*\([0-9]*\).*/\1/')
+if ([[ $PULSE_VERSION > 6 ]] && [[ $PULSE_VERSION < 10 ]]); then
+    PULSE_FLAGS="-e PULSE_CLIENTCONFIG=/etc/pulse/client-noshm.conf"
+fi
+
 $DOCKER_COMMAND run --rm \
     -u $(id -u):$(id -g) \
+    -v /etc/passwd:/etc/passwd:ro \
     -e PULSE_SERVER=unix:$XDG_RUNTIME_DIR/pulse/native \
-    -v $XDG_RUNTIME_DIR/pulse:$XDG_RUNTIME_DIR/pulse \
+    -v $XDG_RUNTIME_DIR/pulse:$XDG_RUNTIME_DIR/pulse:ro \
+    -v $HOME/.config/pulse/cookie:$HOME/.config/pulse/cookie:ro \
+    $PULSE_FLAGS \
     pulseaudio-utils
