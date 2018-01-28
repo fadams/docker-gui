@@ -29,7 +29,7 @@ FROM debian:stretch-slim
 RUN apt-get update && \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	kcalc && \
+	kcalc libgl1-mesa-dri && \
 	rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT ["kcalc"]
