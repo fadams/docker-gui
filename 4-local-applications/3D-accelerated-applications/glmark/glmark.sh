@@ -90,7 +90,7 @@ DOCKER_XAUTHORITY=${XAUTH}.docker
 cp --preserve=all $XAUTH $DOCKER_XAUTHORITY
 xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY nmerge -
 
-$DOCKER_COMMAND run --rm -it \
+$DOCKER_COMMAND run --rm \
     -u $(id -u):$(id -g) \
     -v /etc/passwd:/etc/passwd:ro \
     -e DISPLAY=unix$DISPLAY \
