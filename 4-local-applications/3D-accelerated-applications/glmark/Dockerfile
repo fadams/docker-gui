@@ -32,7 +32,7 @@ LABEL com.nvidia.volumes.needed=nvidia_driver
 RUN apt-get update && \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	glmark2 glmark2-data libgl1-mesa-dri && \
+	glmark2 glmark2-data libgl1-mesa-glx libgl1-mesa-dri && \
 	rm -rf /var/lib/apt/lists/*
 
 ENV LIBGL_DEBUG verbose

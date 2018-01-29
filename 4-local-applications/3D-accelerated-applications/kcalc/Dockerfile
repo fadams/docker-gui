@@ -25,11 +25,14 @@
 
 FROM debian:stretch-slim
 
+# nvidia-docker hooks
+LABEL com.nvidia.volumes.needed=nvidia_driver
+
 # Install kcalc
 RUN apt-get update && \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	kcalc libgl1-mesa-dri && \
+	kcalc libgl1-mesa-glx libgl1-mesa-dri && \
 	rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT ["kcalc"]

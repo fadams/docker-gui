@@ -31,7 +31,7 @@ LABEL com.nvidia.volumes.needed=nvidia_driver
 RUN apt-get update && \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	mesa-utils libgl1-mesa-dri && \
+	mesa-utils libgl1-mesa-glx libgl1-mesa-dri && \
 	rm -rf /var/lib/apt/lists/*
 
 ENV LIBGL_DEBUG verbose
