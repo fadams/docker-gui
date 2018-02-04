@@ -32,7 +32,7 @@ LABEL com.nvidia.volumes.needed=nvidia_driver
 RUN apt-get update && \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	ca-certificates gtk-3-examples libgl1-mesa-glx libgl1-mesa-dri && \
+	gtk-3-examples libgl1-mesa-glx libgl1-mesa-dri && \
 	rm -rf /var/lib/apt/lists/*
 
 CMD ["gtk3-demo"]
