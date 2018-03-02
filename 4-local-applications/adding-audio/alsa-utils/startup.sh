@@ -29,5 +29,6 @@ for i in $(aplay -L | grep CARD); do
     echo trying device $i
     aplay -D $i $HOME/ok.wav
     echo
-    sleep 1
+    echo
+    sleep 2
 done
