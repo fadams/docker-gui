@@ -42,6 +42,7 @@ fi
 
 $DOCKER_COMMAND run --rm \
     --ulimit rtprio=99 \
+    --ulimit memlock=661000000 \
     --ipc=host \
     -u $(id -u):$(id -g) \
     -v /etc/passwd:/etc/passwd:ro \

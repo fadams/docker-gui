@@ -46,10 +46,11 @@ fi
 
 $DOCKER_COMMAND run --rm \
     --ulimit rtprio=99 \
+    --ulimit memlock=83886080 \
     --ipc=host \
     --device=/dev/snd \
     --group-add $(cut -d: -f3 < <(getent group audio)) \
-    -u $(id -u):$(id -g) \
+    -u $(id -u) \
     -v /etc/passwd:/etc/passwd:ro \
     -v /dev/shm:/dev/shm \
     jackd1-mplayer jackd -d alsa -d $ALSA_DEVICE -r 44100 -n 2 -p 2048
