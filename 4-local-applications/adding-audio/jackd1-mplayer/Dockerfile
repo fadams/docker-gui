@@ -16,9 +16,7 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-# Run pulseaudio-utils in a container. Illustrates running a pulseaudio client
-# example in a container and forwarding the audio via the pulseaudio socket
-# to the host.
+# Run jackd and mplayer for JACK 1 in a container.
 
 FROM debian:stretch-slim
 
