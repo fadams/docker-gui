@@ -53,6 +53,7 @@ fi
 
 $DOCKER_COMMAND run --rm \
     --ulimit rtprio=99 \
+    --ulimit memlock=83886080 \
     --ipc=host \
     --device=/dev/snd \
     --group-add $(cut -d: -f3 < <(getent group audio)) \
