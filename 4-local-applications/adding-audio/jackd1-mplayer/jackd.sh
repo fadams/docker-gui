@@ -50,7 +50,7 @@ $DOCKER_COMMAND run --rm \
     --ipc=host \
     --device=/dev/snd \
     --group-add $(cut -d: -f3 < <(getent group audio)) \
-    -u $(id -u) \
+    -u $(id -u):$(id -g) \
     -v /etc/passwd:/etc/passwd:ro \
     -v /dev/shm:/dev/shm \
     jackd1-mplayer jackd -d alsa -d $ALSA_DEVICE -r 44100 -n 2 -p 2048
