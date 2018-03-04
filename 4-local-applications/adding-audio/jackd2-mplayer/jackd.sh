@@ -62,6 +62,5 @@ $DOCKER_COMMAND run --rm \
     -v $HOME/.config/dconf/user:$HOME/.config/dconf/user:ro \
     -u $(id -u):$(id -g) \
     -v /etc/passwd:/etc/passwd:ro \
-    -v /dev/shm:/dev/shm \
     jackd2-mplayer jackd -d alsa -d $ALSA_DEVICE -r 44100 -n 2 -p 2048
 

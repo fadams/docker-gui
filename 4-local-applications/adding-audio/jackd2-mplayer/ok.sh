@@ -46,7 +46,6 @@ $DOCKER_COMMAND run --rm \
     --ipc=host \
     -u $(id -u):$(id -g) \
     -v /etc/passwd:/etc/passwd:ro \
-    -v /dev/shm:/dev/shm \
     -v $PWD/ok.wav:$HOME/ok.wav:ro \
     jackd2-mplayer mplayer -ao jack $HOME/ok.wav
 
