@@ -45,6 +45,12 @@ else
     DBUS_FLAGS="-v $XDG_RUNTIME_DIR/bus:$XDG_RUNTIME_DIR/bus:ro -e NO_AT_BRIDGE=1"
 fi
 
+if test -f "/etc/apparmor.d/docker-dbus"; then
+    APPARMOR_FLAGS="--security-opt apparmor:docker-dbus"
+else
+    APPARMOR_FLAGS="--security-opt apparmor=unconfined"
+fi
+
 # Check is pasuspender (and therefore pulseaudio) is present, if so then
 # prefix with pasuspender to suspend pulseaudio for the duration of the test.
 if test -f /usr/bin/pasuspender; then
@@ -57,6 +63,7 @@ $DOCKER_COMMAND run --rm \
     --ipc=host \
     --device=/dev/snd \
     --group-add $(cut -d: -f3 < <(getent group audio)) \
+    $APPARMOR_FLAGS \
     $DBUS_FLAGS \
     -e DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS \
     -v $HOME/.config/dconf/user:$HOME/.config/dconf/user:ro \
