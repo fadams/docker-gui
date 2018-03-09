@@ -43,7 +43,7 @@ if ([[ $PULSE_VERSION -gt 6 ]] && [[ $PULSE_VERSION -lt 10 ]]); then
     PULSE_FLAGS="-e PULSE_CLIENTCONFIG=/etc/pulse/client-noshm.conf"
 fi
 
-$DOCKER_COMMAND run --rm -it \
+$DOCKER_COMMAND run --rm \
     -u $(id -u):$(id -g) \
     -v /etc/passwd:/etc/passwd:ro \
     -e PULSE_SERVER=unix:$XDG_RUNTIME_DIR/pulse/native \
