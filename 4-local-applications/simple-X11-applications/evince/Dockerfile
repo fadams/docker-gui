@@ -29,15 +29,15 @@ FROM debian:stretch-slim
 RUN apt-get update && \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	libcanberra-gtk3-module packagekit-gtk3-module gedit gedit-common && \
+	evince evince-common gir1.2-evince-3.0 libgxps2 && \
 	rm -rf /var/lib/apt/lists/*
 
-ENTRYPOINT ["gedit"]
+ENTRYPOINT ["evince"]
 
 #-------------------------------------------------------------------------------
 # Example usage
 # 
 # Build the image
-# docker build -t gedit .
+# docker build -t evince .
 
 

@@ -72,7 +72,6 @@ xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY nmer
 # "home directory" in the container for the current user. 
 mkdir -p $(id -un)/.config/dconf
 $DOCKER_COMMAND run --rm \
-    -v /var/run/cups:/var/run/cups:ro \
     $APPARMOR_FLAGS \
     $DBUS_FLAGS \
    -e DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS \
@@ -84,5 +83,6 @@ $DOCKER_COMMAND run --rm \
    -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
    -e XAUTHORITY=$DOCKER_XAUTHORITY \
    -v $DOCKER_XAUTHORITY:$DOCKER_XAUTHORITY:ro \
-   gedit
+   -v $PWD/testfile.pdf:$HOME/testfile.pdf \
+   evince $HOME/testfile.pdf
 
