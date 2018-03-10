@@ -16,7 +16,7 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-# An image to run gedit.
+# An image to run evince.
 # This image uses the simple approach of sharing the host's X11 socket with
 # the container and using xhost or Xauthority to authenticate with the X Server.
 # This method requires the container and display to be on the same host, but
@@ -25,7 +25,7 @@
 
 FROM debian:stretch-slim
 
-# Install gedit
+# Install evince
 RUN apt-get update && \
     # Add the packages used
     apt-get install -y --no-install-recommends \
