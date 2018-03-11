@@ -16,7 +16,7 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-# An image to run gedit.
+# An image to run simple-scan.
 # This image uses the simple approach of sharing the host's X11 socket with
 # the container and using xhost or Xauthority to authenticate with the X Server.
 # This method requires the container and display to be on the same host, but
@@ -25,19 +25,19 @@
 
 FROM debian:stretch-slim
 
-# Install gedit
+# Install simple-scan
 RUN apt-get update && \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	libcanberra-gtk3-module packagekit-gtk3-module gedit gedit-common && \
+	simple-scan && \
 	rm -rf /var/lib/apt/lists/*
 
-ENTRYPOINT ["gedit"]
+ENTRYPOINT ["simple-scan"]
 
 #-------------------------------------------------------------------------------
 # Example usage
 # 
 # Build the image
-# docker build -t gedit .
+# docker build -t simple-scan .
 
 
