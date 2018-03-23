@@ -18,7 +18,8 @@
 # under the License.
 #
 
-DISTRIBUTION_ISO=linuxmint-18.2-cinnamon-64bit.iso
+#DISTRIBUTION_ISO=linuxmint-18.2-cinnamon-64bit.iso
+DISTRIBUTION_ISO=linuxmint-18.3-cinnamon-64bit.iso
 
 # TODO use DISTRIBUTION_ISO to create tar file name
 if [[ $DISTRIBUTION_ISO == *"linuxmint"* ]]; then

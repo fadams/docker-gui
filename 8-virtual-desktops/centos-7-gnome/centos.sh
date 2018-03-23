@@ -118,8 +118,15 @@ fi
 # Create home directory
 mkdir -p $(id -un)
 
-# Launch Xephyr window on display :3 to launch the desktop,
-Xephyr -ac -reset -terminate 2> /dev/null :3 &
+# Launch Xephyr window on display :3 to launch the desktop.
+if test -c "/dev/nvidia-modeset"; then
+    # For systems with Nvidia Drivers explicitly preload
+    # software renderer, for mesa it's done automatically.
+    LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libGL.so \
+    Xephyr -ac -reset -terminate 2> /dev/null :3 &
+else
+    Xephyr -ac -reset -terminate 2> /dev/null :3 &
+fi
 
 # Launch container as root to init core Linux services.
 $DOCKER_COMMAND run --rm -d \
@@ -133,9 +140,8 @@ $DOCKER_COMMAND run --rm -d \
     -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
     -e XAUTHORITY=$DOCKER_XAUTHORITY \
     -v $DOCKER_XAUTHORITY:$DOCKER_XAUTHORITY:ro \
-    $GPU_FLAGS \
     centos-gnome:7.4 /sbin/init
 
 # exec gnome-session as unprivileged user
-#$DOCKER_COMMAND exec -u $(id -u) centos gnome-session
+$DOCKER_COMMAND exec -u $(id -u) centos gnome-session
 
