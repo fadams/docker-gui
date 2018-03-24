@@ -101,6 +101,7 @@ fi
 
 # Launch container as root to init core Linux services.
 $DOCKER_COMMAND run --rm -d \
+    --security-opt apparmor=unconfined \
     --cap-add=SYS_ADMIN --cap-add=SYS_BOOT -v /sys/fs/cgroup:/sys/fs/cgroup \
     --name mint \
     -v $PWD/$(id -un):/home/$(id -un) \

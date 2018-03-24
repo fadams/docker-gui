@@ -73,33 +73,12 @@ cp --preserve=all $XAUTH $DOCKER_XAUTHORITY
 xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY nmerge -
 
 
-# TODO eventually remove the stuff below when problems are fixed.
-#     -v $PWD/$(id -un)/home/$(id -un) \
-#     $GPU_FLAGS \
-#    --cap-add=SYS_ADMIN --cap-add=SYS_BOOT -v /sys/fs/cgroup:/sys/fs/cgroup \
-#--net=host \
-#--ipc=host \
-
-# Adding these causes systemd to go haywire with errors:
-# systemd[1]: Looping too fast. Throttling execution a little.
-# errors when running journalctl and excess systemd CPU usage observed with top
-# I think that the issue is permission related, I think D-bus crashes as it
-# needs a dbus user in centos.
-#    -v /etc/passwd:/etc/passwd:ro \
-#    -v /etc/shadow:/etc/shadow:ro \
-#    -v /etc/group:/etc/group:ro \
-
 #install-info: No such file or directory for /usr/share/info/which.info.gz
 #install-info: No such file or directory for /usr/share/info/nettle.info
 #install-info: No such file or directory for /usr/share/info/libchewing.info
 #install-info: No such file or directory for /usr/share/info/liblouis.info
 #warning: /etc/yum/pluginconf.d/langpacks.conf created as /etc/yum/pluginconf.d/#langpacks.conf.rpmnew
 #install-info: No such file or directory for /usr/share/info/accounting.info
-
-
-
-
-
 
 
 # Create initial /etc/passwd /etc/shadow /etc/group credentials if they
@@ -130,6 +109,7 @@ fi
 
 # Launch container as root to init core Linux services.
 $DOCKER_COMMAND run --rm -d \
+    --security-opt apparmor=unconfined \
     --cap-add=SYS_ADMIN --cap-add=SYS_BOOT -v /sys/fs/cgroup:/sys/fs/cgroup \
     --name centos \
     -v $PWD/$(id -un):/home/$(id -un) \
