@@ -73,33 +73,47 @@ cp --preserve=all $XAUTH $DOCKER_XAUTHORITY
 xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY nmerge -
 
 
+# Create initial /etc/passwd /etc/shadow /etc/group credentials if they
+# don't already exist in this path. We use template files from a container
+# spawned from the image we'll be using in the main run so that users and
+# groups will be correct, if we copy from the host we may see problems if
+# the host distro is different to the container distro so don't do that.
+# Note that the command below creates a new user and group in the cloned
+# credentials files that match the user running this script.
+if ! test -d "etc"; then
+    echo "Creating /etc/passwd /etc/shadow /etc/group"
+    $DOCKER_COMMAND run --rm linuxmint-cinnamon:18 \
+        sh -c 'groupadd -r -g '$(id -g)' '$(id -un)'; useradd -u '$(id -u)' -r -g '$(id -gn)' '$(id -un)'; tar c -C / ./etc/passwd ./etc/shadow ./etc/group' | tar xv
+fi
 
+# Create home directory
+mkdir -p $(id -un)
 
-#     -v $PWD/$(id -un)/home/$(id -un) \
-#     $GPU_FLAGS \
-#    --cap-add=SYS_ADMIN --cap-add=SYS_BOOT -v /sys/fs/cgroup:/sys/fs/cgroup \
-#--net=host \
-#--ipc=host \
-
-# Launch Xephyr window on display :3 to launch the desktop,
-Xephyr -ac -reset -terminate 2> /dev/null :3 &
+# Launch Xephyr window on display :3 to launch the desktop.
+if test -c "/dev/nvidia-modeset"; then
+    # For systems with Nvidia Drivers explicitly preload
+    # software renderer, for mesa it's done automatically.
+    LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libGL.so \
+    Xephyr -ac -reset -terminate 2> /dev/null :3 &
+else
+    Xephyr -ac -reset -terminate 2> /dev/null :3 &
+fi
 
 # Launch container as root to init core Linux services.
-mkdir -p $(id -un)
 $DOCKER_COMMAND run --rm -d \
+    --security-opt apparmor=unconfined \
     --cap-add=SYS_ADMIN --cap-add=SYS_BOOT -v /sys/fs/cgroup:/sys/fs/cgroup \
     --name mint \
     -v $PWD/$(id -un):/home/$(id -un) \
-    -v /etc/passwd:/etc/passwd:ro \
-    -v /etc/shadow:/etc/shadow:ro \
-    -v /etc/group:/etc/group:ro \
+    -v $PWD/etc/passwd:/etc/passwd \
+    -v $PWD/etc/shadow:/etc/shadow \
+    -v $PWD/etc/group:/etc/group \
     -e DISPLAY=unix:3.0 \
     -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
     -e XAUTHORITY=$DOCKER_XAUTHORITY \
     -v $DOCKER_XAUTHORITY:$DOCKER_XAUTHORITY:ro \
-    $GPU_FLAGS \
     linuxmint-cinnamon:18 /sbin/init
 
 # exec cinnamon-session as unprivileged user
-docker exec -u 1000 mint cinnamon-session
+$DOCKER_COMMAND exec -u $(id -u) mint cinnamon-session
 

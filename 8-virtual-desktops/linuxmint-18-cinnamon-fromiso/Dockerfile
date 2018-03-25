@@ -19,7 +19,22 @@
 
 FROM scratch
 
+# Make sure APT operations are non-interactive
+ENV DEBIAN_FRONTEND noninteractive
+
+ENV LANG=en_GB.UTF-8
+ENV TZ=Europe/London
+
 ADD linuxmint-18-cinnamon.tar.gz /
+
+RUN \
+    # Generate locales
+    echo LANG=$LANG > /etc/default/locale && \
+    update-locale LANG=$LANG && \
+    # Set up the timezone
+    echo $TZ > /etc/timezone && \
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    dpkg-reconfigure tzdata
 
 #ENTRYPOINT ["/sbin/init"]
 
