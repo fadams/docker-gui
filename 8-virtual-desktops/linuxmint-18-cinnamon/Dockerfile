@@ -40,13 +40,13 @@ RUN \
     apt-get install -y --no-install-recommends \
     base-files ntp apt-utils locales language-pack-en tzdata \
     cinnamon cinnamon-core cinnamon-themes \
-    mint-info-cinnamon mint-x-icons grub2-theme-mint mint-artwork-cinnamon \
+    mint-info-cinnamon mint-x-icons mint-y-icons grub2-theme-mint mint-artwork-cinnamon \
     mint-artwork-common mint-artwork-gnome mint-common mint-meta-core \
     mint-mirrors mint-themes mint-themes-gtk3 mint-translations \
     mint-user-guide-cinnamon mint-meta-cinnamon mintsystem mintwelcome \
     mint-mdm-themes mint-mdm-themes-gdm mint-mdm-themes-html mintnanny \
     mintupdate mint-upgrade-info mintlocale mintsources mintstick \
-    mdm mintupload mintbackup mintdrivers mintinstall mintinstall-icons \
+    mdm mintupload mintbackup mintdrivers mintinstall \
     mint-backgrounds-sylvia libreoffice-style-mint mintdesktop mintmenu \
     gnome-terminal keyboard-configuration libreoffice gimp xed firefox && \
     # Tidy up
