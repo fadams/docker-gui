@@ -28,27 +28,32 @@ ENV TZ=Europe/London
 #    apt-get -fy -o Dpkg::Options::="--force-confnew" -o APT::Immediate-Configure=false #dist-upgrade && \
 
 RUN \
-    # Set up the repositories for Linux Mint sylvia
-    echo "deb http://packages.linuxmint.com/ sylvia main upstream import backport " > /etc/apt/sources.list.d/mint.list && \
+    # Set up the repositories for Linux Mint Sylvia
+    echo "deb http://packages.linuxmint.com/ sylvia main upstream import backport\n\n$(cat /etc/apt/sources.list)" > /etc/apt/sources.list.d/official-package-repositories.list && \
+    rm /etc/apt/sources.list && \
     LINUX_MINT_KEY=$(apt update 2>&1 | grep -o '[0-9A-Z]\{16\}$' | xargs) && \
-    apt-key adv --recv-keys --keyserver keyserver.ubuntu.com ${LINUX_MINT_KEY} && \
+    apt-key adv --recv-keys --keyserver \
+    hkp://keyserver.ubuntu.com:80 ${LINUX_MINT_KEY} && \
     apt-get update && \
     apt-get -fy -o Dpkg::Options::="--force-confnew" -o APT::Immediate-Configure=false dist-upgrade && \
     apt-get install -y --allow-unauthenticated linuxmint-keyring && \
     unset LINUX_MINT_KEY && \
-    # Add the main packages
+    # Add the main Minty flavoured packages
     apt-get install -y --no-install-recommends \
-    base-files ntp apt-utils locales language-pack-en tzdata \
-    cinnamon cinnamon-core cinnamon-themes \
-    mint-info-cinnamon mint-x-icons mint-y-icons grub2-theme-mint mint-artwork-cinnamon \
-    mint-artwork-common mint-artwork-gnome mint-common mint-meta-core \
-    mint-mirrors mint-themes mint-themes-gtk3 mint-translations \
-    mint-user-guide-cinnamon mint-meta-cinnamon mintsystem mintwelcome \
+    base-files ntp apt-utils add-apt-key apt-transport-https apt-xapian-index \
+    locales language-pack-en tzdata cinnamon cinnamon-core cinnamon-themes \
+    mint-info-cinnamon mint-x-icons mint-y-icons grub2-theme-mint \
+    mint-artwork-cinnamon mint-artwork-common mint-artwork-gnome mint-common \
+    mint-meta-core mint-mirrors mint-themes mint-themes-gtk3 mintwelcome \
+    mint-user-guide-cinnamon mint-meta-cinnamon mintsystem mint-translations \
     mint-mdm-themes mint-mdm-themes-gdm mint-mdm-themes-html mintnanny \
     mintupdate mint-upgrade-info mintlocale mintsources mintstick \
     mdm mintupload mintbackup mintdrivers mintinstall \
     mint-backgrounds-sylvia libreoffice-style-mint mintdesktop mintmenu \
-    gnome-terminal keyboard-configuration libreoffice gimp xed firefox && \
+    # Add additional packages to be similar to iso installation.
+    gnome-terminal keyboard-configuration libreoffice gimp xed firefox \
+    firefox-locale-en thunderbird thunderbird-gnome-support hexchat \
+    pidgin transmission-gtk && \
     # Tidy up
     apt-get -y autoremove && \
     apt-get clean && \
@@ -61,8 +66,16 @@ RUN \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     dpkg-reconfigure tzdata && \
     # Configure console
-    echo console-setup console-setup/charmap select UTF-8 | debconf-set-selections
-
+    echo console-setup console-setup/charmap select UTF-8 | debconf-set-selections && \
+    # Fix mintupdate "APT-cache damaged" error
+    cp /usr/share/linuxmint/mintsystem/apt/official-package-repositories.pref \
+       /etc/apt/preferences.d/official-package-repositories.pref && \
+    # Fix synaptic Empty Dir::Cache::pkgcache setting not handled correctly
+    # https://bugs.launchpad.net/ubuntu/+source/synaptic/+bug/1243615
+    # which causes synaptic to barf with:
+    # E: Could not open file - open (2: No such file or directory)
+    # E: _cache->open() failed, please report.
+    sed -i 's/Dir::Cache::pkgcache ""; //' /etc/apt/apt.conf.d/docker-clean
 
 
 # mintwifi mint-kernel-info mint-search-addon mint-meta-codecs
