@@ -50,10 +50,16 @@ RUN \
     mintupdate mint-upgrade-info mintlocale mintsources mintstick \
     mdm mintupload mintbackup mintdrivers mintinstall \
     mint-backgrounds-sylvia libreoffice-style-mint mintdesktop mintmenu \
-    # Add additional packages to be similar to iso installation.
+    # Add additional packages to be similar to Mint iso installation.
     gnome-terminal keyboard-configuration libreoffice gimp xed firefox \
     firefox-locale-en thunderbird thunderbird-gnome-support hexchat \
-    pidgin transmission-gtk && \
+    pidgin transmission-gtk pix gnome-calculator gnome-screenshot \
+    gucharmap xreader xviewer xplayer rhythmbox tomboy simple-scan \
+    vlc vlc-data baobab lightdm-settings gnome-power-manager gufw \
+    gnome-system-log gnome-system-monitor blueberry vino gnome-disk-utility \
+    pulseaudio pulseaudio-utils pulseaudio-module-x11 libcanberra-pulse \
+    pulseaudio-module-bluetooth gstreamer1.0-pulseaudio \
+    gstreamer0.10-pulseaudio libpulsedsp mesa-utils && \
     # Tidy up
     apt-get -y autoremove && \
     apt-get clean && \
@@ -78,7 +84,7 @@ RUN \
     sed -i 's/Dir::Cache::pkgcache ""; //' /etc/apt/apt.conf.d/docker-clean
 
 
-# mintwifi mint-kernel-info mint-search-addon mint-meta-codecs
+# mintwifi mint-kernel-info mint-search-addon mint-meta-codecs system-config-printer
 
 #ENTRYPOINT ["/sbin/init"]
 

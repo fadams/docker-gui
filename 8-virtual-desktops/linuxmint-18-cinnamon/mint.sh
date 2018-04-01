@@ -94,13 +94,14 @@ if test -c "/dev/nvidia-modeset"; then
     # For systems with Nvidia Drivers explicitly preload
     # software renderer, for mesa it's done automatically.
     LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libGL.so \
-    Xephyr -ac -reset -terminate 2> /dev/null :3 &
+    Xephyr -sw-cursor -a 5 -ac -reset -terminate 2> /dev/null :3 &
 else
     Xephyr -ac -reset -terminate 2> /dev/null :3 &
 fi
 
 # Launch container as root to init core Linux services.
 $DOCKER_COMMAND run --rm -d \
+    --shm-size 2g \
     --security-opt apparmor=unconfined \
     --cap-add=SYS_ADMIN --cap-add=SYS_BOOT -v /sys/fs/cgroup:/sys/fs/cgroup \
     --name mint \
