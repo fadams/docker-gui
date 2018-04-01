@@ -40,3 +40,10 @@ RUN \
 # Build the image
 # docker build -t centos-gnome:7.4 .
 
+# FIXME
+#install-info: No such file or directory for /usr/share/info/which.info.gz
+#install-info: No such file or directory for /usr/share/info/nettle.info
+#install-info: No such file or directory for /usr/share/info/libchewing.info
+#install-info: No such file or directory for /usr/share/info/liblouis.info
+#warning: /etc/yum/pluginconf.d/langpacks.conf created as /etc/yum/pluginconf.d/#langpacks.conf.rpmnew
+#install-info: No such file or directory for /usr/share/info/accounting.info

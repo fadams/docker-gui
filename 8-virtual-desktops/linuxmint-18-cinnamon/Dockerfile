@@ -18,8 +18,6 @@
 #
 
 FROM ubuntu:16.04
-
-# Make sure APT operations are non-interactive
 ENV DEBIAN_FRONTEND noninteractive
 
 ENV LANG=en_GB.UTF-8
