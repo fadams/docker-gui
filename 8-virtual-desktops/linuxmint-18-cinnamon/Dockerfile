@@ -41,7 +41,6 @@ RUN \
     base-files ntp apt-utils add-apt-key apt-transport-https apt-xapian-index \
     locales language-pack-en tzdata mintlocale mint-meta-cinnamon mintupload \
     mint-user-guide-cinnamon mint-info-cinnamon mintnanny mintreport \
-    mintdesktop \
     # Add additional packages to be similar to Mint iso installation.
     gnome-terminal keyboard-configuration libreoffice gimp xed firefox \
     firefox-locale-en thunderbird thunderbird-gnome-support hexchat \
@@ -86,6 +85,7 @@ RUN \
 
 #     rm -rf /var/lib/apt/lists/* && \
 # mintwifi mint-kernel-info mint-search-addon mint-meta-codecs
+# mintdesktop
 # mdm mint-mdm-themes mint-mdm-themes-gdm mint-mdm-themes-html \
 
 #ENTRYPOINT ["/sbin/init"]
