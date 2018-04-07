@@ -34,7 +34,16 @@ RUN \
     # Set up the timezone
     echo $TZ > /etc/timezone && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
-    dpkg-reconfigure tzdata
+    dpkg-reconfigure tzdata && \
+    # Configure console
+    echo console-setup console-setup/charmap select UTF-8 | debconf-set-selections && \
+    # Remove some unnecessary files from /etc/X11/Xsession.d The files in
+    # this directory are called by /etc/X11/Xsession and the ones below run
+    # X clients (xhost and xrdb), this causes Xephyr to terminate prematurely
+    # as we have set Xephyr to reset and terminate after last client exits.
+    rm /etc/X11/Xsession.d/30x11-common_xresources && \
+    rm /etc/X11/Xsession.d/35x11-common_xhost-local && \
+    rm /etc/X11/Xsession.d/60x11-common_localhost
 
 #ENTRYPOINT ["/sbin/init"]
 
