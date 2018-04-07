@@ -29,8 +29,11 @@ RUN \
     rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-Testing-7 && \
     rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-Debug-7 && \
     # Install required packages
-    yum -y --setopt=tsflags=nodocs update && \
-    yum -y --setopt=tsflags=nodocs groups install "GNOME Desktop" || true
+    yum -y update && \
+    yum -y groups install "GNOME Desktop" || true && \
+    yum -y groups install "Office Suite and Productivity" && \
+    yum -y groups install "Graphics Creation Tools" && \
+    yum -y install pavucontrol pulseaudio-module-zeroconf
 
 #ENTRYPOINT ["/sbin/init"]
 
@@ -47,3 +50,5 @@ RUN \
 #install-info: No such file or directory for /usr/share/info/liblouis.info
 #warning: /etc/yum/pluginconf.d/langpacks.conf created as /etc/yum/pluginconf.d/#langpacks.conf.rpmnew
 #install-info: No such file or directory for /usr/share/info/accounting.info
+
+# --setopt=tsflags=nodocs makes image smaller

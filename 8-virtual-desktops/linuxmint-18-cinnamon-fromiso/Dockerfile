@@ -42,4 +42,4 @@ RUN \
 # Example usage
 # 
 # Build the image
-# docker build -t linuxmint-cinnamon:18 .
+# docker build -t linuxmint-cinnamon-fromiso:18 .

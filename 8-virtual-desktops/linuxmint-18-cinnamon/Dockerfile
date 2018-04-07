@@ -36,18 +36,12 @@ RUN \
     apt-get -fy -o Dpkg::Options::="--force-confnew" -o APT::Immediate-Configure=false dist-upgrade && \
     apt-get install -y --allow-unauthenticated linuxmint-keyring && \
     unset LINUX_MINT_KEY && \
-    # Add the main Minty flavoured packages
+    # Add the main Mint flavoured packages
     apt-get install -y --no-install-recommends \
     base-files ntp apt-utils add-apt-key apt-transport-https apt-xapian-index \
-    locales language-pack-en tzdata cinnamon cinnamon-core cinnamon-themes \
-    mint-info-cinnamon mint-x-icons mint-y-icons grub2-theme-mint \
-    mint-artwork-cinnamon mint-artwork-common mint-artwork-gnome mint-common \
-    mint-meta-core mint-mirrors mint-themes mint-themes-gtk3 mintwelcome \
-    mint-user-guide-cinnamon mint-meta-cinnamon mintsystem mint-translations \
-    mint-mdm-themes mint-mdm-themes-gdm mint-mdm-themes-html mintnanny \
-    mintupdate mint-upgrade-info mintlocale mintsources mintstick \
-    mdm mintupload mintbackup mintdrivers mintinstall \
-    mint-backgrounds-sylvia libreoffice-style-mint mintdesktop mintmenu \
+    locales language-pack-en tzdata mintlocale mint-meta-cinnamon mintupload \
+    mint-user-guide-cinnamon mint-info-cinnamon mintnanny mintreport \
+    mintdesktop \
     # Add additional packages to be similar to Mint iso installation.
     gnome-terminal keyboard-configuration libreoffice gimp xed firefox \
     firefox-locale-en thunderbird thunderbird-gnome-support hexchat \
@@ -55,13 +49,14 @@ RUN \
     gucharmap xreader xviewer xplayer rhythmbox tomboy simple-scan \
     vlc vlc-data baobab lightdm-settings gnome-power-manager gufw \
     gnome-system-log gnome-system-monitor blueberry vino gnome-disk-utility \
-    pulseaudio pulseaudio-utils pulseaudio-module-x11 libcanberra-pulse \
-    pulseaudio-module-bluetooth gstreamer1.0-pulseaudio \
-    gstreamer0.10-pulseaudio libpulsedsp mesa-utils && \
+    pulseaudio libpulsedsp pulseaudio-utils paman paprefs libcanberra-pulse \
+    pulseaudio-module-x11 pulseaudio-module-bluetooth gstreamer1.0-pulseaudio \
+    gstreamer0.10-pulseaudio pulseaudio-module-zeroconf pavucontrol \
+    avahi-utils libnss-mdns mesa-utils \
+    cups system-config-printer-gnome system-config-printer-udev && \
     # Tidy up
     apt-get -y autoremove && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
     # Generate locales
     echo LANG=$LANG > /etc/default/locale && \
     update-locale LANG=$LANG && \
@@ -79,10 +74,19 @@ RUN \
     # which causes synaptic to barf with:
     # E: Could not open file - open (2: No such file or directory)
     # E: _cache->open() failed, please report.
-    sed -i 's/Dir::Cache::pkgcache ""; //' /etc/apt/apt.conf.d/docker-clean
+    sed -i 's/Dir::Cache::pkgcache ""; //' /etc/apt/apt.conf.d/docker-clean && \
+    # Remove some unnecessary files from /etc/X11/Xsession.d The files in
+    # this directory are called by /etc/X11/Xsession and the ones below run
+    # X clients (xhost and xrdb), this causes Xephyr to terminate prematurely
+    # as we have set Xephyr to reset and terminate after last client exits.
+    rm /etc/X11/Xsession.d/30x11-common_xresources && \
+    rm /etc/X11/Xsession.d/35x11-common_xhost-local && \
+    rm /etc/X11/Xsession.d/60x11-common_localhost
 
 
-# mintwifi mint-kernel-info mint-search-addon mint-meta-codecs system-config-printer
+#     rm -rf /var/lib/apt/lists/* && \
+# mintwifi mint-kernel-info mint-search-addon mint-meta-codecs
+# mdm mint-mdm-themes mint-mdm-themes-gdm mint-mdm-themes-html \
 
 #ENTRYPOINT ["/sbin/init"]
 
