@@ -46,7 +46,7 @@ RUN \
     firefox-locale-en thunderbird thunderbird-gnome-support hexchat \
     pidgin transmission-gtk pix gnome-calculator gnome-screenshot \
     gucharmap xreader xviewer xplayer rhythmbox tomboy simple-scan \
-    vlc vlc-data baobab lightdm-settings gnome-power-manager gufw \
+    vlc vlc-data baobab gnome-power-manager gufw \
     gnome-system-log gnome-system-monitor blueberry vino gnome-disk-utility \
     pulseaudio libpulsedsp pulseaudio-utils paman paprefs libcanberra-pulse \
     pulseaudio-module-x11 pulseaudio-module-bluetooth gstreamer1.0-pulseaudio \
@@ -80,12 +80,14 @@ RUN \
     # as we have set Xephyr to reset and terminate after last client exits.
     rm /etc/X11/Xsession.d/30x11-common_xresources && \
     rm /etc/X11/Xsession.d/35x11-common_xhost-local && \
-    rm /etc/X11/Xsession.d/60x11-common_localhost
+    rm /etc/X11/Xsession.d/60x11-common_localhost && \
+    # Fix issues with slow shutdown
+    sed -i 's/#DefaultTimeoutStopSec=90s/DefaultTimeoutStopSec=5s/' /etc/systemd/system.conf
 
 
 #     rm -rf /var/lib/apt/lists/* && \
 # mintwifi mint-kernel-info mint-search-addon mint-meta-codecs
-# mintdesktop
+# mintdesktop lightdm-settings
 # mdm mint-mdm-themes mint-mdm-themes-gdm mint-mdm-themes-html \
 
 #ENTRYPOINT ["/sbin/init"]
