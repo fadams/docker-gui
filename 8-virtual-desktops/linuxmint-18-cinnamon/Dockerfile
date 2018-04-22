@@ -23,9 +23,9 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV LANG=en_GB.UTF-8
 ENV TZ=Europe/London
 
-#    apt-get -fy -o Dpkg::Options::="--force-confnew" -o APT::Immediate-Configure=false #dist-upgrade && \
-
 RUN \
+    # Enable partner repository (needed for mint-meta-codecs)
+    sed -i 's/# deb http:\/\/archive.canonical.com\/ubuntu xenial partner/deb http:\/\/archive.canonical.com\/ubuntu xenial partner/' /etc/apt/sources.list && \
     # Set up the repositories for Linux Mint Sylvia
     echo "deb http://packages.linuxmint.com/ sylvia main upstream import backport\n\n$(cat /etc/apt/sources.list)" > /etc/apt/sources.list.d/official-package-repositories.list && \
     rm /etc/apt/sources.list && \
@@ -38,15 +38,16 @@ RUN \
     unset LINUX_MINT_KEY && \
     # Add the main Mint flavoured packages
     apt-get install -y --no-install-recommends \
-    base-files ntp apt-utils add-apt-key apt-transport-https apt-xapian-index \
-    locales language-pack-en tzdata mintlocale mint-meta-cinnamon mintupload \
-    mint-user-guide-cinnamon mint-info-cinnamon mintnanny mintreport \
+    base-files ntp apt-utils add-apt-key aptdaemon apt-transport-https \
+    apt-xapian-index locales language-pack-en tzdata mintlocale \
+    mint-meta-cinnamon mintupload mint-user-guide-cinnamon \
+    mint-info-cinnamon mintnanny mintreport mint-meta-codecs \
     # Add additional packages to be similar to Mint iso installation.
     gnome-terminal keyboard-configuration libreoffice gimp xed firefox \
     firefox-locale-en thunderbird thunderbird-gnome-support hexchat \
     pidgin transmission-gtk pix gnome-calculator gnome-screenshot \
     gucharmap xreader xviewer xplayer rhythmbox tomboy simple-scan \
-    vlc vlc-data baobab gnome-power-manager gufw \
+    vlc vlc-data baobab gnome-power-manager gufw dmz-cursor-theme \
     gnome-system-log gnome-system-monitor blueberry vino gnome-disk-utility \
     pulseaudio libpulsedsp pulseaudio-utils paman paprefs libcanberra-pulse \
     pulseaudio-module-x11 pulseaudio-module-bluetooth gstreamer1.0-pulseaudio \
@@ -82,13 +83,23 @@ RUN \
     rm /etc/X11/Xsession.d/35x11-common_xhost-local && \
     rm /etc/X11/Xsession.d/60x11-common_localhost && \
     # Fix issues with slow shutdown
-    sed -i 's/#DefaultTimeoutStopSec=90s/DefaultTimeoutStopSec=5s/' /etc/systemd/system.conf
+    sed -i 's/#DefaultTimeoutStopSec=90s/DefaultTimeoutStopSec=5s/' /etc/systemd/system.conf && \
+    # Fix Polkit issues caused by container login being considered
+    # to be an "inactive" session.
+    chmod 755 /etc/polkit-1/localauthority && \
+    # Mint Software Sources
+    echo "[Mint Software Sources]\nIdentity=unix-user:*\nAction=com.linuxmint.mintsources\nResultAny=auth_self_keep\nResultInactive=auth_self_keep\nResultActive=auth_self_keep\n" > /etc/polkit-1/localauthority/50-local.d/10-mintsources.pkla && \
+    # Date & Time
+    echo "[Date & Time]\nIdentity=unix-user:*\nAction=org.cinnamon.settingsdaemon.datetimemechanism.configure\nResultAny=auth_admin_keep\nResultInactive=auth_admin_keep\nResultActive=auth_admin_keep\n" > /etc/polkit-1/localauthority/50-local.d/10-datetimemechanism.pkla  && \
+    # Xapian Index
+    echo "[Xapian Index]\nIdentity=unix-user:*\nAction=org.debian.aptxapianindex.update\nResultAny=yes\nResultInactive=yes\nResultActive=yes\n" > /etc/polkit-1/localauthority/50-local.d/10-xapian.pkla && \
+    # Gnome System Log
+    echo "[Gnome System Log]\nIdentity=unix-user:*\nAction=org.debian.pkexec.gnome-system-log.run\nResultAny=auth_admin_keep\nResultInactive=auth_admin_keep\nResultActive=auth_admin_keep\n" > /etc/polkit-1/localauthority/50-local.d/10-system-log.pkla && \
+    # Shutdown & Restart
+    # Note that auth_admin_keep may be better than yes here, but there seems to be
+    # an issue with the authentication dialog appearing.
+    echo "[Shutdown & Restart]\nIdentity=unix-user:*\nAction=org.freedesktop.login1.power-off;org.freedesktop.login1.power-off-multiple-sessions;org.freedesktop.login1.reboot;org.freedesktop.login1.reboot-multiple-sessions\nResultAny=yes\nResultInactive=yes\nResultActive=yes\n" > /etc/polkit-1/localauthority/50-local.d/10-shutdown.pkla
 
-
-#     rm -rf /var/lib/apt/lists/* && \
-# mintwifi mint-kernel-info mint-search-addon mint-meta-codecs
-# mintdesktop lightdm-settings
-# mdm mint-mdm-themes mint-mdm-themes-gdm mint-mdm-themes-html \
 
 #ENTRYPOINT ["/sbin/init"]
 
