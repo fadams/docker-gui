@@ -31,13 +31,17 @@ RUN \
     # Add the main packages
     apt-get install -y --no-install-recommends \
     base-files add-apt-key aptdaemon apt-transport-https \
-    language-pack-en gnome ubuntu-minimal ubuntu-standard \
-    ubuntu-system-service ubuntu-desktop ubuntu-restricted-extras \
-    gsettings-ubuntu-schemas \
+    language-pack-en gnome ubuntu-minimal ubuntu-standard ubuntu-desktop \
+    ubuntu-system-service ubuntu-restricted-extras gsettings-ubuntu-schemas \
     gnome-shell-extension-ubuntu-dock gnome-shell-extension-appindicator \
     gnome-control-center-faces gnome-software-plugin-snap \
     # Add additional packages to be similar to Ubuntu iso installation.
     synaptic thunderbird-locale-en thunderbird-locale-en-us \
+    transmission-gtk firefox-locale-en tracker-miner-fs avahi-utils \
+    remmina remmina-common remmina-plugin-rdp remmina-plugin-vnc \
+    mesa-utils paman paprefs pavucontrol libcanberra-pulse \
+    pulseaudio-module-bluetooth gstreamer1.0-pulseaudio \
+    pulseaudio-module-zeroconf cups system-config-printer-gnome \
     && \
     # Tidy up
     apt-get -y autoremove && \
@@ -51,9 +55,6 @@ RUN \
     dpkg-reconfigure tzdata && \
     # Configure console
     echo console-setup console-setup/charmap select UTF-8 | debconf-set-selections && \
-    # Fix mintupdate "APT-cache damaged" error
-#    cp /usr/share/linuxmint/mintsystem/apt/official-package-repositories.pref \
-#       /etc/apt/preferences.d/official-package-repositories.pref && \
     # Fix synaptic Empty Dir::Cache::pkgcache setting not handled correctly
     # https://bugs.launchpad.net/ubuntu/+source/synaptic/+bug/1243615
     # which causes synaptic to barf with:
@@ -67,6 +68,8 @@ RUN \
     rm /etc/X11/Xsession.d/30x11-common_xresources && \
     rm /etc/X11/Xsession.d/35x11-common_xhost-local && \
     rm /etc/X11/Xsession.d/60x11-common_localhost && \
+    # Remove unnecessary file from /etc/update-motd.d to suppress warning
+    rm /etc/update-motd.d/98-fsck-at-reboot && \
     # Fix issues with slow shutdown
     sed -i 's/#DefaultTimeoutStopSec=90s/DefaultTimeoutStopSec=5s/' /etc/systemd/system.conf && \
     # Fix Polkit issues caused by container login being considered
@@ -78,22 +81,12 @@ RUN \
     echo "[Xapian Index]\nIdentity=unix-user:*\nAction=org.debian.aptxapianindex.update\nResultAny=yes\nResultInactive=yes\nResultActive=yes\n" > /etc/polkit-1/localauthority/50-local.d/10-xapian.pkla && \
     # Gnome System Log
     echo "[Gnome System Log]\nIdentity=unix-user:*\nAction=org.debian.pkexec.gnome-system-log.run\nResultAny=auth_admin_keep\nResultInactive=auth_admin_keep\nResultActive=auth_admin_keep\n" > /etc/polkit-1/localauthority/50-local.d/10-system-log.pkla && \
+    # System Color Manager
+    echo "[System Color Manager]\nIdentity=unix-user:*\nAction=org.freedesktop.color-manager.create-device;org.freedesktop.color-manager.create-profile;org.freedesktop.color-manager.delete-device;org.freedesktop.color-manager.delete-profile;org.freedesktop.color-manager.modify-device;org.freedesktop.color-manager.modify-profile;org.freedesktop.color-manager.device-inhibit;org.freedesktop.color-manager.sensor-lock\nResultAny=yes\nResultInactive=yes\nResultActive=yes\n" > /etc/polkit-1/localauthority/50-local.d/10-color.pkla && \
     # Shutdown & Restart
     # Note that auth_admin_keep may be better than yes here, but there seems to be
     # an issue with the authentication dialog appearing.
     echo "[Shutdown & Restart]\nIdentity=unix-user:*\nAction=org.freedesktop.login1.power-off;org.freedesktop.login1.power-off-multiple-sessions;org.freedesktop.login1.reboot;org.freedesktop.login1.reboot-multiple-sessions\nResultAny=yes\nResultInactive=yes\nResultActive=yes\n" > /etc/polkit-1/localauthority/50-local.d/10-shutdown.pkla
-
-
-
-# ntp ubuntu-artwork ubuntu-sounds ubuntu-release-upgrader-gtk ubuntu-settings
-# branding-ubuntu ttf-ubuntu-font-family ubuntu-software
-
-#    gsettings-ubuntu-schemas \
-
-# apt-utils locales tzdata
-
-
-
 
 
 #ENTRYPOINT ["/sbin/init"]

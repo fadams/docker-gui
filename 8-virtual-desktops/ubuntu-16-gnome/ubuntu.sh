@@ -52,9 +52,10 @@ fi
 # Create home directory
 if ! test -d $(id -un); then
     cp -R /etc/skel/. $(id -un)
+    rm -rf $(id -un)/.mozilla
     echo "export DISPLAY=unix$NESTED_DISPLAY" >> $(id -un)/.profile
     echo "export XAUTHORITY=$DOCKER_XAUTHORITY" >> $(id -un)/.profile
-    echo "/etc/X11/Xsession" >> $(id -un)/.profile
+    echo -e "\nif ! test -d \"Desktop\"; then\n    gsettings set org.gnome.shell enabled-extensions \"['ubuntu-dock@ubuntu.com']\"\n    gsettings set org.gnome.desktop.background show-desktop-icons true\n    gsettings set org.gnome.nautilus.desktop home-icon-visible false\n    gsettings set org.gnome.nautilus.icon-view default-zoom-level 'small'\n    gsettings set org.gnome.desktop.interface gtk-theme 'Ambiance'\n    gsettings set org.gnome.desktop.interface cursor-theme 'DMZ-White'\n    gsettings set org.gnome.desktop.interface icon-theme 'Humanity'\nfi\n\n/etc/X11/Xsession" >> $(id -un)/.profile
 fi
 
 # Launch Xephyr window.
