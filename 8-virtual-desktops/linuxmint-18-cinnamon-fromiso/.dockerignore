@@ -1,7 +1,0 @@
-
-# First exclude everything
-**
-*.*
-
-# Then explicitly whitelist
-!linuxmint-18-cinnamon.tar.gz
