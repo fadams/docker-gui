@@ -54,7 +54,7 @@ if ! test -d $(id -un); then
     cp -R /etc/skel/. $(id -un)
     echo "export DISPLAY=unix$NESTED_DISPLAY" >> $(id -un)/.profile
     echo "export XAUTHORITY=$DOCKER_XAUTHORITY" >> $(id -un)/.profile
-#    echo "/etc/X11/Xsession" >> $(id -un)/.profile
+    echo -e "\nif ! test -d \"Desktop\"; then\n    gsettings set org.gnome.nautilus.icon-view default-zoom-level 'small'\nfi\n\n/etc/X11/xinit/Xclients" >> $(id -un)/.profile
 fi
 
 # Launch Xephyr window.
