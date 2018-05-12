@@ -50,7 +50,12 @@ if ! test -f "etc.tar.gz"; then
 fi
 
 # Create home directory
-mkdir -p $(id -un)
+if ! test -d $(id -un); then
+    cp -R /etc/skel/. $(id -un)
+    echo "export DISPLAY=unix$NESTED_DISPLAY" >> $(id -un)/.profile
+    echo "export XAUTHORITY=$DOCKER_XAUTHORITY" >> $(id -un)/.profile
+#    echo "/etc/X11/Xsession" >> $(id -un)/.profile
+fi
 
 # Launch Xephyr window.
 $DOCKER_COMMAND run --rm -d \
@@ -70,9 +75,7 @@ $DOCKER_COMMAND run --rm -d \
     --cap-add=SYS_ADMIN --cap-add=SYS_BOOT -v /sys/fs/cgroup:/sys/fs/cgroup \
     --name $CONTAINER \
     -v $PWD/$(id -un):/home/$(id -un) \
-    -e DISPLAY=unix$NESTED_DISPLAY \
     -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
-    -e XAUTHORITY=$DOCKER_XAUTHORITY \
     -v $DOCKER_XAUTHORITY:$DOCKER_XAUTHORITY:ro \
     $IMAGE /sbin/init
 
@@ -81,5 +84,6 @@ cat etc.tar.gz | $DOCKER_COMMAND cp - $CONTAINER:/
 
 # exec gnome-session as unprivileged user
 #$DOCKER_COMMAND exec -u $(id -u) $CONTAINER gnome-session
-$DOCKER_COMMAND exec -u $(id -u) $CONTAINER gnome-session --session=gnome-classic
+#$DOCKER_COMMAND exec -u $(id -u) $CONTAINER gnome-session --session=gnome-classic
+$DOCKER_COMMAND exec -it $CONTAINER login
 
