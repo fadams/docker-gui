@@ -42,14 +42,13 @@ RUN \
     yum autoremove -y && \
     yum clean all && \
     # Generate locales
-    localectl set-locale LANG=$LANG && \
+    echo LANG=\"$LANG\" > /etc/locale.conf && \
+#    localectl set-locale LANG=$LANG && \
 #    echo LANG=$LANG > /etc/default/locale && \
 #    update-locale LANG=$LANG && \
     # Set up the timezone
-    timedatectl set-timezone $TZ && \
-#    echo $TZ > /etc/timezone && \
-#    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
-#    dpkg-reconfigure tzdata && \
+    echo $TZ > /etc/timezone && \
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     # Configure console
 #    echo console-setup console-setup/charmap select UTF-8 | debconf-set-selections && \
     # Fix issues with slow shutdown
