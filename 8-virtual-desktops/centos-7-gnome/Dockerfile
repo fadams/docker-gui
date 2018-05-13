@@ -19,6 +19,9 @@
 
 FROM centos:7.4.1708
 
+ENV LANG=en_GB.UTF-8
+ENV TZ=Europe/London
+
 RUN \
     # When installing from yum repo it is common to see:
     # Error : Public key for *.rpm is not installed
@@ -33,8 +36,11 @@ RUN \
     yum -y groups install "GNOME Desktop" || true && \
     yum -y groups install "Office Suite and Productivity" && \
     yum -y groups install "Graphics Creation Tools" && \
-    yum -y install pavucontrol pulseaudio-module-zeroconf \
+    yum -y install pavucontrol pulseaudio-module-zeroconf thunderbird \
     && \
+    # Tidy up
+    yum autoremove -y && \
+    yum clean all && \
     # Generate locales
 #    echo LANG=$LANG > /etc/default/locale && \
 #    update-locale LANG=$LANG && \
@@ -60,6 +66,9 @@ RUN \
     # an issue with the authentication dialog appearing.
     echo -e "[Shutdown & Restart]\nIdentity=unix-user:*\nAction=org.freedesktop.login1.power-off;org.freedesktop.login1.power-off-multiple-sessions;org.freedesktop.login1.reboot;org.freedesktop.login1.reboot-multiple-sessions\nResultAny=yes\nResultInactive=yes\nResultActive=yes\n" > /etc/polkit-1/localauthority/50-local.d/10-shutdown.pkla
 
+# Remove NetworkManager. It is unneeded but takes time for boot up.
+#yum remove -y NetworkManager
+
 #-------------------------------------------------------------------------------
 # Example usage
 # 
@@ -75,3 +84,4 @@ RUN \
 #install-info: No such file or directory for /usr/share/info/accounting.info
 
 # --setopt=tsflags=nodocs makes image smaller
+
