@@ -43,14 +43,10 @@ RUN \
     yum clean all && \
     # Generate locales
     echo LANG=\"$LANG\" > /etc/locale.conf && \
-#    localectl set-locale LANG=$LANG && \
-#    echo LANG=$LANG > /etc/default/locale && \
-#    update-locale LANG=$LANG && \
+    localedef -i "${LANG%.*}" -f "${LANG#*.}" $LANG && \
     # Set up the timezone
     echo $TZ > /etc/timezone && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
-    # Configure console
-#    echo console-setup console-setup/charmap select UTF-8 | debconf-set-selections && \
     # Fix issues with slow shutdown
     sed -i 's/#DefaultTimeoutStopSec=90s/DefaultTimeoutStopSec=5s/' /etc/systemd/system.conf && \
     # Fix Polkit issues caused by container login being considered
