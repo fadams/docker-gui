@@ -63,9 +63,6 @@ RUN \
     # an issue with the authentication dialog appearing.
     echo -e "[Shutdown & Restart]\nIdentity=unix-user:*\nAction=org.freedesktop.login1.power-off;org.freedesktop.login1.power-off-multiple-sessions;org.freedesktop.login1.reboot;org.freedesktop.login1.reboot-multiple-sessions\nResultAny=yes\nResultInactive=yes\nResultActive=yes\n" > /etc/polkit-1/localauthority/50-local.d/10-shutdown.pkla
 
-# Remove NetworkManager. It is unneeded but takes time for boot up.
-#yum remove -y NetworkManager
-
 #-------------------------------------------------------------------------------
 # Example usage
 # 
