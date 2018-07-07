@@ -26,7 +26,7 @@
 FROM debian:stretch-slim
 
 # Install evince
-RUN apt-get update && \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
 	evince evince-common gir1.2-evince-3.0 libgxps2 && \
