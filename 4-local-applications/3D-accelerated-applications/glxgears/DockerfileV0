@@ -25,7 +25,7 @@
 FROM debian:stretch-slim
 
 # Install glxgears
-RUN apt-get update && \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
 	mesa-utils && \
