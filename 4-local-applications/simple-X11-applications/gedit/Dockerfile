@@ -26,7 +26,7 @@
 FROM debian:stretch-slim
 
 # Install gedit
-RUN apt-get update && \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
 	libcanberra-gtk3-module packagekit-gtk3-module gedit gedit-common && \
