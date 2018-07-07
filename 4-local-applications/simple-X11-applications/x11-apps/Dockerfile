@@ -27,7 +27,7 @@
 FROM debian:stretch-slim
 
 # Install x11-apps
-RUN apt-get update && \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
 	x11-apps && \
