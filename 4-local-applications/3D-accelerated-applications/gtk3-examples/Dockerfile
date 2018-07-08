@@ -29,7 +29,7 @@ FROM debian:stretch-slim
 LABEL com.nvidia.volumes.needed=nvidia_driver
 
 # Install gtk-3-examples
-RUN apt-get update && \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
 	gtk-3-examples libgl1-mesa-glx libgl1-mesa-dri && \
