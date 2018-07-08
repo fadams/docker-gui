@@ -23,7 +23,7 @@
 # running the application directly (i.e. not in a container) on the host.
 
 # glmark2 binaries not available in Debian repository
-FROM ubuntu:18.04
+FROM ubuntu:16.04
 
 # nvidia-docker hooks
 LABEL com.nvidia.volumes.needed=nvidia_driver
