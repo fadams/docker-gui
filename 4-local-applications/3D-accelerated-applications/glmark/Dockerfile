@@ -23,13 +23,13 @@
 # running the application directly (i.e. not in a container) on the host.
 
 # glmark2 binaries not available in Debian repository
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
 # nvidia-docker hooks
 LABEL com.nvidia.volumes.needed=nvidia_driver
 
 # Install glmark2
-RUN apt-get update && \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
 	glmark2 glmark2-data libgl1-mesa-glx libgl1-mesa-dri && \
