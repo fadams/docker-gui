@@ -32,6 +32,9 @@
 # Replace with real device name
 ALSA_DEVICE=hw:CARD=NVidia,DEV=7
 
+# This seems to work with VMWare VM Virtual Audio Device
+#ALSA_DEVICE=hw:CARD=AudioPCI,DEV=1
+
 # If user isn't in docker group prefix docker with sudo 
 if id -nG $(id -un) | grep -qw docker; then
     DOCKER_COMMAND=docker
@@ -70,4 +73,7 @@ $DOCKER_COMMAND run --rm \
     -u $(id -u):$(id -g) \
     -v /etc/passwd:/etc/passwd:ro \
     jackd2-mplayer jackd -d alsa -d $ALSA_DEVICE -r 44100 -n 2 -p 2048
+
+# VMWare VM Virtual Audio Device seems to need
+# jackd2-mplayer jackd -d alsa -d $ALSA_DEVICE -r 44100 -n 2 -p 1024
 
