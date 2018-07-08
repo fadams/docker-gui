@@ -23,7 +23,7 @@
 FROM debian:stretch-slim
 
 # Install pulseaudio-utils
-RUN apt-get update && \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
 	pulseaudio-utils && \
