@@ -21,7 +21,7 @@
 FROM debian:stretch-slim
 
 # Install mplayer and jack
-RUN apt-get update && \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
 	mplayer jackd2 libjack-jackd2-0 && \
