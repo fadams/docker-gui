@@ -16,17 +16,11 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-# An image to run simple-scan.
-# This image uses the simple approach of sharing the host's X11 socket with
-# the container and using xhost or Xauthority to authenticate with the X Server.
-# This method requires the container and display to be on the same host, but
-# gives performance that is equivalent to running the application directly
-# (i.e. not in a container) on the host.
 
 FROM debian:stretch-slim
 
 # Install simple-scan
-RUN apt-get update && \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
 	simple-scan && \
