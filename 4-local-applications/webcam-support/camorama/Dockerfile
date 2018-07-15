@@ -23,7 +23,7 @@ FROM debian:stretch-slim
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	camorama && \
+	libcanberra-gtk3-module camorama && \
 	rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT ["camorama"]
