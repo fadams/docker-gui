@@ -23,7 +23,7 @@ FROM debian:stretch-slim
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	simple-scan && \
+	libcanberra-gtk3-module simple-scan && \
 	rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT ["simple-scan"]

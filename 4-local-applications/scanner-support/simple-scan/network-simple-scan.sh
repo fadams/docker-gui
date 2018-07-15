@@ -83,5 +83,8 @@ $DOCKER_COMMAND run --rm \
    -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
    -e XAUTHORITY=$DOCKER_XAUTHORITY \
    -v $DOCKER_XAUTHORITY:$DOCKER_XAUTHORITY:ro \
-   simple-scan
+   simple-scan $@
+
+# Example usage:
+# ./network-simple-scan.sh net:172.17.0.1:epson2:libusb:001:006
 
