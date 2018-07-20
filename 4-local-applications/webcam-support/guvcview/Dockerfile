@@ -23,7 +23,7 @@ FROM debian:stretch-slim
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	libcanberra-gtk-module guvcview && \
+	libcanberra-gtk-module libcanberra-gtk3-module guvcview && \
 	rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT ["guvcview"]
