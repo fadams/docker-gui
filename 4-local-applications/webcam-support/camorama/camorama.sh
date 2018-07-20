@@ -17,6 +17,10 @@
 # specific language governing permissions and limitations
 # under the License.
 #
+# In order for configuration to be saved correctly the host system needs to
+# have gconf2 installed. This is no longer the default for modern GNOME 3
+# based distros such as Ubuntu 18.04 as gconf is deprecated, so it must be
+# explicitly added using sudo apt-get install gconf2.
 
 # If user isn't in docker group prefix docker with sudo 
 if id -nG $(id -un) | grep -qw docker; then
