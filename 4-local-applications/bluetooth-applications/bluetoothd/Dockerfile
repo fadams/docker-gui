@@ -26,7 +26,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     bluez pulseaudio pulseaudio-module-bluetooth pulseaudio-utils && \
 	rm -rf /var/lib/apt/lists/* && \
     sed -i "s/; exit-idle-time = 20/exit-idle-time = -1/g" /etc/pulse/daemon.conf && \
-    sed -i "s/#load-module module-native-protocol-tcp/load-module module-native-protocol-tcp auth-ip-acl=127.0.0.1\;192.168.0.0\/16 port=4714/g" /etc/pulse/default.pa
+    sed -i "s/#load-module module-native-protocol-tcp/load-module module-native-protocol-tcp auth-ip-acl=127.0.0.1\;192.168.0.0\/16 port=4714/g" /etc/pulse/default.pa && \
+    sed -i "s/load-module module-console-kit/#load-module module-console-kit/g" /etc/pulse/default.pa
 
 COPY ./set-a2dp-sink.sh /src/set-a2dp-sink.sh
 COPY ./startup.sh /src/startup.sh
