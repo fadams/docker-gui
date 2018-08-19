@@ -34,9 +34,21 @@ else
     APPARMOR_FLAGS="--security-opt apparmor=unconfined"
 fi
 
+# Unload module-bluetooth-discover from the host if present as the host and
+# container can't both use the bluetooth speaker at the same time.
+BLUETOOTH_DISCOVER=$(pactl list | grep module-bluetooth-discover)
+if [ "${BLUETOOTH_DISCOVER}" != "" ]; then
+    echo "pactl unload-module module-bluetooth-discover"
+    pactl unload-module module-bluetooth-discover
+fi
+
 $DOCKER_COMMAND run --rm -it \
     $APPARMOR_FLAGS \
     $DBUS_FLAGS \
     -p 4714:4714 \
     pulseaudio | ./create-tunnel-sink.sh
 
+if [ "${BLUETOOTH_DISCOVER}" != "" ]; then
+    echo "pactl load-module module-bluetooth-discover"
+    pactl load-module module-bluetooth-discover
+fi
