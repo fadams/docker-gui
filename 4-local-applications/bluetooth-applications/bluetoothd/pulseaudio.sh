@@ -18,13 +18,25 @@
 # under the License.
 #
 
-# Simple script to launch PulseAudio as a daemon and start bluetoothd
-# The bluetoothd launch uses the -d option to enable verbose logging and
-# stderr is redirected to stdout and piped to the set-a2dp-sink.sh script
-# which parses the logs to detect when a2dp-sink changes state to connected.
+# If user isn't in docker group prefix docker with sudo 
+if id -nG $(id -un) | grep -qw docker; then
+    DOCKER_COMMAND=docker
+else
+    DOCKER_COMMAND="sudo docker"
+fi
 
-echo "Starting PulseAudio"
-pulseaudio -D
+# Add flags for connecting to the D-bus system bus.
+DBUS_FLAGS="-v /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro "$DBUS_FLAGS
 
-echo "Starting bluetoothd"
-bluetoothd -d -n 2>&1 | /src/set-a2dp-sink.sh
+if test -f "/etc/apparmor.d/docker-dbus"; then
+    APPARMOR_FLAGS="--security-opt apparmor:docker-dbus"
+else
+    APPARMOR_FLAGS="--security-opt apparmor=unconfined"
+fi
+
+$DOCKER_COMMAND run --rm -it \
+    $APPARMOR_FLAGS \
+    $DBUS_FLAGS \
+    -p 4714:4714 \
+    pulseaudio | ./create-tunnel-sink.sh
+

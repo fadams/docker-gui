@@ -18,25 +18,15 @@
 # under the License.
 #
 
-# This script receives the verbose output from bluetoothd piped via
-# bluetoothd -d -n 2>&1 | /src/set-a2dp-sink.sh
-# When an A2DP sink connects bluetoothd generates a log line containing the
-# text "a2dp-sink state changed: connecting -> connected", if we see that
-# we regex extract the MAC address also present in that log line then
-# substitute underscores for colons in order to create the pulseaudio card
-# name that can be used in the pacmd call to set the profile to a2dp_sink.
+# This script receives the verbose output from pulseaudio piped via
+# pulseaudio -v 2>&1 | /src/set-a2dp-sink.sh
+# When an A2DP sink connects pulseaudio generates a log line containing the
+# text "[pulseaudio] card.c: Created", if we see that we regex extract the
+# bluez_card name also present in that log line which can be used in the
+# pacmd call to set the profile to a2dp_sink.
 while IFS= read -r line; do
-    if [[ $line = *"a2dp-sink state changed: connecting -> connected"* ]]; then
-        MAC=$(echo "${line}" | grep -o -E "([[:xdigit:]]{2}:){5}[[:xdigit:]]{2}")
-        echo "A2DP device ${MAC} connected"
-
-        NAME="bluez_card.${MAC//:/_}"
-        
-        while [[ $(pacmd list-cards) != *"${NAME}"* ]]; do
-            echo "Waiting for PulseAudio card ${NAME}"
-            sleep 1
-        done
-
+    if [[ $line = *"[pulseaudio] card.c: Created"* ]]; then
+        NAME=$(echo "${line}" | grep -o -E "bluez_card.([[:xdigit:]]{2}_){5}[[:xdigit:]]{2}")
         echo "pacmd set-card-profile ${NAME} a2dp_sink"
         pacmd set-card-profile ${NAME} a2dp_sink
     fi

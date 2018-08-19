@@ -34,11 +34,11 @@ else
     APPARMOR_FLAGS="--security-opt apparmor=unconfined"
 fi
 
-$DOCKER_COMMAND run --rm -it \
+$DOCKER_COMMAND run --rm \
     --device=/dev/rfkill \
-    --net=host \
-    --cap-add=NET_ADMIN \
+    --cap-add=NET_ADMIN --cap-add=SYS_ADMIN --cap-add=SYS_PTRACE \
+    -v /proc/1/ns:/rootns \
     $APPARMOR_FLAGS \
     $DBUS_FLAGS \
-    bluetoothd | ./create-tunnel-sink.sh
+    bluetoothd
 

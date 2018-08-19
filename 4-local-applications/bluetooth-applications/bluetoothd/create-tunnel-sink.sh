@@ -18,7 +18,7 @@
 # under the License.
 #
 
-# This script receives the output piped from the docker bluetoothd container,
+# This script receives the output piped from the docker pulseaudio container,
 # which is the output from the set-a2dp-sink.sh script run by the container.
 #
 # Each line of stdin is parsed looking for "a2dp_sink" and when it sees this
@@ -29,7 +29,9 @@
 while IFS= read -r line; do
     echo ${line}
     if [[ $line = *"a2dp_sink"* ]]; then
+        sleep 1
         echo "Connecting module-tunnel-sink to localhost:4714"
-        pactl load-module module-tunnel-sink server=localhost:4714 sink_name=bluetooth
+        echo -e "\r"
+        pactl load-module module-tunnel-sink server=localhost:4714 sink_name=bluetooth > /dev/null
     fi
 done
