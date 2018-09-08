@@ -36,10 +36,6 @@ else
 fi
 
 # Add flags for connecting to the D-bus system bus.
-# This is necessary in order to connect to colord, a service
-# that makes it easy to manage, install and generate colour
-# profiles to accurately colour manage devices. 
-# https://www.freedesktop.org/software/colord/intro.html
 DBUS_FLAGS="-v /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro "$DBUS_FLAGS
 
 if test -f "/etc/apparmor.d/docker-dbus"; then
