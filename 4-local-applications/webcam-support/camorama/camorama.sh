@@ -54,7 +54,7 @@ xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY nmer
 # "home directory" in the container for the current user. 
 mkdir -p $(id -un)/.config/dconf
 $DOCKER_COMMAND run --rm \
-    --device /dev/video0 \
+    --device=/dev/video0 \
     --group-add $(cut -d: -f3 < <(getent group video)) \
     $APPARMOR_FLAGS \
     $DBUS_FLAGS \
