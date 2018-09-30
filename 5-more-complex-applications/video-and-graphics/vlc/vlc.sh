@@ -41,5 +41,5 @@ $DOCKER_COMMAND run --rm \
     $X11_FLAGS \
     $GPU_FLAGS \
     $WEBCAM_FLAGS \
-    vlc
+    vlc $@
 

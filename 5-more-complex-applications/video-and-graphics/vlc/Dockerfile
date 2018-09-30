@@ -33,7 +33,9 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
 	apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
 	libdvdcss2 && \
-	rm -rf /var/lib/apt/lists/*
+	rm -rf /var/lib/apt/lists/* && \
+    cp /etc/pulse/client.conf /etc/pulse/client-noshm.conf && \
+    sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client-noshm.conf
 
 ENTRYPOINT ["vlc"]
 
