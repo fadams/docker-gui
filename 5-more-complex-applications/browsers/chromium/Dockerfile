@@ -33,7 +33,9 @@ RUN sed -i 's/main/main contrib/' /etc/apt/sources.list && \
     libpulse0 libv4l-0 libgl1-mesa-glx libgl1-mesa-dri \
     gsettings-desktop-schemas \
     chromium chromium-l10n chromium-widevine && \
-	rm -rf /var/lib/apt/lists/*
+	rm -rf /var/lib/apt/lists/* && \
+    cp /etc/pulse/client.conf /etc/pulse/client-noshm.conf && \
+    sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client-noshm.conf
 
 # Debian seems to have some issues with the default font setup.
 # See the following blog:
