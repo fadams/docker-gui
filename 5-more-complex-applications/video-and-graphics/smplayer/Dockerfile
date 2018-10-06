@@ -27,7 +27,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
 	apt-transport-https wget gnupg ca-certificates \
-    smplayer mplayer libv4l-0 libvdpau1 libgl1-mesa-glx libgl1-mesa-dri && \
+    smplayer smtube mplayer libvdpau1 libgl1-mesa-glx libgl1-mesa-dri && \
 	wget -O - https://download.videolan.org/pub/debian/videolan-apt.asc | apt-key add - && \
 	echo "deb [arch=amd64] https://download.videolan.org/pub/debian/stable/ /" > /etc/apt/sources.list.d/videolan.list && \
 	apt-get update && DEBIAN_FRONTEND=noninteractive \
