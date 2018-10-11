@@ -26,7 +26,7 @@ BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 # Create a directory on the host that we can mount as a
 # "home directory" in the container for the current user. 
 mkdir -p $(id -un)/.config/pulse
-$DOCKER_COMMAND run --rm -it \
+$DOCKER_COMMAND run --rm \
     -u $(id -u):$(id -g) \
     -v $PWD/$(id -un):/home/$(id -un) \
     -v /etc/passwd:/etc/passwd:ro \
