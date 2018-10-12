@@ -19,11 +19,15 @@
 
 FROM debian:stretch-slim
 
+# nvidia-docker hooks (Only needed for Nvidia Docker V1)
+LABEL com.nvidia.volumes.needed=nvidia_driver
+
 # Install guvcview
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	libcanberra-gtk-module libcanberra-gtk3-module guvcview pulseaudio && \
+	libcanberra-gtk-module libcanberra-gtk3-module guvcview \
+    pulseaudio libgl1-mesa-glx libgl1-mesa-dri && \
 	rm -rf /var/lib/apt/lists/* && \
     cp /etc/pulse/client.conf /etc/pulse/client-noshm.conf && \
     sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client-noshm.conf
