@@ -22,7 +22,7 @@ BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 . $BIN/docker-xauth.sh
 . $BIN/docker-gpu.sh
 
-$DOCKER_COMMAND run --rm -it \
+$DOCKER_COMMAND run --rm \
     -u $(id -u):$(id -g) \
     -v /etc/passwd:/etc/passwd:ro \
     $X11_FLAGS \
