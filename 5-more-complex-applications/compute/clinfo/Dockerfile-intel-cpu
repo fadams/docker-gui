@@ -50,6 +50,6 @@ ENTRYPOINT ["clinfo"]
 # Example usage
 # 
 # Build the image
-# docker build -t clinfo -f Dockerfile-intel-cpu .
+# docker build -t clinfo-intel-cpu -f Dockerfile-intel-cpu .
 
 

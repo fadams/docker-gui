@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -17,22 +18,12 @@
 # under the License.
 #
 
-FROM debian:stretch-slim
+BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
+. $BIN/docker-gpu.sh
 
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
-    # Add the packages
-    apt-get install -y --no-install-recommends \
-    ocl-icd-libopencl1 clinfo \
-    # Add the Mesa OpenCL Installable Client Driver
-    mesa-opencl-icd && \
-	rm -rf /var/lib/apt/lists/*
-
-ENTRYPOINT ["clinfo"]
-
-#-------------------------------------------------------------------------------
-# Example usage
-# 
-# Build the image
-# docker build -t clinfo-mesa -f Dockerfile-mesa .
-
+$DOCKER_COMMAND run --rm \
+    -u $(id -u):$(id -g) \
+    -v /etc/passwd:/etc/passwd:ro \
+    $GPU_FLAGS \
+    clinfo-mesa $@
 
