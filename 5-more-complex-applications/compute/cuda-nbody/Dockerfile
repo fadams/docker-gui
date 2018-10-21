@@ -22,7 +22,6 @@ FROM debian:stretch-slim
 ENV CUDA_VERSION 9.0
 ENV NVIDIA_REQUIRE_CUDA "cuda>=${CUDA_VERSION}"
 ENV CUDA_FULL_VERSION ${CUDA_VERSION}.176
-ENV CUDA_PKG_VERSION 9-0=${CUDA_FULL_VERSION}-1
 
 # nvidia-docker hooks (Only needed for Nvidia Docker V1)
 LABEL com.nvidia.volumes.needed=nvidia_driver
@@ -38,7 +37,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
     libgl1-mesa-glx libgl1-mesa-dri libglu1-mesa freeglut3 \
-    cuda-cudart-${CUDA_PKG_VERSION} cuda-samples-${CUDA_PKG_VERSION} && \
+    cuda-cudart-${CUDA_VERSION} cuda-samples-${CUDA_VERSION} && \
     ln -s cuda-${CUDA_VERSION} /usr/local/cuda && \
     # Compile the nbody sample. Note the tweak of findgllib.mk
     # that is needed to find the OpenGL libraries on debian.
@@ -48,7 +47,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Remove the packages used for installation and build
     apt-get clean && \
     apt-get purge -y apt-transport-https wget gnupg ca-certificates \
-    cuda-samples-${CUDA_PKG_VERSION} && \
+    cuda-samples-${CUDA_VERSION} && \
     apt-get autoremove -y && \
 	rm -rf /var/lib/apt/lists/*
 
