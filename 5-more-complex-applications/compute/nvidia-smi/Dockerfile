@@ -22,7 +22,6 @@ FROM debian:stretch-slim
 ENV CUDA_VERSION 9.0
 ENV NVIDIA_REQUIRE_CUDA "cuda>=${CUDA_VERSION}"
 ENV CUDA_FULL_VERSION ${CUDA_VERSION}.176
-ENV CUDA_PKG_VERSION 9-0=${CUDA_FULL_VERSION}-1
 
 # nvidia-docker hooks (Only needed for Nvidia Docker V1)
 LABEL com.nvidia.volumes.needed=nvidia_driver
@@ -37,7 +36,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64 /" > /etc/apt/sources.list.d/cuda.list && \
     apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-    cuda-cudart-$CUDA_PKG_VERSION && \
+    cuda-cudart-${CUDA_VERSION} && \
     ln -s cuda-${CUDA_VERSION} /usr/local/cuda && \
     # Remove packages used for installation
     apt-get clean && \
