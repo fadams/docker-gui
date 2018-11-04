@@ -19,27 +19,17 @@
 #
 
 # The X11 DISPLAY number of the nested Xephyr X server.
-NESTED_DISPLAY=:1
+# Accepts user input value or defaults to :1
+NESTED_DISPLAY=${@:-:1}
 
-DOCKER_COMMAND=docker
-# If user isn't in docker group prefix docker with sudo 
-if ! (id -nG $(id -un) | grep -qw docker); then
-    DOCKER_COMMAND="sudo $DOCKER_COMMAND"
-fi
-
-# Create .Xauthority.docker file with wildcarded hostname.
-XAUTH=${XAUTHORITY:-$HOME/.Xauthority}
-DOCKER_XAUTHORITY=${XAUTH}.docker
-cp --preserve=all $XAUTH $DOCKER_XAUTHORITY
-xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY nmerge -
+BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
+. $BIN/docker-xauth.sh
+. $BIN/docker-command.sh
 
 $DOCKER_COMMAND run --rm \
     --ipc=host \
     -u $(id -u):$(id -g) \
     -v /etc/passwd:/etc/passwd:ro \
-    -e DISPLAY=unix$DISPLAY \
-    -v /tmp/.X11-unix:/tmp/.X11-unix \
-    -e XAUTHORITY=$DOCKER_XAUTHORITY \
-    -v $DOCKER_XAUTHORITY:$DOCKER_XAUTHORITY:ro \
+    $X11_FLAGS_RW \
     xephyr $NESTED_DISPLAY -ac -reset -terminate 2> /dev/null
 
