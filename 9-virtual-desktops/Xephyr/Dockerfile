@@ -18,10 +18,9 @@
 #
 
 FROM ubuntu:16.04
-ENV DEBIAN_FRONTEND noninteractive
 
 # Install Xephyr
-RUN apt-get update && \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
 	xserver-xephyr && \
