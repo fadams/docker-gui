@@ -29,8 +29,22 @@ cp --preserve=all $XAUTH $DOCKER_XAUTHORITY
 xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY nmerge -
 
 # Populate the X11_FLAGS variable as a short cut instead of
-# having to set the environment and volume flags individually.
-X11_FLAGS="-e DISPLAY=unix$DISPLAY "
-X11_FLAGS+="-v /tmp/.X11-unix:/tmp/.X11-unix:ro "
-X11_FLAGS+="-e XAUTHORITY=$DOCKER_XAUTHORITY "
-X11_FLAGS+="-v $DOCKER_XAUTHORITY:$DOCKER_XAUTHORITY:ro "
+# having to set the environment and volume flags individually
+# in the docker run command. The X11_FLAGS_RW variable is
+# similar except the X11 socket directory is bind-mounted rw
+# for use-cases such as nested X servers where we might need
+# to open additional displays and thus write to that directory.
+
+X11_ENV="-e DISPLAY=unix$DISPLAY "
+X11_ENV+="-e XAUTHORITY=$DOCKER_XAUTHORITY "
+
+X11_MOUNTS="-v /tmp/.X11-unix:/tmp/.X11-unix:ro "
+X11_MOUNTS+="-v $DOCKER_XAUTHORITY:$DOCKER_XAUTHORITY:ro "
+
+X11_MOUNTS_RW="-v /tmp/.X11-unix:/tmp/.X11-unix:rw "
+X11_MOUNTS_RW+="-v $DOCKER_XAUTHORITY:$DOCKER_XAUTHORITY:ro "
+
+X11_FLAGS=$X11_ENV$X11_MOUNTS
+X11_FLAGS_RW=$X11_ENV$X11_MOUNTS_RW
+
+
