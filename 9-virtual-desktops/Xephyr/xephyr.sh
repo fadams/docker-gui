@@ -26,10 +26,10 @@ BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 . $BIN/docker-xauth.sh
 . $BIN/docker-command.sh
 
-$DOCKER_COMMAND run --rm \
+$DOCKER_COMMAND run --rm -it \
     --ipc=host \
     -u $(id -u):$(id -g) \
     -v /etc/passwd:/etc/passwd:ro \
     $X11_FLAGS_RW \
-    xephyr $NESTED_DISPLAY -ac -reset -terminate 2> /dev/null
+    xephyr $NESTED_DISPLAY -resizeable -ac -reset -terminate 2> /dev/null
 
