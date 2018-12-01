@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -16,25 +17,22 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-# This uses VirtualGL to perform “split rendering” (GLX forking) which
+
+################################################################################
+# Script to run glxgears in a container.
+# This version uses VirtualGL to perform “split rendering” (GLX forking) which
 # intercepts GLX calls and renders to a memory buffer, which can then be 
 # forwarded to a remote display.
+################################################################################
 
-# Use our virtualgl base image
-FROM virtualgl
+BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
+. $BIN/docker-xauth.sh
+. $BIN/docker-gpu.sh
 
-# nvidia-docker hooks (Only needed for Nvidia Docker V1)
-LABEL com.nvidia.volumes.needed=nvidia_driver
-
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
-    apt-get install -y --no-install-recommends \
-    mesa-utils && \
-	rm -rf /var/lib/apt/lists/*
-
-#-------------------------------------------------------------------------------
-# Example usage
-# 
-# Build the image
-# docker build -t glxgears-vgl .
-#
+$DOCKER_COMMAND run --rm -it \
+    -u $(id -u):$(id -g) \
+    -v /etc/passwd:/etc/passwd:ro \
+    $X11_FLAGS \
+    $GPU_FLAGS \
+    glxgears-vgl vglrun glxgears
 
