@@ -23,10 +23,14 @@
 # Include this file in any Docker launch script that needs X11 authentication.
 ################################################################################
 
+# Copies .Xauthority to a temporary location based on the pid of this shell
+# then nmerges an nlist from DISPLAY, with the hostname wildcarded, into
+# the temporary .Xauthority before finally renaming that to .Xauthority.docker
 XAUTH=${XAUTHORITY:-$HOME/.Xauthority}
 DOCKER_XAUTHORITY=${XAUTH}.docker
-cp --preserve=all $XAUTH $DOCKER_XAUTHORITY
-xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY nmerge -
+cp --preserve=all $XAUTH $DOCKER_XAUTHORITY.$$
+xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY.$$ nmerge -
+mv $DOCKER_XAUTHORITY.$$ $DOCKER_XAUTHORITY
 
 # Populate the X11_FLAGS variable as a short cut instead of
 # having to set the environment and volume flags individually
