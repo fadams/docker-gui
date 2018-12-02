@@ -26,7 +26,7 @@ BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 . $BIN/docker-xauth.sh
 . $BIN/docker-command.sh
 
-$DOCKER_COMMAND run --rm -it \
+$DOCKER_COMMAND run --rm \
     --ipc=host \
     -u $(id -u):$(id -g) \
     -v /etc/passwd:/etc/passwd:ro \
