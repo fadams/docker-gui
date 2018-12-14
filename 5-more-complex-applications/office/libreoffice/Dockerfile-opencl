@@ -31,7 +31,7 @@ RUN sed -i 's/main/main contrib/' /etc/apt/sources.list && \
     apt-get install -y --no-install-recommends \
     libreoffice libreoffice-pdfimport libreoffice-ogltrans libreoffice-gtk3 \
     ca-certificates locales tzdata default-jre \
-    fonts-symbola fonts-lmodern fonts-freefont-ttf \
+    fonts-symbola fonts-lmodern fonts-freefont-ttf fonts-noto \
     fonts-liberation fonts-dejavu ttf-mscorefonts-installer \
     libpulse0 libgl1-mesa-glx libgl1-mesa-dri \
     ocl-icd-libopencl1 ocl-icd-opencl-dev && \
