@@ -66,6 +66,11 @@ else
   fi
 fi
 
+# If user isn't in docker group prefix docker with sudo 
+if ! (id -nG $(id -un) | grep -qw docker); then
+    DOCKER_COMMAND="sudo $DOCKER_COMMAND"
+fi
+
 # Create .Xauthority.docker file with wildcarded hostname.
 XAUTH=${XAUTHORITY:-$HOME/.Xauthority}
 DOCKER_XAUTHORITY=${XAUTH}.docker

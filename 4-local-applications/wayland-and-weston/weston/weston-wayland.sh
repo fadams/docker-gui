@@ -68,6 +68,11 @@ else
   fi
 fi
 
+# If user isn't in docker group prefix docker with sudo 
+if ! (id -nG $(id -un) | grep -qw docker); then
+    DOCKER_COMMAND="sudo $DOCKER_COMMAND"
+fi
+
 $DOCKER_COMMAND run --rm \
   --ipc=host \
   -u $(id -u):$(id -g) \
