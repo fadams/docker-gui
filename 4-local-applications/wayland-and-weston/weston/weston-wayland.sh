@@ -18,6 +18,8 @@
 # under the License.
 #
 
+WAYLAND_DISPLAY=${WAYLAND_DISPLAY:-wayland-0}
+
 # Attempt to detect the type of GPU present on the host and set the necessary
 # parameters for docker run in the GPU_FLAGS variable.
 DOCKER_COMMAND=docker
@@ -66,23 +68,15 @@ else
   fi
 fi
 
-# Create .Xauthority.docker file with wildcarded hostname.
-XAUTH=${XAUTHORITY:-$HOME/.Xauthority}
-DOCKER_XAUTHORITY=${XAUTH}.docker
-cp --preserve=all $XAUTH $DOCKER_XAUTHORITY
-xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY nmerge -
-
 $DOCKER_COMMAND run --rm \
   --ipc=host \
   -u $(id -u):$(id -g) \
   -v /etc/passwd:/etc/passwd:ro \
-  -e DISPLAY=unix$DISPLAY \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
   -v /tmp/.X0-lock:/tmp/.X0-lock \
-  -e XAUTHORITY=$DOCKER_XAUTHORITY \
-  -v $DOCKER_XAUTHORITY:$DOCKER_XAUTHORITY:ro \
   -e XDG_RUNTIME_DIR=/tmp \
-  -v $XDG_RUNTIME_DIR:/tmp \
+  -e WAYLAND_DISPLAY=$WAYLAND_DISPLAY \
+  -v $XDG_RUNTIME_DIR:/tmp\
   $GPU_FLAGS \
   weston
 
