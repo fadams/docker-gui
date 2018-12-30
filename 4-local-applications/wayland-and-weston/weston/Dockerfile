@@ -22,8 +22,8 @@ FROM debian:stretch-slim
 # Install weston
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-	weston xwayland dmz-cursor-theme && \
-	rm -rf /var/lib/apt/lists/*
+    weston xwayland dmz-cursor-theme libgl1-mesa-glx libgl1-mesa-dri && \
+    rm -rf /var/lib/apt/lists/*
 
 CMD weston --modules=xwayland.so
 
