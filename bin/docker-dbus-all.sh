@@ -29,13 +29,14 @@
 ################################################################################
 
 if [[ $DBUS_SESSION_BUS_ADDRESS == *"abstract"* ]]; then
-    DBUS_FLAGS="--net=host"
+    DBUS_FLAGS="--net=host "
 else
-    DBUS_FLAGS="-v $XDG_RUNTIME_DIR/bus:$XDG_RUNTIME_DIR/bus:ro -e NO_AT_BRIDGE=1"
+    DBUS_FLAGS="-v $XDG_RUNTIME_DIR/bus:$XDG_RUNTIME_DIR/bus:ro -e NO_AT_BRIDGE=1 "
 fi
 
 # Add flags for connecting to the D-bus system bus.
-DBUS_FLAGS="-v /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro "$DBUS_FLAGS
+DBUS_FLAGS+="-v /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro "
+DBUS_FLAGS+="-e DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS "
 
 if test -f "/etc/apparmor.d/docker-dbus"; then
     APPARMOR_FLAGS="--security-opt apparmor:docker-dbus"
@@ -45,6 +46,6 @@ fi
 
 # Populate the DCONF_FLAGS variable as a short cut instead of
 # having to set the environment and volume flags individually.
-DCONF_FLAGS="$DBUS_FLAGS "
-DCONF_FLAGS+="-e DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS "
+DCONF_FLAGS=$DBUS_FLAGS
 DCONF_FLAGS+="-v $HOME/.config/dconf/user:$HOME/.config/dconf/user:ro "
+
