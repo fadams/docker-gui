@@ -24,9 +24,6 @@ BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 . $BIN/docker-pulseaudio.sh
 . $BIN/docker-dbus-all.sh
 
-#-v $PWD/libpepflashplayer.so:/usr/lib/adobe-flashplugin/libpepflashplayer.so:ro \
-#-v $PWD/manifest.json:/usr/lib/adobe-flashplugin/manifest.json:ro \
-
 # Create a directory on the host that we can mount as a
 # "home directory" in the container for the current user. 
 mkdir -p $(id -un)/.config/pulse
@@ -41,5 +38,5 @@ $DOCKER_COMMAND run --rm \
     $PULSEAUDIO_FLAGS \
     $X11_FLAGS \
     $GPU_FLAGS \
-    firefox-flashdrm
+    firefox-flash
 

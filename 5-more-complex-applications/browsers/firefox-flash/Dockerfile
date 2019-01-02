@@ -41,6 +41,6 @@ ENTRYPOINT ["/usr/lib/firefox/firefox", "--no-remote"]
 #-------------------------------------------------------------------------------
 # 
 # To build the image
-# docker build -t firefox-flashdrm .
+# docker build -t firefox-flash .
 #
 
