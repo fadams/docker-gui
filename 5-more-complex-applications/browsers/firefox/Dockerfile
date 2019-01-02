@@ -26,14 +26,13 @@ LABEL com.nvidia.volumes.needed=nvidia_driver
 
 # Install Firefox
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
-    # Add the packages used
     apt-get install -y --no-install-recommends \
 	wget bzip2 ca-certificates gnupg dirmngr procps \
     fonts-symbola fonts-lmodern fonts-freefont-ttf \
     fonts-liberation fonts-dejavu gsfonts \
-    libgtk-3-0 libgtk2.0-0 libnss3 libxt6 libavcodec57 libvpx4 \
-    libdbus-glib-1-2 libcanberra-gtk3-module libpulse0 libv4l-0 \
-	libgl1-mesa-glx libgl1-mesa-dri && \
+    libgtk-3-0 libgtk2.0-0 libnss3 libxt6 libavcodec57 \
+    libvpx4 libdbus-glib-1-2 libcanberra-gtk3-module \
+    libpulse0 libv4l-0 libgl1-mesa-glx libgl1-mesa-dri && \
     # Debian ships with esr, so download and install latest Firefox.
     wget -O firefox.tar.bz2 "https://download.mozilla.org/?product=firefox-latest&os=linux64&lang=${FIREFOX_LANG}" && \
     tar xjf firefox.tar.bz2 -C /usr/lib/ && \
@@ -42,8 +41,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     cp /etc/pulse/client.conf /etc/pulse/client-noshm.conf && \
     sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client-noshm.conf
 
-# Debian seems to have some issues with the default font setup.
-# See the following blog:
+# Debian seems to have some issues with the default font
+# setup. See the following blog:
 # http://blog.programster.org/debian-8-gnome-desktop-improve-font-rendering/
 COPY fonts.conf /etc/fonts/local.conf
 
