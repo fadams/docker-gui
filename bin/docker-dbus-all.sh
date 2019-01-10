@@ -29,7 +29,7 @@
 ################################################################################
 
 if [[ $DBUS_SESSION_BUS_ADDRESS == *"abstract"* ]]; then
-    DBUS_FLAGS="--net=host "
+    DBUS_FLAGS="--network=host -e NO_AT_BRIDGE=1 "
 else
     DBUS_FLAGS="-v $XDG_RUNTIME_DIR/bus:$XDG_RUNTIME_DIR/bus:ro -e NO_AT_BRIDGE=1 "
 fi
