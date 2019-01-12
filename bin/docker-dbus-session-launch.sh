@@ -33,6 +33,14 @@
 # port of the client, so should be unique for each connection. The script checks
 # if a key file for the connection exists and if not launches D-bus and
 # writes a key file to $XDG_RUNTIME_DIR/ssh-dbus containing the address.
+# 
+# Note: This script needs to be run before docker-remote-xauth.sh because
+# dbus-launch uses the DISPLAY environment variable, which gets clobbered
+# by docker-remote-xauth.sh to point to 172.17.0.1, which causes dbus-launch
+# to fail to authenticate. In practice we don't actually need this D-bus to
+# connect to the X server, but the error message is annoying.
+# This script also needs to run before docker-dbus-all.sh as that script needs
+# DBUS_SESSION_BUS_ADDRESS to be set.
 ################################################################################
 
 mkdir -p $XDG_RUNTIME_DIR/ssh-dbus
