@@ -1,0 +1,57 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+# 
+#   http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+FROM debian:stretch-slim
+
+ENV FIREFOX_LANG=en-GB
+
+# Install Firefox plus x11vnc and xvfb
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
+    apt-get install -y --no-install-recommends \
+	wget bzip2 ca-certificates gnupg dirmngr procps \
+    fonts-symbola fonts-lmodern fonts-freefont-ttf \
+    fonts-liberation fonts-dejavu gsfonts \
+    libgtk-3-0 libgtk2.0-0 libnss3 libxt6 libavcodec57 \
+    libvpx4 libdbus-glib-1-2 libcanberra-gtk3-module \
+    libpulse0 libv4l-0 libgl1-mesa-glx libgl1-mesa-dri \
+    x11vnc xvfb twm && \
+    # Debian ships with esr, so download and install latest Firefox.
+    wget -O firefox.tar.bz2 "https://download.mozilla.org/?product=firefox-latest&os=linux64&lang=${FIREFOX_LANG}" && \
+    tar xjf firefox.tar.bz2 -C /usr/lib/ && \
+    rm firefox.tar.bz2 && \
+	rm -rf /var/lib/apt/lists/* && \
+    # Create simple launch script to start Xvfb, firefox, twn and x11vnc
+    echo "#!/bin/bash\nexport DISPLAY=:0\nXvfb -screen scrn 1280x720x24 -cc 4 &\nsleep 0.5\n/usr/lib/firefox/firefox &\ntwm &\nx11vnc -forever -usepw" > /usr/local/bin/startup && \
+    chmod +x /usr/local/bin/startup && \
+    cp /etc/pulse/client.conf /etc/pulse/client-noshm.conf && \
+    sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client-noshm.conf
+
+# Debian seems to have some issues with the default font
+# setup. See the following blog:
+# http://blog.programster.org/debian-8-gnome-desktop-improve-font-rendering/
+COPY fonts.conf /etc/fonts/local.conf
+
+CMD ["/usr/local/bin/startup"]
+
+#-------------------------------------------------------------------------------
+# 
+# To build the image
+# docker build -t x11vnc-firefox .
+#
+
