@@ -26,7 +26,7 @@ BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 # "home directory" in the container for the current user. 
 mkdir -p $(id -un)/.config/pulse
 $DOCKER_COMMAND run --rm -it \
---init \
+    --init \
     --shm-size 2g \
     -p 5900:5900 \
     -u $(id -u):$(id -g) \
