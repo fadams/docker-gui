@@ -25,12 +25,10 @@ BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 . $BIN/docker-dbus-session-launch.sh # Run before remote-xauth and dbus-all
 . $BIN/docker-command.sh
 . $BIN/docker-remote-xauth.sh
-. $BIN/docker-pulseaudio.sh
 . $BIN/docker-dbus-all.sh
 
 # Create a directory on the host that we can mount as a
-# "home directory" in the container for the current user. 
-mkdir -p $(id -un)/.config/pulse
+# "home directory" in the container for the current user.
 mkdir -p $(id -un)/.config/dconf
 $DOCKER_COMMAND run --rm \
     --shm-size 2g \
@@ -39,7 +37,6 @@ $DOCKER_COMMAND run --rm \
     -v /etc/passwd:/etc/passwd:ro \
     $APPARMOR_FLAGS \
     $DCONF_FLAGS \
-    $PULSEAUDIO_FLAGS \
     $X11_FLAGS \
     firefox
 
