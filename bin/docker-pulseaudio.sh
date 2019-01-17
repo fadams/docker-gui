@@ -20,7 +20,7 @@
 
 ################################################################################
 # This script sets some additional environment configuration for docker run
-# based on the version of pulseaudion being run by the host as described in
+# based on the version of pulseaudio being run by the host as described in
 # section 4.4.1 of the book.
 # 
 # For pulseaudio versions 7 to 9 there is a bug whereby shm files get "cleaned
