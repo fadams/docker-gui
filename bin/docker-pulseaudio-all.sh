@@ -66,7 +66,16 @@ PULSEAUDIO_FLAGS+="-v $HOME/.config/pulse/cookie:$HOME/.config/pulse/cookie:ro "
 PULSEAUDIO_FLAGS+="$PULSE_FLAGS "
 
 else
-# SSH_CLIENT not set, so set flags for remote application.
-PULSEAUDIO_FLAGS="-e PULSE_SERVER=$PA_HOST:4713 "
+# SSH_CLIENT set, so set flags for remote application.
+TUNNEL=$(netstat -nl | grep "0.0.0.0:4714")
+TUNNEL=${TUNNEL// /}
+if [ -z $TUNNEL ]; then
+    # No ssh tunnel set so forward directly to client IP.
+    PULSEAUDIO_FLAGS="-e PULSE_SERVER=$PA_HOST:4713 "
+else
+    # Tunnel set so send to tunnel endpoint.
+    echo "Using SSH Tunnel PULSE_SERVER=172.17.0.1:4714"
+    PULSEAUDIO_FLAGS="-e PULSE_SERVER=172.17.0.1:4714 "
+fi
 fi
 
