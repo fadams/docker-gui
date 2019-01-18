@@ -20,7 +20,7 @@
 
 BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 . $BIN/docker-command.sh
-. $BIN/docker-pulseaudio.sh
+. $BIN/docker-pulseaudio-all.sh
 
 # Create a directory on the host that we can mount as a
 # "home directory" in the container for the current user. 

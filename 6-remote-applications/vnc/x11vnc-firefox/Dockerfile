@@ -39,6 +39,10 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Create simple launch script to start Xvfb, firefox, twn and x11vnc
     echo "#!/bin/bash\nexport DISPLAY=:0\nXvfb -screen scrn 1280x720x24 -cc 4 &\nsleep 0.5\n/usr/lib/firefox/firefox &\ntwm &\nx11vnc -forever -usepw" > /usr/local/bin/startup && \
     chmod +x /usr/local/bin/startup && \
+    # Resolve error: _XSERVTransmkdir: ERROR: euid != 0,directory 
+    # /tmp/.X11-unix will not be created.
+    mkdir /tmp/.X11-unix && \
+    chmod 1777 /tmp/.X11-unix && \
     cp /etc/pulse/client.conf /etc/pulse/client-noshm.conf && \
     sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client-noshm.conf
 
