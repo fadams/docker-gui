@@ -30,6 +30,7 @@ mkdir -p $(id -un)/.config/pulse
 # Use -d option to daemonise and --init to run tini as pid 1
 $DOCKER_COMMAND run --rm -it -d \
     --init \
+    --shm-size 2g \
     --name=x11vnc-xvfb \
     -p 5900:5900 \
     -u $(id -u):$(id -g) \
