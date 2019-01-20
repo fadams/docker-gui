@@ -37,7 +37,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     rm firefox.tar.bz2 && \
 	rm -rf /var/lib/apt/lists/* && \
     # Create simple launch script to start Xvfb, firefox, twn and x11vnc
-    echo "#!/bin/bash\nexport DISPLAY=:0\nXvfb -screen 0 1280x720x24 -cc 4 &\nsleep 0.5\n/usr/lib/firefox/firefox &\ntwm &\nx11vnc -forever -usepw" > /usr/local/bin/startup && \
+    echo '#!/bin/bash\nXvfb $DISPLAY -screen 0 $GEOMETRY -cc 4 &\nsleep 0.5\n/usr/lib/firefox/firefox --no-remote &\ntwm &\nx11vnc -forever -usepw' > /usr/local/bin/startup && \
     chmod +x /usr/local/bin/startup && \
     # Resolve error: _XSERVTransmkdir: ERROR: euid != 0,directory 
     # /tmp/.X11-unix will not be created.

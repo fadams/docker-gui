@@ -21,10 +21,12 @@
 BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 . $BIN/docker-command.sh
 . $BIN/docker-pulseaudio-all.sh
+. $BIN/docker-dbus-all.sh
 
 # Create a directory on the host that we can mount as a
 # "home directory" in the container for the current user. 
 mkdir -p $(id -un)/.config/pulse
+mkdir -p $(id -un)/.config/dconf
 $DOCKER_COMMAND run --rm -it \
     --init \
     --shm-size 2g \
@@ -32,6 +34,10 @@ $DOCKER_COMMAND run --rm -it \
     -u $(id -u):$(id -g) \
     -v $PWD/$(id -un):/home/$(id -un) \
     -v /etc/passwd:/etc/passwd:ro \
+    $APPARMOR_FLAGS \
+    $DCONF_FLAGS \
     $PULSEAUDIO_FLAGS \
+    -e DISPLAY=:1 \
+    -e GEOMETRY=1280x720x24 \
     x11vnc-firefox
 
