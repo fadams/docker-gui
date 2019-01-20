@@ -21,10 +21,12 @@
 BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 . $BIN/docker-command.sh
 . $BIN/docker-pulseaudio-all.sh
+. $BIN/docker-dbus-all.sh
 
 # Create a directory on the host that we can mount as a
 # "home directory" in the container for the current user. 
 mkdir -p $(id -un)/.config/pulse
+mkdir -p $(id -un)/.config/dconf
 
 # Launch Xvfb and x11vnc exposing /tmp/.X11-unix as a volume.
 # Use -d option to daemonise and --init to run tini as pid 1
@@ -36,7 +38,8 @@ $DOCKER_COMMAND run --rm -it -d \
     -u $(id -u):$(id -g) \
     -v $PWD/$(id -un):/home/$(id -un) \
     -v /etc/passwd:/etc/passwd:ro \
-    -e DISPLAY=:0 \
+    -e DISPLAY=:1 \
+    -e GEOMETRY=1280x720x24 \
     x11vnc-xvfb
 
 # Launch firefox. Use --volumes-from to mount /tmp/.X11-unix
@@ -46,8 +49,10 @@ $DOCKER_COMMAND run --rm \
     -u $(id -u):$(id -g) \
     -v $PWD/$(id -un):/home/$(id -un) \
     -v /etc/passwd:/etc/passwd:ro \
+    $APPARMOR_FLAGS \
+    $DCONF_FLAGS \
     $PULSEAUDIO_FLAGS \
-    -e DISPLAY=:0 \
+    -e DISPLAY=:1 \
     --ipc=container:x11vnc-xvfb \
     --volumes-from x11vnc-xvfb \
     firefox

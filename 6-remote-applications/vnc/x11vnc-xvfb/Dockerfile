@@ -25,7 +25,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     libgl1-mesa-glx libgl1-mesa-dri x11vnc xvfb twm && \
 	rm -rf /var/lib/apt/lists/* && \
     # Create simple launch script to start Xvfb, twm and x11vnc
-    echo "#!/bin/bash\nXvfb -screen 0 1280x720x24 -cc 4 &\nsleep 0.5\ntwm &\nx11vnc -forever -usepw" > /usr/local/bin/startup && \
+    echo '#!/bin/bash\nXvfb $DISPLAY -screen 0 $GEOMETRY -cc 4 &\nsleep 0.5\ntwm &\nx11vnc -forever -usepw' > /usr/local/bin/startup && \
     chmod +x /usr/local/bin/startup && \
     # We'll be exporting /tmp/.X11-unix as a volume and we need
     # the mode of /tmp/.X11-unix to be set to 1777
