@@ -19,6 +19,7 @@
 #
 
 BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
+. $BIN/docker-dbus-session-launch.sh # Run before dbus-all
 . $BIN/docker-command.sh
 . $BIN/docker-pulseaudio-all.sh
 . $BIN/docker-dbus-all.sh
