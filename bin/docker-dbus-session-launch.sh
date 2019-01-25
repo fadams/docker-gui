@@ -25,8 +25,8 @@
 #
 # On a desktop environment connecting is usually fairly straightforward as D-bus
 # will be running and DBUS_SESSION_BUS_ADDRESS will be set, but when running
-# remote applications, e.g. over ssh, D-bus won't be running for that session
-# nor will DBUS_SESSION_BUS_ADDRESS be set.
+# remote applications, e.g. over ssh, D-bus won't usually be running for that
+# session nor will the DBUS_SESSION_BUS_ADDRESS be set.
 #
 # The script launches a D-bus session bus instance for the ssh client connection
 # It uses ${SSH_CLIENT//[. ]/} as a key which concatenates the IP address and
@@ -41,7 +41,21 @@
 # connect to the X server, but the error message is annoying.
 # This script also needs to run before docker-dbus-all.sh as that script needs
 # DBUS_SESSION_BUS_ADDRESS to be set.
+#
+# Another issue is that on some systems DBUS_SESSION_BUS_ADDRESS seems to get
+# "randomly" (and incorrectly) set to $XDG_RUNTIME_DIR/bus when doing ssh
+# even though a normal desktop session might be an abstract socket and although
+# DBUS_SESSION_BUS_ADDRESS might be getting set there is no bus instance.
+# I've no idea what causes that but the UNIX_SOCKET variable at the start
+# checks for the presence of that directory and if it is populated. If so
+# then it's likely a valid DBUS_SESSION_BUS_ADDRESS, if not then it is
+# being set incorrectly and we ignore it and launch our own D-bus instance.
 ################################################################################
+
+UNIX_SOCKET=$([ -d $XDG_RUNTIME_DIR/bus ] && [ $(ls -A $XDG_RUNTIME_DIR/bus) ] && echo "true")
+
+# If DBUS_SESSION_BUS_ADDRESS exists use that instead
+if [ -z $DBUS_SESSION_BUS_ADDRESS ] || [ -z $UNIX_SOCKET ]; then
 
 mkdir -p $XDG_RUNTIME_DIR/ssh-dbus
 
@@ -79,20 +93,18 @@ CLIENT_KEY=${CLIENT_KEY// /:}
 KEY_FILE=$XDG_RUNTIME_DIR/ssh-dbus/$CLIENT_KEY
 
 #echo $KEY_FILE
-# If DBUS_SESSION_BUS_ADDRESS exists use that instead
-if test -z "$DBUS_SESSION_BUS_ADDRESS" ; then
-    if [ -f $KEY_FILE ]; then
-        # Read KEY_FILE to get DBUS_SESSION_BUS_ADDRESS
-        DBUS_SESSION_BUS_ADDRESS=$(cat $KEY_FILE)
-        DBUS_SESSION_BUS_PID=$(cat $KEY_FILE.pid)
-    else
-        echo "Launching D-bus"
-        eval $(dbus-launch)
+if [ -f $KEY_FILE ]; then
+    # Read KEY_FILE to get DBUS_SESSION_BUS_ADDRESS
+    DBUS_SESSION_BUS_ADDRESS=$(cat $KEY_FILE)
+    DBUS_SESSION_BUS_PID=$(cat $KEY_FILE.pid)
+else
+    echo "Launching D-bus"
+    eval $(dbus-launch)
 
-        # Write DBUS_SESSION_BUS_ADDRESS to KEY_FILE
-        echo $DBUS_SESSION_BUS_ADDRESS > $KEY_FILE
-        echo $DBUS_SESSION_BUS_PID > $KEY_FILE.pid
-    fi
+    # Write DBUS_SESSION_BUS_ADDRESS to KEY_FILE
+    echo $DBUS_SESSION_BUS_ADDRESS > $KEY_FILE
+    echo $DBUS_SESSION_BUS_PID > $KEY_FILE.pid
+fi
 fi
 
 #echo $DBUS_SESSION_BUS_ADDRESS
