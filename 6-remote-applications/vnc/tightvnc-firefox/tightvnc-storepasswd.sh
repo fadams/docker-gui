@@ -28,5 +28,5 @@ $DOCKER_COMMAND run --rm -it \
     -u $(id -u):$(id -g) \
     -v /etc/passwd:/etc/passwd:ro \
     -v $PWD/$(id -un):/home/$(id -un) \
-    tightvnc vncpasswd
+    tightvnc-firefox vncpasswd
 
