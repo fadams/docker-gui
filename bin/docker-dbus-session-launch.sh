@@ -46,16 +46,15 @@
 # "randomly" (and incorrectly) set to $XDG_RUNTIME_DIR/bus when doing ssh
 # even though a normal desktop session might be an abstract socket and although
 # DBUS_SESSION_BUS_ADDRESS might be getting set there is no bus instance.
-# I've no idea what causes that but the UNIX_SOCKET variable at the start
+# I've no idea what causes that but the UNIX_SOCKET_DIR variable at the start
 # checks for the presence of that directory and if it is populated. If so
 # then it's likely a valid DBUS_SESSION_BUS_ADDRESS, if not then it is
 # being set incorrectly and we ignore it and launch our own D-bus instance.
 ################################################################################
 
-UNIX_SOCKET=$([ -d $XDG_RUNTIME_DIR/bus ] && [ $(ls -A $XDG_RUNTIME_DIR/bus) ] && echo "true")
+UNIX_SOCKET_DIR=$([ -d $XDG_RUNTIME_DIR/bus ] && [ $(ls -A $XDG_RUNTIME_DIR/bus) ] && echo "true")
 
-# If DBUS_SESSION_BUS_ADDRESS exists use that instead
-if [ -z $DBUS_SESSION_BUS_ADDRESS ] || [ -z $UNIX_SOCKET ]; then
+if [[ $DBUS_SESSION_BUS_ADDRESS == "" || ($DBUS_SESSION_BUS_ADDRESS == "unix:path=$XDG_RUNTIME_DIR/bus" && $UNIX_SOCKET_DIR == "") ]]; then
 
 mkdir -p $XDG_RUNTIME_DIR/ssh-dbus
 
