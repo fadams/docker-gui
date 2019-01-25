@@ -19,6 +19,7 @@
 #
 
 BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
+. $BIN/docker-dbus-session-launch.sh # Run before dbus-all
 . $BIN/docker-command.sh
 . $BIN/docker-pulseaudio-all.sh
 . $BIN/docker-dbus-all.sh
@@ -42,19 +43,3 @@ $DOCKER_COMMAND run --rm -it \
     -e USER=$(id -un) \
     tightvnc-firefox
 
-# Launch firefox. Use --volumes-from to mount /tmp/.X11-unix
-# from tightvnc and also use that container's IPC
-#$DOCKER_COMMAND run --rm \
-#    --shm-size 2g \
-#    -u $(id -u):$(id -g) \
-#    -v $PWD/$(id -un):/home/$(id -un) \
-#    -v /etc/passwd:/etc/passwd:ro \
-#    $APPARMOR_FLAGS \
-#    $DCONF_FLAGS \
-#    $PULSEAUDIO_FLAGS \
-#    -e DISPLAY=:1 \
-#    --ipc=container:tightvnc \
-#    --volumes-from tightvnc \
-#    firefox
-
-#$DOCKER_COMMAND kill tightvnc
