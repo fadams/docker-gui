@@ -59,8 +59,7 @@ NETWORK_STATUS=$(netstat -t | grep ssh)
 
 pushd $XDG_RUNTIME_DIR/ssh-dbus/ > /dev/null
     for f in *; do
-        if [[ $f != *.pid ]]; then
-            #echo $f
+        if [ -f $f ] && [[ $f != *.pid ]]; then
             if ! [[ $NETWORK_STATUS == *"$f"* ]]; then
                 PID=$(cat ${f}.pid)
                 echo "Session $f is closed, killing D-bus PID=$PID"
