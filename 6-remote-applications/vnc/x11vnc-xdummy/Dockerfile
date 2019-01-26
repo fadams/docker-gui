@@ -26,7 +26,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     x11vnc xserver-xorg-video-dummy twm && \
 	rm -rf /var/lib/apt/lists/* && \
     # Create simple launch script to start Xorg, twm and x11vnc
-    echo '#!/bin/bash\nXorg $DISPLAY -cc 4 &\nsleep 0.5\ntwm &\nx11vnc -forever -usepw -noxfixes' > /usr/local/bin/startup && \
+    echo '#!/bin/bash\nXorg $DISPLAY -cc 4 &\nsleep 0.5\ntwm &\nx11vnc -forever -usepw' > /usr/local/bin/startup && \
     chmod +x /usr/local/bin/startup && \
     # We'll be exporting /tmp/.X11-unix as a volume and we need
     # the mode of /tmp/.X11-unix to be set to 1777
