@@ -34,7 +34,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     libgl1-mesa-glx libgl1-mesa-dri libglu1-mesa libxv1 && \
     # Attempt to work out the latest VirtualGL version from
     # https://sourceforge.net/projects/virtualgl/files/
-	VGL_VERSION=$(curl -sSL https://sourceforge.net/projects/virtualgl/files/ | grep "<span class=\"name\">" | head -n 1 | cut -d \> -f2 | cut -d \< -f1) && \
+	VGL_VERSION=$(curl -sSL https://sourceforge.net/projects/virtualgl/files/ | grep "<span class=\"name\">[0-9]" | head -n 1 | cut -d \> -f2 | cut -d \< -f1) && \
     echo "VirtualGL version: ${VGL_VERSION}" && \
     # Given the version download and install VirtualGL
     curl -sSL https://sourceforge.net/projects/virtualgl/files/"${VGL_VERSION}"/virtualgl_"${VGL_VERSION}"_amd64.deb -o virtualgl_"${VGL_VERSION}"_amd64.deb && \
