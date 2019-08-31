@@ -30,7 +30,7 @@ mkdir -p $(id -un)/.config/dconf
 
 # Create password if required.
 if ! test -d "etc"; then
-echo "creating password"
+    echo "creating password"
     $(cd $(dirname $0); echo $PWD)/nomachine-storepasswd.sh
 fi
 
