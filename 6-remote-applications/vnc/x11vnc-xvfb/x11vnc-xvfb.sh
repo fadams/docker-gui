@@ -29,6 +29,12 @@ BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 mkdir -p $(id -un)/.config/pulse
 mkdir -p $(id -un)/.config/dconf
 
+# Create password if required.
+if ! test -f "$(id -un)/.vnc/passwd"; then
+    echo "creating password"
+    $(cd $(dirname $0); echo $PWD)/x11vnc-storepasswd.sh
+fi
+
 # Launch Xvfb and x11vnc exposing /tmp/.X11-unix as a volume.
 # Use -d option to daemonise and --init to run tini as pid 1
 $DOCKER_COMMAND run --rm -it -d \
@@ -58,4 +64,4 @@ $DOCKER_COMMAND run --rm \
     --volumes-from x11vnc-xvfb \
     firefox
 
-$DOCKER_COMMAND kill x11vnc-xvfb
+$DOCKER_COMMAND stop x11vnc-xvfb
