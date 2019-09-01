@@ -65,4 +65,4 @@ $DOCKER_COMMAND run --rm \
     --volumes-from tightvnc \
     firefox
 
-$DOCKER_COMMAND kill tightvnc
+$DOCKER_COMMAND stop tightvnc
