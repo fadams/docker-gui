@@ -29,6 +29,12 @@ BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 mkdir -p $(id -un)/.config/pulse
 mkdir -p $(id -un)/.config/dconf
 
+# Create password if required.
+if ! test -f "$(id -un)/.vnc/passwd"; then
+    echo "creating password"
+    $(cd $(dirname $0); echo $PWD)/tightvnc-storepasswd.sh
+fi
+
 # Launch tightvncserver exposing /tmp/.X11-unix as a volume.
 # Use -d option to daemonise and --init to run tini as pid 1
 $DOCKER_COMMAND run --rm -it -d \
