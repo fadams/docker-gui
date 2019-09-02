@@ -19,6 +19,10 @@
 
 FROM debian:stretch-slim
 
+ENV LANG=en_GB.UTF-8
+ENV TZ=Europe/London
+ENV TVNC_WM=/usr/bin/jwm
+
 # Install turbovnc from the sourceforge downloads page
 # https://sourceforge.net/projects/turbovnc/files/
 # This attempts to work out the latest version by "scraping" the page,
@@ -26,9 +30,9 @@ FROM debian:stretch-slim
 # TVNC_VERSION variable could simply be set manually below.
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-	curl ca-certificates \
+	curl ca-certificates locales \
     libgl1-mesa-glx libgl1-mesa-dri \
-    xauth x11-xkb-utils xkb-data x11-xserver-utils libssl1.0.2 twm \
+    xauth x11-xkb-utils xkb-data x11-xserver-utils libssl1.0.2 jwm \
     xfonts-base xfonts-75dpi xfonts-100dpi xfonts-scalable && \
     # Attempt to work out the latest turbovnc version from
     # https://sourceforge.net/projects/turbovnc/files/
@@ -43,6 +47,17 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get purge -y curl ca-certificates && \
     apt-get autoremove -y && \
 	rm -rf /var/lib/apt/lists/* && \
+    # Generate locales
+    sed -i "s/^# *\($LANG\)/\1/" /etc/locale.gen && locale-gen && \
+    # Set up the timezone
+    echo $TZ > /etc/timezone && \
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    DEBIAN_FRONTEND=noninteractive dpkg-reconfigure tzdata && \
+    # Tidy up JWM for single app use case
+    sed -i "s/Desktops width=\"4\"/Desktops width=\"1\"/g" /etc/jwm/system.jwmrc && \
+    sed -i "s/<TrayButton icon=\"\/usr\/share\/jwm\/jwm-red.svg\">root:1<\/TrayButton>//g" /etc/jwm/system.jwmrc && \
+    sed -i "s/<TrayButton label=\"_\">showdesktop<\/TrayButton>//g" /etc/jwm/system.jwmrc && \
+    sed -i "s/<Include>\/etc\/jwm\/debian-menu<\/Include>//g" /etc/jwm/system.jwmrc && \
     # We'll be exporting /tmp/.X11-unix as a volume and we need
     # the mode of /tmp/.X11-unix to be set to 1777
     mkdir /tmp/.X11-unix && \
