@@ -33,7 +33,7 @@ RUN sed -i 's/main/main non-free/' /etc/apt/sources.list && \
     libxfixes-dev libxrandr-dev libxml2-dev dpkg-dev libcap-dev \
     libmp3lame-dev libopus-dev libfdk-aac-dev libjpeg-dev \
     libturbojpeg0-dev libpixman-1-dev libfuse-dev \
-    libgl1-mesa-glx libgl1-mesa-dri twm xauth x11-utils \
+    libgl1-mesa-glx libgl1-mesa-dri jwm xauth x11-utils \
     xfonts-base xfonts-75dpi xfonts-100dpi xfonts-scalable && \
     #
     # Install tini. Can't just use --init in docker run because we need
@@ -46,6 +46,11 @@ RUN sed -i 's/main/main non-free/' /etc/apt/sources.list && \
     echo $TZ > /etc/timezone && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     DEBIAN_FRONTEND=noninteractive dpkg-reconfigure tzdata && \
+    # Tidy up JWM for single app use case
+    sed -i "s/Desktops width=\"4\"/Desktops width=\"1\"/g" /etc/jwm/system.jwmrc && \
+    sed -i "s/<TrayButton icon=\"\/usr\/share\/jwm\/jwm-red.svg\">root:1<\/TrayButton>//g" /etc/jwm/system.jwmrc && \
+    sed -i "s/<TrayButton label=\"_\">showdesktop<\/TrayButton>//g" /etc/jwm/system.jwmrc && \
+    sed -i "s/<Include>\/etc\/jwm\/debian-menu<\/Include>//g" /etc/jwm/system.jwmrc && \
     #
     # Clone xrdp and xorgxrdp source from GitHub and build them.
     cd /usr/src && \
@@ -102,7 +107,7 @@ RUN sed -i 's/main/main non-free/' /etc/apt/sources.list && \
     chmod +x /usr/lib/xorg/XorgFake && \
     sed -i 's/param=Xorg/param=\/usr\/lib\/xorg\/XorgFake/' /etc/xrdp/sesman.ini && \
     #
-    # Create launch script to start Xorg, twm and xrdp. The sed replaces
+    # Create launch script to start Xorg, jwm and xrdp. The sed replaces
     # X11DisplayOffset with $DISPLAY using an explicit temp file in /tmp
     # because /etc/xrdp isn't writable so we can't use sed -i
     echo '#!/bin/bash\nsed '\"'s/X11DisplayOffset=10/X11DisplayOffset=${DISPLAY:1}/'\"' /etc/xrdp/sesman.ini > /tmp/sesman.ini && cat /tmp/sesman.ini > /etc/xrdp/sesman.ini && rm -f /tmp/sesman.ini\npulseaudio &\nXorg $DISPLAY -ac -noreset -nolisten tcp -config /etc/X11/xrdp/xorg.conf &\nxrdp-sesman --nodaemon &\nexec xrdp --nodaemon' > /usr/local/bin/startup && \
