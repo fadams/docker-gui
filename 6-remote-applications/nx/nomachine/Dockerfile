@@ -19,19 +19,25 @@
 
 FROM debian:stretch-slim
 
+ENV LANG=en_GB.UTF-8
+ENV TZ=Europe/London
+
 # Install NoMachine and xserver-xorg-video-dummy. Note net-tools as
 # NoMachine uses netstat to detect if there is a current X Server.
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-    curl ca-certificates libgl1-mesa-glx libgl1-mesa-dri \
+    curl sudo ca-certificates libgl1-mesa-glx libgl1-mesa-dri \
     desktop-base xdg-user-dirs xserver-xorg-video-dummy xauth \
-    xserver-xorg-input-libinput jwm cups pulseaudio net-tools sudo \
+    xserver-xorg-input-libinput locales jwm cups pulseaudio net-tools \
     xfonts-base xfonts-75dpi xfonts-100dpi xfonts-scalable && \
     # Install NoMachine binary and dependencies.
     # Ensure the nx user ID is not in the normal user range.
     groupadd -r -g 2000 nx && useradd -u 2000 -r -g nx nx && \
-    curl -sSL https://download.nomachine.com/download/6.5/Linux/nomachine_6.5.6_9_amd64.deb -o nomachine_6.5.6_9_amd64.deb && \
-    dpkg -i nomachine_6.5.6_9_amd64.deb && \
+    NOMACHINE_MAJOR_VERSION=6.7 && \
+    NOMACHINE_VERSION=6.7.6_11 && \
+    echo "NOMACHINE_VERSION version: ${NOMACHINE_VERSION}" && \
+    curl -sSL https://download.nomachine.com/download/${NOMACHINE_MAJOR_VERSION}/Linux/nomachine_${NOMACHINE_VERSION}_amd64.deb -o nomachine_${NOMACHINE_VERSION}_amd64.deb && \
+    dpkg -i nomachine_${NOMACHINE_VERSION}_amd64.deb && \
     # Create simple launch scripts to start NoMachine server and client.
     # Setting XDG_RUNTIME_DIR in /etc/environment ensures the correct
     # PulseAudio socket path will be used even when PulseAudio is
@@ -43,6 +49,12 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     sed -i "s/load-module module-console-kit/#load-module module-console-kit/g" /etc/pulse/default.pa && \
     # Allow users in sudo group to run commands without password.
     sed -i "s/%sudo\tALL=(ALL\:ALL) ALL/%sudo\tALL=(ALL\:ALL) NOPASSWD\:ALL/g" /etc/sudoers && \
+    # Generate locales
+    sed -i "s/^# *\($LANG\)/\1/" /etc/locale.gen && locale-gen && \
+    # Set up the timezone
+    echo $TZ > /etc/timezone && \
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    DEBIAN_FRONTEND=noninteractive dpkg-reconfigure tzdata && \
     # Tidy up JWM for single app use case
     sed -i "s/Desktops width=\"4\"/Desktops width=\"1\"/g" /etc/jwm/system.jwmrc && \
     sed -i "s/<TrayButton icon=\"\/usr\/share\/jwm\/jwm-red.svg\">root:1<\/TrayButton>//g" /etc/jwm/system.jwmrc && \
@@ -53,7 +65,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     mkdir /run/user && \
     chmod 1777 /run/user && \
     # Tidy up
-    rm nomachine_6.5.6_9_amd64.deb && \
+    rm nomachine_${NOMACHINE_VERSION}_amd64.deb && \
     apt-get clean && \
     apt-get purge -y curl && \
     apt-get autoremove -y && \
