@@ -30,10 +30,10 @@ mkdir -p $(id -un)/.config/dconf
 
 # Create fake machine-id http://man7.org/linux/man-pages/man5/machine-id.5.html
 # Also https://www.freedesktop.org/software/systemd/man/machine-id.html
-# The issue is that containers derived from the same base image seem to
-# have the same machine-id (which is normally set by systemd on first boot).
-# This ID is used by xpra to detect if user and server environment are identical
-# and if so it fails to start speaker forwarding. An alternative is to set
+# The issue is that containers derived from the same base image will have the
+# same default machine-id (which is normally set by systemd on first boot).
+# This ID is used to detect if client and server environment are identical
+# and if so xpra fails to start speaker forwarding. An alternative is to set
 # XPRA_ALLOW_SOUND_LOOP=1 on the environment, but setting machine-id can
 # be useful in other situations too, so it's a good approach to illustrate.
 if ! test -f "$(id -un)/machine-id"; then
@@ -53,7 +53,6 @@ $DOCKER_COMMAND run --rm -it -d \
     -v $PWD/$(id -un):/home/$(id -un) \
     -v $PWD/$(id -un)/machine-id:/etc/machine-id \
     -e XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR \
-    -e PULSE_SERVER=unix:$XDG_RUNTIME_DIR/pulse/native \
     -e DISPLAY=:1 \
     xpra start --bind=$HOME/.xpra/xpra-socket --bind-tcp=0.0.0.0:10000
 

@@ -47,6 +47,8 @@ $DOCKER_COMMAND run --rm -it \
 
 # ./xpra-attach.sh --desktop-scaling=1 --mmap=$HOME/.xpra/xpra-mmap socket:$HOME/.xpra/xpra-socket
 
+# XPRA_PULSE_SINK_DEVICE_NAME=alsa_output.pci-0000_01_00.1.hdmi-stereo-extra1 ./xpra-attach.sh --desktop-scaling=1 --mmap=$HOME/.xpra/xpra-mmap socket:$HOME/.xpra/xpra-socket
+
 # ./xpra-attach.sh --desktop-scaling=1 --speaker-codec=flac --mmap=$HOME/.xpra/xpra-mmap socket:$HOME/.xpra/xpra-socket
 
 # ./xpra-attach.sh --desktop-scaling=1 --mmap=$HOME/.xpra/xpra-mmap tcp://<host-ip>:10000
