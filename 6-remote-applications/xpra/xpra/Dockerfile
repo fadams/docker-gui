@@ -22,7 +22,7 @@ FROM debian:stretch-slim
 # Install xpra and xserver-xorg-video-dummy
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-    curl ca-certificates libgl1-mesa-glx libgl1-mesa-dri \
+    curl cups-client ca-certificates libgl1-mesa-glx libgl1-mesa-dri \
     xvfb xserver-xorg-video-dummy x11-xserver-utils gir1.2-gtk-3.0 \
     libturbojpeg0 python-rencode python-paramiko python-pyinotify \
     python-gtkglext1 python-gst-1.0 python-lz4 python-netifaces \
@@ -38,13 +38,13 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     pip install wheel && pip install PyOpenGL-accelerate && \
     # Install xpra binary and dependencies. Use xpra releases
     # rather than debian distro as xpra releases is more up to date.
-    XPRA_VERSION=xpra_2.5.3-r23270-1 && \
+    XPRA_VERSION=2.5.3-r23270-1 && \
     echo "XPRA_VERSION version: ${XPRA_VERSION}" && \
     curl -sSL https://xpra.org/dists/stretch/main/binary-amd64/ffmpeg-xpra_4.0-1_amd64.deb -o ffmpeg-xpra_4.0-1_amd64.deb && \
-    curl -sSL https://xpra.org/dists/stretch/main/binary-amd64/python2-${XPRA_VERSION}_amd64.deb -o python2-${XPRA_VERSION}_amd64.deb && \
-    curl -sSL https://xpra.org/dists/stretch/main/binary-amd64/${XPRA_VERSION}_amd64.deb -o ${XPRA_VERSION}_amd64.deb && \
+    curl -sSL https://xpra.org/dists/stretch/main/binary-amd64/python2-xpra_${XPRA_VERSION}_amd64.deb -o python2-xpra_${XPRA_VERSION}_amd64.deb && \
+    curl -sSL https://xpra.org/dists/stretch/main/binary-amd64/xpra_${XPRA_VERSION}_amd64.deb -o xpra_${XPRA_VERSION}_amd64.deb && \
     dpkg -i ffmpeg-xpra_4.0-1_amd64.deb && \
-    dpkg -i python2-${XPRA_VERSION}_amd64.deb ${XPRA_VERSION}_amd64.deb && \
+    dpkg -i python2-xpra_${XPRA_VERSION}_amd64.deb xpra_${XPRA_VERSION}_amd64.deb && \
     #
     # In xpra_2.5.3 (and earlier) av-sync capabilities don't seem to be being
     # exchanged correctly. The following is a minimal patch. NB that when
@@ -55,11 +55,17 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     sed -i 's/updict({}/updict({"av-sync": self.av_sync}/g' /usr/lib/python2.7/dist-packages/xpra/client/mixins/audio.py && \
     sed -i 's/    def get_info/    def get_caps(self): return {"av-sync.enabled" : self.av_sync_enabled}\n\n    def get_info/g' /usr/lib/python2.7/dist-packages/xpra/server/source/avsync_mixin.py && \
     #
+    # xpra *really* wants to use a private pulseaudio session, but I *really*
+    # want it to use $XDG_RUNTIME_DIR/pulse. There doesn't seem to be a clean
+    # way to do this so resorting to patching xpra/server/mixins/audio_server.py
+    # This may need changing if the xpra code changes, so it's a bit fragile. 
+    sed -i 's/self.pulseaudio_private_dir = osexpand(os.path.join(xpra_rd, "pulse-%s" % display))/self.pulseaudio_private_dir = os.environ.get("XDG_RUNTIME_DIR", "")/g' /usr/lib/python2.7/dist-packages/xpra/server/mixins/audio_server.py && \
+    #
     # Create simple launch scripts to start xpra server and client.
     # Note dbus-launch was made the default in 2.5 and causes issues if D-bus
     # isn't present, so set --dbus-launch= for now. TODO investigate the best
-    # way to integrate the xpra server container with a D-bus instance. 
-    echo '#!/bin/bash\nmkdir -p $XDG_RUNTIME_DIR\nxpra start $DISPLAY --dbus-launch= $@ &\nln -s $XDG_RUNTIME_DIR/xpra/pulse-1/pulse $XDG_RUNTIME_DIR/pulse\nexec sleep infinity' > /usr/local/bin/start && \
+    # way to integrate the xpra server container with a D-bus instance.
+    echo '#!/bin/bash\nmkdir -p $XDG_RUNTIME_DIR/pulse\nmkdir -p ~/.xpra\nexec xpra start --daemon=no --notifications=no $DISPLAY --dbus-launch= $@\n' > /usr/local/bin/start && \
     echo '#!/bin/bash\nxpra attach $@' > /usr/local/bin/attach && \
     chmod +x /usr/local/bin/start && \
     chmod +x /usr/local/bin/attach && \
@@ -76,7 +82,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     chmod 1777 /run/user && \
     # Tidy up
     rm ffmpeg-xpra_4.0-1_amd64.deb && \
-    rm python2-${XPRA_VERSION}_amd64.deb ${XPRA_VERSION}_amd64.deb && \
+    rm python2-xpra_${XPRA_VERSION}_amd64.deb xpra_${XPRA_VERSION}_amd64.deb && \
     apt-get clean && \
     apt-get purge -y curl python-pip python-setuptools python-dev gcc && \
     apt-get autoremove -y && \
