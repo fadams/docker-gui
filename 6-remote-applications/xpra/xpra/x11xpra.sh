@@ -56,6 +56,13 @@ $DOCKER_COMMAND run --rm -it -d \
     -e DISPLAY=:1 \
     xpra start --bind=$HOME/.xpra/xpra-socket --bind-tcp=0.0.0.0:10000
 
+# Test for the presence of $XDG_RUNTIME_DIR/pulse/pid to wait until
+# xpra has launched Pulseaudio as if we launch application containers
+# before the Pulseaudio socket is available then their audio will fail.
+$DOCKER_COMMAND run --rm -it \
+    --volumes-from x11xpra \
+    xpra bash -c "while [ ! -f $XDG_RUNTIME_DIR/pulse/pid ]; do echo 'Waiting for xpra Pulseaudio daemon';sleep 1; done; echo 'xpra Pulseaudio daemon running'"
+
 # Launch firefox. Use --volumes-from to mount /tmp/.X11-unix
 # from x11xpra and also use that container's IPC
 $DOCKER_COMMAND run --rm \

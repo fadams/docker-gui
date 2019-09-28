@@ -40,10 +40,10 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     pip3 --no-cache-dir install PyOpenGL-accelerate opencv-python python-lzo \
     cryptography paramiko-ng python-uinput && \
     #
-    # Install xpra binary and dependencies. Use xpra releases
+    # Install xpra binary and dependencies. Use xpra beta releases
     # rather than debian distro as xpra releases is more up to date.
     # Use xserver-xorg-video-dummy from xpra dists to fix DPI issues.
-    XPRA_VERSION=3.0-20190914r23788-1 && \
+    XPRA_VERSION=3.0-20190927r23994-1 && \
     echo "XPRA_VERSION version: ${XPRA_VERSION}" && \
     curl -sSL https://xpra.org/dists/stretch/main/binary-amd64/ffmpeg-xpra_4.0-1_amd64.deb -o ffmpeg-xpra_4.0-1_amd64.deb && \
     curl -sSL https://xpra.org/dists/stretch/main/binary-amd64/xserver-xorg-video-dummy_0.3.8-5_amd64.deb -o xserver-xorg-video-dummy_0.3.8-5_amd64.deb && \
