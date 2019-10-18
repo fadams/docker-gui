@@ -40,7 +40,12 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     ln -s /usr/local/lib/node-v10.16.3-linux-x64/bin/npm /usr/local/bin/npm && \
     ln -s /usr/local/lib/node-v10.16.3-linux-x64/bin/npx /usr/local/bin/npx && \
     npm install -g es6-module-transpiler && \
+    npm install -g @babel/cli && \
+    npm install --save-dev @babel/core @babel/preset-env && \
+    ln -s /usr/local/lib/node-v10.16.3-linux-x64/bin/babel /usr/local/bin/babel && \
+    ln -s /usr/local/lib/node-v10.16.3-linux-x64/bin/compile-modules /usr/local/bin/compile-modules && \
     cd /usr/local/bin/noVNC-${NOVNC_VERSION} && \
+    echo '{"presets": ["@babel/preset-env"]}' > .babelrc && \
     # Tweak noVNC configuration as the defaults point to websockify not the
     # built-in x11vnc websocket support.
     sed -i "s/UI.initSetting('port', port)/UI.initSetting('port', 5900)/g" app/ui.js && \
@@ -49,7 +54,10 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     sed -i 's/type="module" crossorigin="anonymous" src="app\/ui.js"/src="app.js"/g' vnc.html && \
     sed -i 's/<script src="vendor\/promise.js"><\/script>//g' vnc.html && \
     sed -i 's/if (window._noVNC_has_module_support) //g' vnc.html && \
-    /usr/local/lib/node-v10.16.3-linux-x64/bin/compile-modules convert app/ui.js > app.js && \
+    # Transpile the Javascript to speed up loading and allow it to work on
+    # a wider variety of browsers.
+    compile-modules convert app/ui.js > app.js && \
+    babel app.js --out-file app.js && \
     mkdir -p /usr/local/bin/noVNC/app && \
     mv /usr/local/bin/noVNC-${NOVNC_VERSION}/app/images /usr/local/bin/noVNC/app/images && \
     mv /usr/local/bin/noVNC-${NOVNC_VERSION}/app/locale /usr/local/bin/noVNC/app/locale && \
