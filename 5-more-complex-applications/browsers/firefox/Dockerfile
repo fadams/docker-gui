@@ -34,9 +34,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     libvpx4 libdbus-glib-1-2 libcanberra-gtk3-module \
     libpulse0 libv4l-0 libgl1-mesa-glx libgl1-mesa-dri && \
     # Debian ships with esr, so download and install latest Firefox.
-    wget -O firefox.tar.bz2 "https://download.mozilla.org/?product=firefox-latest&os=linux64&lang=${FIREFOX_LANG}" && \
-    tar xjf firefox.tar.bz2 -C /usr/lib/ && \
-    rm firefox.tar.bz2 && \
+    wget -qO - "https://download.mozilla.org/?product=firefox-latest&os=linux64&lang=${FIREFOX_LANG}" | tar -xjv -C /usr/lib && \
 	rm -rf /var/lib/apt/lists/* && \
     cp /etc/pulse/client.conf /etc/pulse/client-noshm.conf && \
     sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client-noshm.conf
