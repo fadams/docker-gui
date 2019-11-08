@@ -19,20 +19,36 @@
 
 FROM debian:stretch-slim
 
-# https://github.com/intel/compute-runtime/releases
+# See https://github.com/intel/compute-runtime/releases
 # should (hopefully) just need --device=/dev/dri
-ENV VERSION 18.40.11622
+ENV OCL_VERSION 19.43.14583
+ENV GMM_VERSION 19.3.2
+ENV IGC_VERSION 1.0.2714.1
 
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
+# Use testing the install requires as libc6 >= 2.27
+RUN echo "deb http://ftp.debian.org/debian testing main" > /etc/apt/sources.list.d/stretch-testing.list && \
+    apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages
-    apt-get install -y --no-install-recommends \
+    apt-get install -y --no-install-recommends -t testing \
     ocl-icd-libopencl1 clinfo wget ca-certificates && \
-    # Add the Intel OpenCL Installable Client Driver
-    wget -O intel-opencl_${VERSION}_amd64.deb "https://github.com/intel/compute-runtime/releases/download/${VERSION}/intel-opencl_${VERSION}_amd64.deb" && \
-    dpkg -i intel-opencl_${VERSION}_amd64.deb && \
+    # Add the Intel compute-runtime
+    wget -O intel-opencl_${OCL_VERSION}_amd64.deb "https://github.com/intel/compute-runtime/releases/download/${OCL_VERSION}/intel-opencl_${OCL_VERSION}_amd64.deb" && \
+    wget -O intel-ocloc_${OCL_VERSION}_amd64.deb "https://github.com/intel/compute-runtime/releases/download/${OCL_VERSION}/intel-ocloc_${OCL_VERSION}_amd64.deb" && \
+    wget -O intel-gmmlib_${GMM_VERSION}_amd64.deb "https://github.com/intel/compute-runtime/releases/download/${OCL_VERSION}/intel-gmmlib_${GMM_VERSION}_amd64.deb" && \
+    wget -O intel-igc-core_${IGC_VERSION}_amd64.deb "https://github.com/intel/compute-runtime/releases/download/${OCL_VERSION}/intel-igc-core_${IGC_VERSION}_amd64.deb" && \
+    wget -O intel-igc-opencl_${IGC_VERSION}_amd64.deb "https://github.com/intel/compute-runtime/releases/download/${OCL_VERSION}/intel-igc-opencl_${IGC_VERSION}_amd64.deb" && \
+    dpkg -i intel-opencl_${OCL_VERSION}_amd64.deb \
+            intel-ocloc_${OCL_VERSION}_amd64.deb \
+            intel-gmmlib_${GMM_VERSION}_amd64.deb \
+            intel-igc-core_${IGC_VERSION}_amd64.deb \
+            intel-igc-opencl_${IGC_VERSION}_amd64.deb && \
     apt-get install -f && \
     # Remove packages used for installation
-    rm intel-opencl_${VERSION}_amd64.deb && \
+    rm intel-opencl_${OCL_VERSION}_amd64.deb \
+       intel-ocloc_${OCL_VERSION}_amd64.deb \
+       intel-gmmlib_${GMM_VERSION}_amd64.deb \
+       intel-igc-core_${IGC_VERSION}_amd64.deb \
+       intel-igc-opencl_${IGC_VERSION}_amd64.deb && \
     apt-get clean && \
     apt-get purge -y wget ca-certificates && \
     apt-get autoremove -y && \
