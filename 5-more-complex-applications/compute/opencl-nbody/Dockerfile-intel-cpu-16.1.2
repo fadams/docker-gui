@@ -19,7 +19,9 @@
 
 FROM debian:stretch-slim
 
-ENV RUNTIME opencl_runtime_16.1.1_x64_ubuntu_6.4.0.25
+# Driver Version 1.2.0.37 
+# Device Version OpenCL 1.2 (Build 37)
+ENV RUNTIME opencl_runtime_16.1.2_x64_rh_6.4.0.37
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages
@@ -28,12 +30,12 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     libxmu-dev freeglut3-dev libglew-dev \
     wget ca-certificates tar rpm2cpio cpio gcc g++ make && \
     # Add the Intel OpenCL Installable Client Driver  
-    wget -O ${RUNTIME}.tgz "http://registrationcenter-download.intel.com/akdlm/irc_nas/9019/${RUNTIME}.tgz" && \
+    wget -O ${RUNTIME}.tgz "http://registrationcenter-download.intel.com/akdlm/irc_nas/12556/${RUNTIME}.tgz" && \
     tar zxfp ${RUNTIME}.tgz && \
     cd ${RUNTIME}/rpm && \
-    rpm2cpio opencl-1.2-intel-cpu-6.4.0.25-1.x86_64.rpm | cpio -idmv && \
+    rpm2cpio opencl-1.2-intel-cpu-6.4.0.37-1.x86_64.rpm | cpio -idmv && \
     mkdir -p /opt/intel/opencl && \
-    cp ./opt/intel/opencl-1.2-6.4.0.25/lib64/* /opt/intel/opencl && \
+    cp ./opt/intel/opencl-1.2-6.4.0.37/lib64/* /opt/intel/opencl && \
     # Add ICD to the ICD registry
     mkdir -p /etc/OpenCL/vendors && \
     echo "/opt/intel/opencl/libintelocl.so" > /etc/OpenCL/vendors/intel_cpu.icd && \
@@ -86,6 +88,6 @@ ENTRYPOINT ["oclNbody"]
 # Example usage
 # 
 # Build the image
-# docker build -t opencl-nbody-intel-cpu -f Dockerfile-intel-cpu .
+# docker build -t opencl-nbody-intel-cpu -f Dockerfile-intel-cpu-16.1.2 .
 
 
