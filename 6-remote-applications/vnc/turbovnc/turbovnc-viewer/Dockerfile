@@ -35,7 +35,7 @@ RUN mkdir -p /usr/share/man/man1 && \
 	TVNC_VERSION=$(curl -sSL https://sourceforge.net/projects/turbovnc/files/ | grep "<span class=\"name\">[0-9]" | head -n 1 | cut -d \> -f2 | cut -d \< -f1) && \
     echo "turbovnc version: ${TVNC_VERSION}" && \
     # Given the version download and install turbovnc
-    curl -sSL https://sourceforge.net/projects/turbovnc/files/"${TVNC_VERSION}"/turbovnc_"${TVNC_VERSION}"_amd64.deb -o turbovnc_"${TVNC_VERSION}"_amd64.deb && \
+    curl -sSL https://sourceforge.net/projects/turbovnc/files/${TVNC_VERSION}/turbovnc_${TVNC_VERSION}_amd64.deb -o turbovnc_${TVNC_VERSION}_amd64.deb && \
     dpkg -i turbovnc_*_amd64.deb && \
     # Tidy up packages only used for installing turbovnc.
     rm turbovnc_*_amd64.deb && \
