@@ -21,6 +21,9 @@
 # Run the samples from https://github.com/NVIDIAGameWorks/GraphicsSamples
 # in a Docker container.
 
+TARGET_DISPLAY=${DISPLAY:-:0}
+DISPLAY=${VGL_DISPLAY:-:0} # The Display to use for 3D rendering
+
 BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 . $BIN/docker-xauth.sh
 . $BIN/docker-gpu.sh
@@ -30,5 +33,6 @@ docker run --rm \
     -v /etc/passwd:/etc/passwd:ro \
     $X11_FLAGS \
     $GPU_FLAGS \
-    gameworks-graphics-samples vglrun ./ThreadedRenderingGL
+    -e DISPLAY=$TARGET_DISPLAY \
+    gameworks-graphics-samples-vgl vglrun ./BlendedAA
 

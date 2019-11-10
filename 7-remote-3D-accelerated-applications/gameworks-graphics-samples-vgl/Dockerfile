@@ -54,5 +54,5 @@ WORKDIR /usr/src/GraphicsSamples/samples/bin/linux64
 #-------------------------------------------------------------------------------
 # 
 # To build the image
-# docker build -t gameworks-graphics-samples .
+# docker build -t gameworks-graphics-samples-vgl .
 #
