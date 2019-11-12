@@ -39,16 +39,16 @@ mv $DOCKER_XAUTHORITY.$$ $DOCKER_XAUTHORITY
 # for use-cases such as nested X servers where we might need
 # to open additional displays and thus write to that directory.
 
-X11_ENV="-e DISPLAY=unix$DISPLAY "
-X11_ENV+="-e XAUTHORITY=$DOCKER_XAUTHORITY "
+X11_XAUTH="-e XAUTHORITY=$DOCKER_XAUTHORITY "
+X11_XAUTH+="-v $DOCKER_XAUTHORITY:$DOCKER_XAUTHORITY:ro "
 
-X11_MOUNTS="-v /tmp/.X11-unix:/tmp/.X11-unix:ro "
-X11_MOUNTS+="-v $DOCKER_XAUTHORITY:$DOCKER_XAUTHORITY:ro "
+X11_DISPLAY="-e DISPLAY=unix$DISPLAY "
+X11_DISPLAY+="-v /tmp/.X11-unix:/tmp/.X11-unix:ro "
 
-X11_MOUNTS_RW="-v /tmp/.X11-unix:/tmp/.X11-unix:rw "
-X11_MOUNTS_RW+="-v $DOCKER_XAUTHORITY:$DOCKER_XAUTHORITY:ro "
+X11_DISPLAY_RW="-e DISPLAY=unix$DISPLAY "
+X11_DISPLAY_RW+="-v /tmp/.X11-unix:/tmp/.X11-unix:rw "
 
-X11_FLAGS=$X11_ENV$X11_MOUNTS
-X11_FLAGS_RW=$X11_ENV$X11_MOUNTS_RW
+X11_FLAGS=$X11_XAUTH$X11_DISPLAY
+X11_FLAGS_RW=$X11_XAUTH$X11_DISPLAY_RW
 
 
