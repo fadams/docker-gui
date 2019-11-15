@@ -33,9 +33,14 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Install NoMachine binary and dependencies.
     # Ensure the nx user ID is not in the normal user range.
     groupadd -r -g 2000 nx && useradd -u 2000 -r -g nx nx && \
-    NOMACHINE_MAJOR_VERSION=6.7 && \
-    NOMACHINE_VERSION=6.7.6_11 && \
+    # Try to work out the latest version from the NoMachine Linux download
+    # page. If this fails set the following variables manually instead.
+    NOMACHINE_VERSION=$(curl -sSL "https://www.nomachine.com/download/download&id=3" | grep "Linux/nomachine" | cut -d \' -f2 | cut -d \_ -f2-3) && \
+    NOMACHINE_MAJOR_VERSION=$(echo $NOMACHINE_VERSION | cut -d \. -f1-2) && \
+    #NOMACHINE_VERSION=6.8.1_1 && \
+    #NOMACHINE_MAJOR_VERSION=6.8 && \
     echo "NOMACHINE_VERSION version: ${NOMACHINE_VERSION}" && \
+    echo "NOMACHINE_MAJOR_VERSION version: ${NOMACHINE_MAJOR_VERSION}" && \
     curl -sSL https://download.nomachine.com/download/${NOMACHINE_MAJOR_VERSION}/Linux/nomachine_${NOMACHINE_VERSION}_amd64.deb -o nomachine_${NOMACHINE_VERSION}_amd64.deb && \
     dpkg -i nomachine_${NOMACHINE_VERSION}_amd64.deb && \
     # Create simple launch scripts to start NoMachine server and client.
