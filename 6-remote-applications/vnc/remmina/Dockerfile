@@ -19,15 +19,19 @@
 
 FROM debian:stretch-slim
 
+# nvidia-docker hooks (Only needed for Nvidia Docker V1)
+LABEL com.nvidia.volumes.needed=nvidia_driver
+
 # Install remmina and all plugins
 RUN echo "deb http://ftp.debian.org/debian stretch-backports main" > /etc/apt/sources.list.d/stretch-backports.list && \
     apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends -t stretch-backports \
     remmina remmina-plugin-vnc remmina-plugin-rdp remmina-plugin-nx \
     remmina-plugin-spice  remmina-plugin-exec remmina-plugin-xdmcp \
-    remmina-plugin-secret remmina-plugin-telepathy && \
+    remmina-plugin-secret remmina-plugin-telepathy \
+    libgl1-mesa-glx libgl1-mesa-dri && \
 	rm -rf /var/lib/apt/lists/* && \
-    # Apparently remmina-plugin-rdp and remmina-plugin-spice
+    # remmina-plugin-rdp and remmina-plugin-spice
     # have a PulseAudio dependency, so enable PulseAudio for those.
     cp /etc/pulse/client.conf /etc/pulse/client-noshm.conf && \
     sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client-noshm.conf

@@ -19,8 +19,8 @@
 #
 
 BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
-. $BIN/docker-command.sh
 . $BIN/docker-xauth.sh
+. $BIN/docker-gpu.sh
 . $BIN/docker-pulseaudio.sh
 . $BIN/docker-dbus-all.sh
 
@@ -36,5 +36,6 @@ $DOCKER_COMMAND run --rm \
     $DCONF_FLAGS \
     $PULSEAUDIO_FLAGS \
     $X11_FLAGS \
+    $GPU_FLAGS \
     remmina
 
