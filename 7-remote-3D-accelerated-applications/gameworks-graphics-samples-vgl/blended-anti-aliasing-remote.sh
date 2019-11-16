@@ -18,18 +18,29 @@
 # under the License.
 #
 
-TARGET_DISPLAY=${DISPLAY:-:0}
-DISPLAY=${VGL_DISPLAY:-:0} # The Display to use for 3D rendering
+# Run the samples from https://github.com/NVIDIAGameWorks/GraphicsSamples
+# in a Docker container.
+
+if [ -z ${REMOTE+x} ]; then
+    echo "Usage: REMOTE=<display server container> ./blended-anti-aliasing-remote.sh"
+    echo "e.g. REMOTE=xserver-xspice ./blended-anti-aliasing-remote.sh"
+    exit 1
+fi
 
 BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 . $BIN/docker-xauth.sh
 . $BIN/docker-gpu.sh
 
-$DOCKER_COMMAND run --rm \
+# Launch BlendedAA. Use --volumes-from to mount /tmp/.X11-unix
+# from REMOTE container and also use that container's IPC
+docker run --rm \
     -u $(id -u):$(id -g) \
     -v /etc/passwd:/etc/passwd:ro \
-    $X11_FLAGS \
+    $X11_XAUTH \
+    -v /tmp/.X11-unix/X0:/tmp/.X11-unix/X0:ro \
     $GPU_FLAGS \
-    -e DISPLAY=$TARGET_DISPLAY \
-    cuda-smoke-vgl vglrun ./smokeParticles $@
+    -e DISPLAY=:1 \
+    --ipc=container:$REMOTE \
+    --volumes-from $REMOTE \
+    gameworks-graphics-samples-vgl vglrun ./BlendedAA
 

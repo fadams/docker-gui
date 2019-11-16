@@ -1,4 +1,3 @@
-#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -17,26 +16,29 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-
-################################################################################
-# Script to run glxgears in a container.
-# This version uses VirtualGL to perform “split rendering” (GLX forking) which
+# This uses VirtualGL to perform “split rendering” (GLX forking) which
 # intercepts GLX calls and renders to a memory buffer, which can then be 
 # forwarded to a remote display.
-################################################################################
 
-TARGET_DISPLAY=${DISPLAY:-:0}
-DISPLAY=${VGL_DISPLAY:-:0} # The Display to use for 3D rendering
+# Use our virtualgl base image
+FROM virtualgl
 
-BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
-. $BIN/docker-xauth.sh
-. $BIN/docker-gpu.sh
+# nvidia-docker hooks (Only needed for Nvidia Docker V1)
+LABEL com.nvidia.volumes.needed=nvidia_driver
 
-$DOCKER_COMMAND run --rm \
-    -u $(id -u):$(id -g) \
-    -v /etc/passwd:/etc/passwd:ro \
-    $X11_FLAGS \
-    $GPU_FLAGS \
-    -e DISPLAY=$TARGET_DISPLAY \
-    glxgears-vgl vglrun glxgears
+# Install blender
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
+    # Add the packages used
+    apt-get install -y --no-install-recommends \
+	blender libgl1-mesa-glx libgl1-mesa-dri && \
+	rm -rf /var/lib/apt/lists/* && \
+    cp /etc/pulse/client.conf /etc/pulse/client-noshm.conf && \
+    sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client-noshm.conf
 
+ENTRYPOINT ["vglrun", "blender"]
+
+#-------------------------------------------------------------------------------
+# 
+# To build the image
+# docker build -t blender-vgl .
+#

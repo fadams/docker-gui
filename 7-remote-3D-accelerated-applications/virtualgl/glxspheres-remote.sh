@@ -18,21 +18,26 @@
 # under the License.
 #
 
-# Run the samples from https://github.com/NVIDIAGameWorks/GraphicsSamples
-# in a Docker container.
-
-TARGET_DISPLAY=${DISPLAY:-:0}
-DISPLAY=${VGL_DISPLAY:-:0} # The Display to use for 3D rendering
+if [ -z ${REMOTE+x} ]; then
+    echo "Usage: REMOTE=<display server container> ./glxspheres-remote.sh"
+    echo "e.g. REMOTE=xserver-xspice ./glxspheres-remote.sh"
+    exit 1
+fi
 
 BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 . $BIN/docker-xauth.sh
 . $BIN/docker-gpu.sh
 
-docker run --rm \
+# Launch glxspheres64. Use --volumes-from to mount /tmp/.X11-unix
+# from REMOTE container and also use that container's IPC
+$DOCKER_COMMAND run --rm \
     -u $(id -u):$(id -g) \
     -v /etc/passwd:/etc/passwd:ro \
-    $X11_FLAGS \
+    $X11_XAUTH \
+    -v /tmp/.X11-unix/X0:/tmp/.X11-unix/X0:ro \
     $GPU_FLAGS \
-    -e DISPLAY=$TARGET_DISPLAY \
-    gameworks-graphics-samples-vgl vglrun ./BlendedAA
+    -e DISPLAY=:1 \
+    --ipc=container:$REMOTE \
+    --volumes-from $REMOTE \
+    virtualgl vglrun /opt/VirtualGL/bin/glxspheres64 $@
 

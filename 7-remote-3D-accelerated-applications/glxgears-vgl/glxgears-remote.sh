@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -16,27 +17,27 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-# This uses VirtualGL to perform “split rendering” (GLX forking) which
-# intercepts GLX calls and renders to a memory buffer, which can then be 
-# forwarded to a remote display.
 
-# Use our virtualgl base image
-FROM virtualgl
+if [ -z ${REMOTE+x} ]; then
+    echo "Usage: REMOTE=<display server container> ./glxgears-remote.sh"
+    echo "e.g. REMOTE=xserver-xspice ./glxgears-remote.sh"
+    exit 1
+fi
 
-# nvidia-docker hooks (Only needed for Nvidia Docker V1)
-LABEL com.nvidia.volumes.needed=nvidia_driver
+BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
+. $BIN/docker-xauth.sh
+. $BIN/docker-gpu.sh
 
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
-    apt-get install -y --no-install-recommends \
-    mesa-utils && \
-	rm -rf /var/lib/apt/lists/*
-
-ENTRYPOINT ["vglrun", "glxgears"]
-
-#-------------------------------------------------------------------------------
-# Example usage
-# 
-# Build the image
-# docker build -t glxgears-vgl .
-#
+# Launch glxspheres64. Use --volumes-from to mount /tmp/.X11-unix
+# from REMOTE container and also use that container's IPC
+$DOCKER_COMMAND run --rm \
+    -u $(id -u):$(id -g) \
+    -v /etc/passwd:/etc/passwd:ro \
+    $X11_XAUTH \
+    -v /tmp/.X11-unix/X0:/tmp/.X11-unix/X0:ro \
+    $GPU_FLAGS \
+    -e DISPLAY=:1 \
+    --ipc=container:$REMOTE \
+    --volumes-from $REMOTE \
+    glxgears-vgl
 

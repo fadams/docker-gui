@@ -18,21 +18,29 @@
 # under the License.
 #
 
-# Run the samples from https://github.com/NVIDIAGameWorks/GraphicsSamples
-# in a Docker container.
-
-TARGET_DISPLAY=${DISPLAY:-:0}
-DISPLAY=${VGL_DISPLAY:-:0} # The Display to use for 3D rendering
+if [ -z ${REMOTE+x} ]; then
+    echo "Usage: REMOTE=<display server container> ./blender-remote.sh"
+    echo "e.g. REMOTE=xserver-xspice ./blender-remote.sh"
+    exit 1
+fi
 
 BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 . $BIN/docker-xauth.sh
 . $BIN/docker-gpu.sh
 
-docker run --rm \
+# Create a directory on the host that we can mount as a
+# "home directory" in the container for the current user. 
+mkdir -p $(id -un)/.config/pulse
+$DOCKER_COMMAND run --rm \
     -u $(id -u):$(id -g) \
+    -v $PWD/$(id -un):/home/$(id -un) \
     -v /etc/passwd:/etc/passwd:ro \
-    $X11_FLAGS \
+    $X11_XAUTH \
+    -v /tmp/.X11-unix/X0:/tmp/.X11-unix/X0:ro \
     $GPU_FLAGS \
-    -e DISPLAY=$TARGET_DISPLAY \
-    gameworks-graphics-samples-vgl vglrun ./ThreadedRenderingGL
+    -e PULSE_SERVER=unix:$XDG_RUNTIME_DIR/pulse/native \
+    -e DISPLAY=:1 \
+    --ipc=container:$REMOTE \
+    --volumes-from $REMOTE \
+    blender-vgl $@
 
