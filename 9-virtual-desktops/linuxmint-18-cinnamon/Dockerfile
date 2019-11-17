@@ -18,7 +18,6 @@
 #
 
 FROM ubuntu:16.04
-ENV DEBIAN_FRONTEND noninteractive
 
 ENV LANG=en_GB.UTF-8
 ENV TZ=Europe/London
@@ -26,18 +25,19 @@ ENV TZ=Europe/London
 RUN \
     # Enable partner repository (needed for mint-meta-codecs)
     sed -i 's/# deb http:\/\/archive.canonical.com\/ubuntu xenial partner/deb http:\/\/archive.canonical.com\/ubuntu xenial partner/' /etc/apt/sources.list && \
-    # Set up the repositories for Linux Mint Sylvia
+    # Set up the repositories for Linux Mint 18.3 "Sylvia"
     echo "deb http://packages.linuxmint.com/ sylvia main upstream import backport\n\n$(cat /etc/apt/sources.list)" > /etc/apt/sources.list.d/official-package-repositories.list && \
     rm /etc/apt/sources.list && \
     LINUX_MINT_KEY=$(apt update 2>&1 | grep -o '[0-9A-Z]\{16\}$' | xargs) && \
     apt-key adv --recv-keys --keyserver \
     hkp://keyserver.ubuntu.com:80 ${LINUX_MINT_KEY} && \
-    apt-get update && \
+    apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get -fy -o Dpkg::Options::="--force-confnew" -o APT::Immediate-Configure=false dist-upgrade && \
-    apt-get install -y --allow-unauthenticated linuxmint-keyring && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --allow-unauthenticated \
+    linuxmint-keyring && \
     unset LINUX_MINT_KEY && \
     # Add the main Mint flavoured packages
-    apt-get install -y --no-install-recommends \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     base-files ntp apt-utils add-apt-key aptdaemon apt-transport-https \
     apt-xapian-index locales language-pack-en tzdata mintlocale \
     mint-meta-cinnamon mintupload mint-user-guide-cinnamon \
@@ -63,7 +63,7 @@ RUN \
     # Set up the timezone
     echo $TZ > /etc/timezone && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
-    dpkg-reconfigure tzdata && \
+    DEBIAN_FRONTEND=noninteractive dpkg-reconfigure tzdata && \
     # Configure console
     echo console-setup console-setup/charmap select UTF-8 | debconf-set-selections && \
     # Fix mintupdate "APT-cache damaged" error
