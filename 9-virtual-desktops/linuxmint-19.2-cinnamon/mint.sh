@@ -46,25 +46,22 @@ fi
 if ! test -d $(id -un); then
     cp -R /etc/skel/. $(id -un)
     echo "export DISPLAY=unix$NESTED_DISPLAY" >> $(id -un)/.profile
+    echo "export XAUTHORITY=$DOCKER_XAUTHORITY" >> $(id -un)/.profile
+    echo "DISPLAY=:0 Xephyr $NESTED_DISPLAY -resizeable -ac -reset -terminate 2> /dev/null&" >> $(id -un)/.profile
     echo "/etc/X11/Xsession" >> $(id -un)/.profile
 fi
 
-# Launch Xephyr window.
-$DOCKER_COMMAND run --rm -d \
-    --ipc=host \
-    -u $(id -u):$(id -g) \
-    -v /etc/passwd:/etc/passwd:ro \
-    $X11_FLAGS_RW \
-    xephyr $NESTED_DISPLAY -resizeable -ac -reset -terminate 2> /dev/null
-
 # Launch container as root to init core Linux services.
+# --ipc=host is set to allow Xephyr to use SHM XImages
 $DOCKER_COMMAND run --rm -d \
+    --name $CONTAINER \
+    --ipc=host \
     --shm-size 2g \
     --security-opt apparmor=unconfined \
     --cap-add=SYS_ADMIN --cap-add=SYS_BOOT -v /sys/fs/cgroup:/sys/fs/cgroup \
-    --name $CONTAINER \
     -v $PWD/$(id -un):/home/$(id -un) \
-    -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
+    $X11_XAUTH \
+    -v /tmp/.X11-unix/X0:/tmp/.X11-unix/X0:ro \
     $IMAGE /sbin/init
 
 # cp credentials bundle to container

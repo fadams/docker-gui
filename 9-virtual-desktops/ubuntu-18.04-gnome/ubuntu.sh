@@ -23,7 +23,7 @@ BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 . $BIN/docker-xauth.sh
 
 # The X11 DISPLAY number of the nested Xephyr X server.
-NESTED_DISPLAY=:4
+NESTED_DISPLAY=:1
 
 IMAGE=ubuntu-gnome:18.04
 CONTAINER=ubuntu
@@ -47,25 +47,22 @@ if ! test -d $(id -un); then
     cp -R /etc/skel/. $(id -un)
     rm -rf $(id -un)/.mozilla
     echo "export DISPLAY=unix$NESTED_DISPLAY" >> $(id -un)/.profile
+    echo "export XAUTHORITY=$DOCKER_XAUTHORITY" >> $(id -un)/.profile
+    echo "DISPLAY=:0 Xephyr $NESTED_DISPLAY -resizeable -ac -reset -terminate 2> /dev/null&" >> $(id -un)/.profile
     echo -e "\nif ! test -d \"Desktop\"; then\n    gsettings set org.gnome.shell enabled-extensions \"['ubuntu-dock@ubuntu.com']\"\n    gsettings set org.gnome.desktop.background show-desktop-icons true\n    gsettings set org.gnome.nautilus.desktop home-icon-visible false\n    gsettings set org.gnome.nautilus.icon-view default-zoom-level 'small'\n    gsettings set org.gnome.desktop.interface gtk-theme 'Ambiance'\n    gsettings set org.gnome.desktop.interface cursor-theme 'DMZ-White'\n    gsettings set org.gnome.desktop.interface icon-theme 'Humanity'\nfi\n\n/etc/X11/Xsession" >> $(id -un)/.profile
 fi
 
-# Launch Xephyr window.
-$DOCKER_COMMAND run --rm -d \
-    --ipc=host \
-    -u $(id -u):$(id -g) \
-    -v /etc/passwd:/etc/passwd:ro \
-    $X11_FLAGS_RW \
-    xephyr $NESTED_DISPLAY -resizeable -ac -reset -terminate 2> /dev/null
-
 # Launch container as root to init core Linux services.
+# --ipc=host is set to allow Xephyr to use SHM XImages
 $DOCKER_COMMAND run --rm -d \
+    --name $CONTAINER \
+    --ipc=host \
     --shm-size 2g \
     --security-opt apparmor=unconfined \
     --cap-add=SYS_ADMIN --cap-add=SYS_BOOT -v /sys/fs/cgroup:/sys/fs/cgroup \
-    --name $CONTAINER \
     -v $PWD/$(id -un):/home/$(id -un) \
-    -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
+    $X11_XAUTH \
+    -v /tmp/.X11-unix/X0:/tmp/.X11-unix/X0:ro \
     $IMAGE /sbin/init
 
 # cp credentials bundle to container

@@ -46,7 +46,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     base-files ntp apt-utils add-apt-key aptdaemon apt-transport-https \
     apt-xapian-index locales language-pack-en tzdata mintlocale \
     mint-meta-cinnamon mintupload mint-common mint-meta-core mint-themes \
-    mintdesktop mintmenu mintstick mintsystem mintwelcome \
+    mintdesktop mintmenu mintstick mintsystem mintwelcome xserver-xephyr \
     cinnamon-core cinnamon-desktop-environment cinnamon-doc \
     mint-info-cinnamon mintnanny mintreport mint-meta-codecs \
     # Add additional packages to be similar to Mint iso installation.
