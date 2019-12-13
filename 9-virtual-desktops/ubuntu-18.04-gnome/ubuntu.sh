@@ -22,9 +22,6 @@ BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 . $BIN/docker-command.sh
 . $BIN/docker-xauth.sh
 
-# The X11 DISPLAY number of the nested Xephyr X server.
-NESTED_DISPLAY=:1
-
 IMAGE=ubuntu-gnome:18.04
 CONTAINER=ubuntu
 
@@ -43,31 +40,24 @@ if ! test -f "etc.tar.gz"; then
 fi
 
 # Create home directory
-if ! test -d $(id -un); then
-    cp -R /etc/skel/. $(id -un)
-    rm -rf $(id -un)/.mozilla
-    echo "export DISPLAY=unix$NESTED_DISPLAY" >> $(id -un)/.profile
-    echo "export XAUTHORITY=$DOCKER_XAUTHORITY" >> $(id -un)/.profile
-    echo "DISPLAY=:0 Xephyr $NESTED_DISPLAY -resizeable -ac -reset -terminate 2> /dev/null&" >> $(id -un)/.profile
-    echo -e "\nif ! test -d \"Desktop\"; then\n    gsettings set org.gnome.shell enabled-extensions \"['ubuntu-dock@ubuntu.com']\"\n    gsettings set org.gnome.desktop.background show-desktop-icons true\n    gsettings set org.gnome.nautilus.desktop home-icon-visible false\n    gsettings set org.gnome.nautilus.icon-view default-zoom-level 'small'\n    gsettings set org.gnome.desktop.interface gtk-theme 'Ambiance'\n    gsettings set org.gnome.desktop.interface cursor-theme 'DMZ-White'\n    gsettings set org.gnome.desktop.interface icon-theme 'Humanity'\nfi\n\n/etc/X11/Xsession" >> $(id -un)/.profile
-fi
+mkdir -p $(id -un)
 
-# Launch container as root to init core Linux services.
+# Launch container as root to init core Linux services and launch the
+# Display Manager and greeter. Switches to unprivileged user after login
+# --device=/dev/tty0 is used to make session creation cleaner.
 # --ipc=host is set to allow Xephyr to use SHM XImages
 $DOCKER_COMMAND run --rm -d \
+    --device=/dev/tty0 \
     --name $CONTAINER \
     --ipc=host \
     --shm-size 2g \
     --security-opt apparmor=unconfined \
     --cap-add=SYS_ADMIN --cap-add=SYS_BOOT -v /sys/fs/cgroup:/sys/fs/cgroup \
     -v $PWD/$(id -un):/home/$(id -un) \
-    $X11_XAUTH \
+    -v $DOCKER_XAUTHORITY:/root/.Xauthority.docker:ro \
     -v /tmp/.X11-unix/X0:/tmp/.X11-unix/X0:ro \
     $IMAGE /sbin/init
 
 # cp credentials bundle to container
 cat etc.tar.gz | $DOCKER_COMMAND cp - $CONTAINER:/
-
-# exec login to the container
-$DOCKER_COMMAND exec -it $CONTAINER login
 

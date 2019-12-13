@@ -44,22 +44,27 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends --allow-downgrades \
     base-files ntp apt-utils add-apt-key aptdaemon apt-transport-https \
-    apt-xapian-index locales language-pack-en tzdata mintlocale \
-    mint-meta-cinnamon mintupload mint-common mint-meta-core mint-themes \
-    mintdesktop mintmenu mintstick mintsystem mintwelcome xserver-xephyr \
+    locales language-pack-en tzdata mintlocale mint-meta-cinnamon \
+    mintupload mint-common mint-meta-core mint-themes mintdesktop \
+    mintmenu mintstick mintsystem mintwelcome xserver-xephyr \
     cinnamon-core cinnamon-desktop-environment cinnamon-doc \
     mint-info-cinnamon mintnanny mintreport mint-meta-codecs \
     # Add additional packages to be similar to Mint iso installation.
     gnome-terminal keyboard-configuration libreoffice gimp xed firefox \
     firefox-locale-en thunderbird thunderbird-gnome-support hexchat \
-    pidgin transmission-gtk pix gnome-calculator gnome-screenshot \
-    gucharmap xreader xviewer xplayer rhythmbox tomboy simple-scan inkscape \
+    pidgin remmina remmina-common remmina-plugin-rdp remmina-plugin-vnc \
+    remmina-plugin-nx remmina-plugin-spice remmina-plugin-xdmcp \
+    transmission-gtk pix gnome-calculator gnome-screenshot gucharmap \
+    xreader xviewer xplayer rhythmbox tomboy simple-scan inkscape \
     vlc vlc-data baobab gnome-power-manager gufw dmz-cursor-theme \
     gnome-system-log gnome-system-monitor blueberry vino gnome-disk-utility \
     pulseaudio libpulsedsp pulseaudio-utils paprefs libcanberra-pulse \
     pavucontrol pulseaudio-module-bluetooth gstreamer1.0-pulseaudio \
-    pulseaudio-module-zeroconf avahi-utils libnss-mdns mesa-utils \
-    cups system-config-printer-gnome system-config-printer-udev \
+    pulseaudio-module-zeroconf avahi-utils libnss-mdns mesa-utils cheese \
+    cups colord system-config-printer-gnome system-config-printer-udev \
+    gnome-keyring libpam-gnome-keyring libpam-kwallet4 libpam-kwallet5 \
+    # Install Display Manager and dependencies
+    lightdm slick-greeter dbus-x11 \
     # Mesa 19.0.8 causes "black window" issues when software rendering
     # Downgrading libgl1-mesa-dri to 18.0.0~rc5-1ubuntu1 works better.
     libgl1-mesa-dri=18.0.0~rc5-1ubuntu1 && \
@@ -68,8 +73,10 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     echo "libgl1-mesa-dri hold" | \
          DEBIAN_FRONTEND=noninteractive dpkg --set-selections && \
     # Tidy up
-    apt-get -y autoremove && \
-    apt-get clean && \
+    apt-get -y autoremove && apt-get clean && \
+    # Stop synaptic package manager being painfully slow
+    rm /etc/apt/apt.conf.d/docker-gzip-indexes && \
+    rm -rf /var/lib/apt/lists/* && apt-get update && \
     # Generate locales
     echo LANG=$LANG > /etc/default/locale && \
     update-locale LANG=$LANG && \
@@ -77,6 +84,10 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     echo $TZ > /etc/timezone && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     DEBIAN_FRONTEND=noninteractive dpkg-reconfigure tzdata && \
+    # Configure LightDM Display Manager to use Xephyr instead of X
+    echo '#!/bin/bash\nexport XAUTHORITY=/root/.Xauthority.docker\nexport DISPLAY=:0\nexec Xephyr $1 -ac >> /var/log/lightdm/x-1.log' > /usr/bin/Xephyr-lightdm-wrapper && \
+    chmod +x /usr/bin/Xephyr-lightdm-wrapper && \
+    echo '[LightDM]\nminimum-display-number=1\n[Seat:*]\nxserver-command=/usr/bin/Xephyr-lightdm-wrapper' > /etc/lightdm/lightdm.conf.d/70-linuxmint.conf && \
     # Configure console
     echo "console-setup console-setup/charmap select UTF-8" | debconf-set-selections && \
     # Fix mintupdate "APT-cache damaged" error
@@ -88,13 +99,6 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # E: Could not open file - open (2: No such file or directory)
     # E: _cache->open() failed, please report.
     sed -i 's/Dir::Cache::pkgcache ""; //' /etc/apt/apt.conf.d/docker-clean && \
-    # Remove some unnecessary files from /etc/X11/Xsession.d The files in
-    # this directory are called by /etc/X11/Xsession and the ones below run
-    # X clients (xhost and xrdb), this causes Xephyr to terminate prematurely
-    # as we have set Xephyr to reset and terminate after last client exits.
-    rm /etc/X11/Xsession.d/30x11-common_xresources && \
-    rm /etc/X11/Xsession.d/35x11-common_xhost-local && \
-    rm /etc/X11/Xsession.d/60x11-common_localhost && \
     # Fix issues with slow shutdown
     sed -i 's/#DefaultTimeoutStopSec=90s/DefaultTimeoutStopSec=5s/' /etc/systemd/system.conf && \
     # Fix Polkit issues caused by container login being considered
@@ -104,8 +108,6 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     echo "[Mint Software Sources]\nIdentity=unix-user:*\nAction=com.linuxmint.mintsources\nResultAny=auth_self_keep\nResultInactive=auth_self_keep\nResultActive=auth_self_keep\n" > /etc/polkit-1/localauthority/50-local.d/10-mintsources.pkla && \
     # Date & Time
     echo "[Date & Time]\nIdentity=unix-user:*\nAction=org.cinnamon.settingsdaemon.datetimemechanism.configure\nResultAny=auth_admin_keep\nResultInactive=auth_admin_keep\nResultActive=auth_admin_keep\n" > /etc/polkit-1/localauthority/50-local.d/10-datetimemechanism.pkla  && \
-    # Xapian Index
-    echo "[Xapian Index]\nIdentity=unix-user:*\nAction=org.debian.aptxapianindex.update\nResultAny=yes\nResultInactive=yes\nResultActive=yes\n" > /etc/polkit-1/localauthority/50-local.d/10-xapian.pkla && \
     # Gnome System Log
     echo "[Gnome System Log]\nIdentity=unix-user:*\nAction=org.debian.pkexec.gnome-system-log.run\nResultAny=auth_admin_keep\nResultInactive=auth_admin_keep\nResultActive=auth_admin_keep\n" > /etc/polkit-1/localauthority/50-local.d/10-system-log.pkla && \
     # Shutdown & Restart
