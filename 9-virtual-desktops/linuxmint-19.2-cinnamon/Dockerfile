@@ -99,6 +99,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # E: Could not open file - open (2: No such file or directory)
     # E: _cache->open() failed, please report.
     sed -i 's/Dir::Cache::pkgcache ""; //' /etc/apt/apt.conf.d/docker-clean && \
+    # Disable getty@tty1.service as this speeds up desktop loading.
+    rm -f /etc/systemd/system/getty.target.wants/getty@tty1.service && \
     # Fix issues with slow shutdown
     sed -i 's/#DefaultTimeoutStopSec=90s/DefaultTimeoutStopSec=5s/' /etc/systemd/system.conf && \
     # Fix Polkit issues caused by container login being considered
