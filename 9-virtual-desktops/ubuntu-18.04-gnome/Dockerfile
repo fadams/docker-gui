@@ -90,6 +90,8 @@ RUN \
     sed -i 's/Dir::Cache::pkgcache ""; //' /etc/apt/apt.conf.d/docker-clean && \
     # Remove unnecessary file from /etc/update-motd.d to suppress warning
     rm /etc/update-motd.d/98-fsck-at-reboot && \
+    # Disable getty@tty1.service as this speeds up desktop loading.
+    rm -f /etc/systemd/system/getty.target.wants/getty@tty1.service && \
     # Fix issues with slow shutdown
     sed -i 's/#DefaultTimeoutStopSec=90s/DefaultTimeoutStopSec=5s/' /etc/systemd/system.conf && \
     # Fix Polkit issues caused by container login being considered
