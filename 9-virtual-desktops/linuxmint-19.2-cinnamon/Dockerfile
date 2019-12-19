@@ -88,6 +88,9 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     echo '#!/bin/bash\nexport XAUTHORITY=/root/.Xauthority.docker\nexport DISPLAY=:0\nexec Xephyr $1 -ac >> /var/log/lightdm/x-1.log' > /usr/bin/Xephyr-lightdm-wrapper && \
     chmod +x /usr/bin/Xephyr-lightdm-wrapper && \
     echo '[LightDM]\nminimum-display-number=1\n[Seat:*]\nxserver-command=/usr/bin/Xephyr-lightdm-wrapper' > /etc/lightdm/lightdm.conf.d/70-linuxmint.conf && \
+    # Change nemo icons from standard to small
+    # https://unix.stackexchange.com/questions/250266/rhel-7-gnome-shell-decrease-desktop-icon-size
+    sed -i '/default-zoom-level/{n; s/standard/small/}' /usr/share/glib-2.0/schemas/org.nemo.gschema.xml && glib-compile-schemas /usr/share/glib-2.0/schemas/ >/dev/null 2>&1 && \
     # Configure console
     echo "console-setup console-setup/charmap select UTF-8" | debconf-set-selections && \
     # Fix mintupdate "APT-cache damaged" error
