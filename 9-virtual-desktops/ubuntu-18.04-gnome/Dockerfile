@@ -47,14 +47,7 @@ RUN \
     pavucontrol gstreamer1.0-pulseaudio pulseaudio-module-zeroconf \
     cups system-config-printer-gnome libpam-kwallet4 libpam-kwallet5 \
     # Install Display Manager and dependencies
-    lightdm slick-greeter dbus-x11 \
-    # Mesa 19.0.8 causes "black window" issues when software rendering
-    # Downgrading libgl1-mesa-dri to 18.0.0~rc5-1ubuntu1 works better.
-    libgl1-mesa-dri=18.0.0~rc5-1ubuntu1 && \
-    # Hold libgl1-mesa-dri to prevent the package manager from
-    # automatically updating it in the future
-    echo "libgl1-mesa-dri hold" | \
-         DEBIAN_FRONTEND=noninteractive dpkg --set-selections && \
+    lightdm slick-greeter dbus-x11 && \
     # Tidy up
     apt-get purge -y gdm3 && \
     apt-get -y autoremove && apt-get clean && \
