@@ -37,7 +37,7 @@ RUN \
     language-pack-en gnome ubuntu-minimal ubuntu-standard ubuntu-desktop \
     ubuntu-system-service ubuntu-restricted-extras gsettings-ubuntu-schemas \
     gnome-shell-extension-ubuntu-dock gnome-shell-extension-appindicator \
-    gnome-control-center-faces gnome-software-plugin-snap \
+    gnome-control-center-faces gnome-software-plugin-snap gnome-system-log \
     # Add additional packages to be similar to Ubuntu iso installation.
     synaptic thunderbird-locale-en thunderbird-locale-en-us inkscape gimp\
     transmission-gtk firefox-locale-en tracker-miner-fs avahi-utils vlc \
@@ -98,7 +98,9 @@ RUN \
     # to be an "inactive" session.
     chmod 755 /etc/polkit-1/localauthority && \
     # Date & Time
-    echo "[Date & Time]\nIdentity=unix-user:*\nAction=org.cinnamon.settingsdaemon.datetimemechanism.configure\nResultAny=auth_admin_keep\nResultInactive=auth_admin_keep\nResultActive=auth_admin_keep\n" > /etc/polkit-1/localauthority/50-local.d/10-datetimemechanism.pkla  && \
+    echo "[Date & Time]\nIdentity=unix-user:*\nAction=org.gnome.controlcenter.datetime.configure\nResultAny=auth_admin_keep\nResultInactive=auth_admin_keep\nResultActive=auth_admin_keep\n" > /etc/polkit-1/localauthority/50-local.d/10-datetimemechanism.pkla && \
+    # User Accounts
+    echo "[Manage user accounts]\nIdentity=unix-user:*\nAction=org.gnome.controlcenter.user-accounts.administration\nResultAny=auth_admin_keep\nResultInactive=auth_admin_keep\nResultActive=auth_admin_keep\n" > /etc/polkit-1/localauthority/50-local.d/10-user-accounts.pkla && \
     # Gnome System Log
     echo "[Gnome System Log]\nIdentity=unix-user:*\nAction=org.debian.pkexec.gnome-system-log.run\nResultAny=auth_admin_keep\nResultInactive=auth_admin_keep\nResultActive=auth_admin_keep\n" > /etc/polkit-1/localauthority/50-local.d/10-system-log.pkla && \
     # System Color Manager
