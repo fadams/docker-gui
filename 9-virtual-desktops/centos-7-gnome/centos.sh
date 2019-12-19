@@ -18,23 +18,12 @@
 # under the License.
 #
 
-# The X11 DISPLAY number of the nested Xephyr X server.
-NESTED_DISPLAY=:3
+BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
+. $BIN/docker-command.sh
+. $BIN/docker-xauth.sh
 
-IMAGE=centos-gnome:7.4
+IMAGE=centos-gnome:7.7
 CONTAINER=centos
-
-DOCKER_COMMAND=docker
-# If user isn't in docker group prefix docker with sudo 
-if ! (id -nG $(id -un) | grep -qw docker); then
-    DOCKER_COMMAND="sudo $DOCKER_COMMAND"
-fi
-
-# Create .Xauthority.docker file with wildcarded hostname.
-XAUTH=${XAUTHORITY:-$HOME/.Xauthority}
-DOCKER_XAUTHORITY=${XAUTH}.docker
-cp --preserve=all $XAUTH $DOCKER_XAUTHORITY
-xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY nmerge -
 
 # Create initial /etc/passwd /etc/shadow /etc/group credentials if they
 # don't already exist in this path. We use template files from a container
@@ -45,45 +34,30 @@ xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY nmer
 # credentials files that match the user running this script.
 if ! test -f "etc.tar.gz"; then
     echo "Creating /etc/passwd /etc/shadow and /etc/group for container."
-    $DOCKER_COMMAND run --rm -it -v $PWD:/mnt $IMAGE \
-        sh -c 'adduser --uid '$(id -u)' --no-create-home '$(id -un)'; passwd '$(id -un)'; usermod -aG wheel '$(id -un)'; tar zcf /mnt/etc.tar.gz -C / ./etc/passwd ./etc/shadow ./etc/group'
+    $DOCKER_COMMAND run --rm -it \
+        -v $PWD:/mnt \
+        $IMAGE sh -c 'adduser --uid '$(id -u)' --no-create-home '$(id -un)'; passwd '$(id -un)'; usermod -aG wheel '$(id -un)'; tar zcf /mnt/etc.tar.gz -C / ./etc/passwd ./etc/shadow ./etc/group'
 fi
 
 # Create home directory
-if ! test -d $(id -un); then
-    cp -R /etc/skel/. $(id -un)
-    echo "export DISPLAY=unix$NESTED_DISPLAY" >> $(id -un)/.profile
-    echo "export XAUTHORITY=$DOCKER_XAUTHORITY" >> $(id -un)/.profile
-    echo -e "\nif ! test -d \"Desktop\"; then\n    gsettings set org.gnome.nautilus.icon-view default-zoom-level 'small'\nfi\n\n/etc/X11/xinit/Xclients" >> $(id -un)/.profile
-fi
+mkdir -p $(id -un)
 
-# Launch Xephyr window.
+# Launch container as root to init core Linux services and launch the
+# Display Manager and greeter. Switches to unprivileged user after login
+# --device=/dev/tty0 is used to make session creation cleaner.
+# --ipc=host is set to allow Xephyr to use SHM XImages
 $DOCKER_COMMAND run --rm -d \
+    --device=/dev/tty0 \
+    --name $CONTAINER \
     --ipc=host \
-    -u $(id -u):$(id -g) \
-    -v /etc/passwd:/etc/passwd:ro \
-    -e DISPLAY=unix$DISPLAY \
-    -v /tmp/.X11-unix:/tmp/.X11-unix \
-    -e XAUTHORITY=$DOCKER_XAUTHORITY \
-    -v $DOCKER_XAUTHORITY:$DOCKER_XAUTHORITY:ro \
-    xephyr $NESTED_DISPLAY -ac -reset -terminate 2> /dev/null
-
-# Launch container as root to init core Linux services.
-$DOCKER_COMMAND run --rm -d \
     --shm-size 2g \
     --security-opt apparmor=unconfined \
     --cap-add=SYS_ADMIN --cap-add=SYS_BOOT -v /sys/fs/cgroup:/sys/fs/cgroup \
-    --name $CONTAINER \
     -v $PWD/$(id -un):/home/$(id -un) \
-    -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
-    -v $DOCKER_XAUTHORITY:$DOCKER_XAUTHORITY:ro \
+    -v $DOCKER_XAUTHORITY:/root/.Xauthority.docker:ro \
+    -v /tmp/.X11-unix/X0:/tmp/.X11-unix/X0:ro \
     $IMAGE /sbin/init
 
 # cp credentials bundle to container
 cat etc.tar.gz | $DOCKER_COMMAND cp - $CONTAINER:/
-
-# exec gnome-session as unprivileged user
-#$DOCKER_COMMAND exec -u $(id -u) $CONTAINER gnome-session
-#$DOCKER_COMMAND exec -u $(id -u) $CONTAINER gnome-session --session=gnome-classic
-$DOCKER_COMMAND exec -it $CONTAINER login
 
