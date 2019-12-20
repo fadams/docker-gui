@@ -42,16 +42,17 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     unset LINUX_MINT_KEY && \
     # Add the main Mint flavoured packages
     DEBIAN_FRONTEND=noninteractive \
-    apt-get install -y --no-install-recommends --allow-downgrades \
+    apt-get install -y --no-install-recommends \
     base-files ntp apt-utils add-apt-key aptdaemon apt-transport-https \
-    locales language-pack-en tzdata mintlocale mint-meta-cinnamon \
-    mintupload mint-common mint-meta-core mint-themes mintdesktop \
-    mintmenu mintstick mintsystem mintwelcome xserver-xephyr \
-    cinnamon-core cinnamon-desktop-environment cinnamon-doc \
-    mint-info-cinnamon mintnanny mintreport mint-meta-codecs \
+    locales language-pack-en language-pack-gnome-en tzdata mintlocale \
+    mint-meta-cinnamon mintupload mint-common mint-meta-core mint-themes \
+    mintdesktop mintmenu mintstick mintsystem mintwelcome xserver-xephyr \
+    cinnamon-core cinnamon-desktop-environment cinnamon-doc wamerican \
+    mint-info-cinnamon mintnanny mintreport mint-meta-codecs wbritish \
     # Add additional packages to be similar to Mint iso installation.
-    gnome-terminal keyboard-configuration libreoffice gimp xed firefox \
-    firefox-locale-en thunderbird thunderbird-gnome-support hexchat \
+    gnome-terminal keyboard-configuration gimp gimp-help-en xed \
+    libreoffice openoffice.org-hyphenation firefox firefox-locale-en \
+    thunderbird thunderbird-locale-en thunderbird-gnome-support hexchat \
     pidgin remmina remmina-common remmina-plugin-rdp remmina-plugin-vnc \
     remmina-plugin-nx remmina-plugin-spice remmina-plugin-xdmcp \
     transmission-gtk pix gnome-calculator gnome-screenshot gucharmap \
