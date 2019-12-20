@@ -22,7 +22,7 @@ BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 . $BIN/docker-command.sh
 . $BIN/docker-xauth.sh
 
-IMAGE=linuxmint-cinnamon:19.2
+IMAGE=linuxmint-cinnamon:19.3
 CONTAINER=mint
 
 # Create initial /etc/passwd /etc/shadow /etc/group credentials if they

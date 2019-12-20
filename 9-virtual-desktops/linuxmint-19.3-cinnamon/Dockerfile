@@ -28,8 +28,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     sed -i 's/# deb http:\/\/archive.canonical.com\/ubuntu bionic partner/deb http:\/\/archive.canonical.com\/ubuntu bionic partner/' /etc/apt/sources.list && \
     # Remove "This system has been minimized" warning.
     rm -f /etc/update-motd.d/60-unminimize && \
-    # Set up the repositories for Linux Mint 19.2 "Tina"
-    echo "deb http://packages.linuxmint.com/ tina main upstream import backport\n\n$(cat /etc/apt/sources.list)" > /etc/apt/sources.list.d/official-package-repositories.list && \
+    # Set up the repositories for Linux Mint 19.3 "Tricia"
+    echo "deb http://packages.linuxmint.com/ tricia main upstream import backport\n\n$(cat /etc/apt/sources.list)" > /etc/apt/sources.list.d/official-package-repositories.list && \
     rm /etc/apt/sources.list && \
     LINUX_MINT_KEY=$(apt update 2>&1 | grep -o '[0-9A-Z]\{16\}$' | xargs) && \
     apt-key adv --recv-keys --keyserver \
@@ -54,9 +54,9 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     libreoffice openoffice.org-hyphenation firefox firefox-locale-en \
     thunderbird thunderbird-locale-en thunderbird-gnome-support hexchat \
     pidgin remmina remmina-common remmina-plugin-rdp remmina-plugin-vnc \
-    remmina-plugin-nx remmina-plugin-spice remmina-plugin-xdmcp \
+    remmina-plugin-nx remmina-plugin-spice remmina-plugin-xdmcp drawing \
     transmission-gtk pix gnome-calculator gnome-screenshot gucharmap \
-    xreader xviewer xplayer rhythmbox tomboy simple-scan inkscape \
+    xreader xviewer xplayer rhythmbox gnote simple-scan inkscape \
     vlc vlc-data baobab gnome-power-manager gufw dmz-cursor-theme \
     gnome-system-log gnome-system-monitor blueberry vino gnome-disk-utility \
     pulseaudio libpulsedsp pulseaudio-utils paprefs libcanberra-pulse \
@@ -118,5 +118,5 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
 # Example usage
 # 
 # Build the image
-# docker build -t linuxmint-cinnamon:19.2 .
+# docker build -t linuxmint-cinnamon:19.3 .
 
