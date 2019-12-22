@@ -39,7 +39,7 @@ RUN \
     gnome-shell-extension-ubuntu-dock gnome-shell-extension-appindicator \
     gnome-control-center-faces gnome-software-plugin-snap gnome-system-log \
     # Add additional packages to be similar to Ubuntu iso installation.
-    synaptic thunderbird-locale-en thunderbird-locale-en-us inkscape gimp\
+    synaptic thunderbird-locale-en thunderbird-locale-en-us inkscape gimp \
     transmission-gtk firefox-locale-en tracker-miner-fs avahi-utils vlc \
     pidgin remmina remmina-common remmina-plugin-rdp remmina-plugin-vnc \
     remmina-plugin-nx remmina-plugin-spice remmina-plugin-xdmcp \
@@ -48,9 +48,6 @@ RUN \
     cups system-config-printer-gnome libpam-kwallet4 libpam-kwallet5 \
     # Install Display Manager and dependencies
     lightdm slick-greeter dbus-x11 && \
-    # Tidy up
-    apt-get purge -y gdm3 && \
-    apt-get -y autoremove && apt-get clean && \
     # Stop synaptic package manager being painfully slow
     rm /etc/apt/apt.conf.d/docker-gzip-indexes && \
     rm -rf /var/lib/apt/lists/* && apt-get update && \
