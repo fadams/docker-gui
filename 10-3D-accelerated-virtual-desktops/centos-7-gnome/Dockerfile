@@ -43,7 +43,3 @@ RUN \
 # Build the image
 # docker build -t centos-gnome-vgl:7.7 .
 
-#    yum -y install xorg-x11-server-Xephyr thunderbird pavucontrol \
-# VirtualGL-2.6.3.x86_64.rpm
-# VirtualGL-2.6.3.x86_64.rpm
-
