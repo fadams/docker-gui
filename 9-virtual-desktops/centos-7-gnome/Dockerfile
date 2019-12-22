@@ -40,8 +40,6 @@ RUN \
     yum -y groups install "Graphics Creation Tools" && \
     yum -y install xorg-x11-server-Xephyr thunderbird pavucontrol \
     pulseaudio-module-zeroconf lightdm slick-greeter dbus-x11 nss-mdns && \
-    # Tidy up
-    yum autoremove -y && yum clean all && \
     # Generate locales
     echo LANG=\"$LANG\" > /etc/locale.conf && \
     localedef -i "${LANG%.*}" -f "${LANG#*.}" $LANG && \
@@ -60,16 +58,15 @@ RUN \
     echo -e '#!/bin/bash\nexport XAUTHORITY=/root/.Xauthority.docker\nexport DISPLAY=:0\nexec Xephyr $1 -ac >> /var/log/lightdm/x-1.log' > /usr/bin/Xephyr-lightdm-wrapper && \
     chmod +x /usr/bin/Xephyr-lightdm-wrapper && \
     echo -e '[LightDM]\nminimum-display-number=1\n[Seat:*]\nsession-setup-script=xrandr --output default --mode 1600x1200\nuser-session=gnome\nxserver-command=/usr/bin/Xephyr-lightdm-wrapper' > /etc/lightdm/lightdm.conf.d/70-centos.conf && \
-#
-    # Change nautilus and desktop icons from large to small
-    # https://unix.stackexchange.com/questions/250266/rhel-7-gnome-shell-decrease-desktop-icon-size
-    sed -i '/default-zoom-level/{n; s/large/small/}' /usr/share/glib-2.0/schemas/org.gnome.nautilus.gschema.xml && glib-compile-schemas /usr/share/glib-2.0/schemas/ >/dev/null 2>&1 && \
-    # CentOS defaults init to multi-user.target, change to graphical.target
-    rm -f /etc/systemd/system/default.target && \
-    ln -s /usr/lib/systemd/system/graphical.target /etc/systemd/system/default.target && \
     # CentOS defaults to GDM, change to LightDM
     rm -f /etc/systemd/system/display-manager.service && \
     ln -s /usr/lib/systemd/system/lightdm.service /etc/systemd/system/display-manager.service && \
+    # CentOS defaults init to multi-user.target, change to graphical.target
+    rm -f /etc/systemd/system/default.target && \
+    ln -s /usr/lib/systemd/system/graphical.target /etc/systemd/system/default.target && \
+    # Change nautilus and desktop icons from large to small
+    # https://unix.stackexchange.com/questions/250266/rhel-7-gnome-shell-decrease-desktop-icon-size
+    sed -i '/default-zoom-level/{n; s/large/small/}' /usr/share/glib-2.0/schemas/org.gnome.nautilus.gschema.xml && glib-compile-schemas /usr/share/glib-2.0/schemas/ >/dev/null 2>&1 && \
     # Prevent PulseAudio trying to launch rtkit-daemon because the container
     # doesn't have the required caps and the failures slow desktop launch.
     sed -i 's/load-module module-udev-detect/load-module module-udev-detect tsched=0/' /etc/pulse/default.pa && \
