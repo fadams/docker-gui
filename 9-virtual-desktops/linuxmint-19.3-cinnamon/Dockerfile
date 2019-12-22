@@ -66,8 +66,6 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     gnome-keyring libpam-gnome-keyring libpam-kwallet4 libpam-kwallet5 \
     # Install Display Manager and dependencies
     lightdm slick-greeter dbus-x11 && \
-    # Tidy up
-    apt-get -y autoremove && apt-get clean && \
     # Stop synaptic package manager being painfully slow
     rm /etc/apt/apt.conf.d/docker-gzip-indexes && \
     rm -rf /var/lib/apt/lists/* && apt-get update && \
