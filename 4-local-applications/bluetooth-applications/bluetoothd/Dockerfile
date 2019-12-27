@@ -26,7 +26,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     bluez && \
 	rm -rf /var/lib/apt/lists/*
 
-CMD ["nsenter", "--net=/rootns/net", "bluetoothd", "-d", "-n"]
+CMD ["nsenter", "--net=/rootns/net", \
+     "bluetoothd", "-d", "-n"]
 
 #-------------------------------------------------------------------------------
 # Example usage
