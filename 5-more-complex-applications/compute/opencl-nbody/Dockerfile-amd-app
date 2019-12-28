@@ -23,8 +23,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages
     apt-get install -y --no-install-recommends \
     ocl-icd-libopencl1 ocl-icd-opencl-dev libnuma1 clinfo libxml2 \
-    libxmu-dev freeglut3-dev libglew-dev \
-    wget bzip2 ca-certificates tar gcc g++ make && \
+    libxmu-dev freeglut3-dev libglew-dev libgl1-mesa-glx \
+    libgl1-mesa-dri wget bzip2 ca-certificates tar gcc g++ make && \
     # Add the AMD APP OpenCL Installable Client Driver
     mkdir -p /opt/amd/opencl/install && \
     cd /opt/amd/opencl/install && \

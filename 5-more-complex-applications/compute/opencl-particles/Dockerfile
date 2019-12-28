@@ -26,8 +26,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages
     apt-get install -y --no-install-recommends \
     ocl-icd-libopencl1 ocl-icd-opencl-dev clinfo \
-    libxmu-dev freeglut3-dev libglew-dev \
-    wget ca-certificates tar gcc g++ make && \
+    libxmu-dev freeglut3-dev libglew-dev libgl1-mesa-glx \
+    libgl1-mesa-dri wget ca-certificates tar gcc g++ make && \
     # Add the Nvidia OpenCL Installable Client Driver
     mkdir -p /etc/OpenCL/vendors && \
     echo "libnvidia-opencl.so.1" > /etc/OpenCL/vendors/nvidia.icd && \

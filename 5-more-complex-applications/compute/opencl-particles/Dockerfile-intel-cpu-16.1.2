@@ -27,8 +27,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages
     apt-get install -y --no-install-recommends \
     ocl-icd-libopencl1 ocl-icd-opencl-dev libnuma1 clinfo \
-    libxmu-dev freeglut3-dev libglew-dev \
-    wget ca-certificates tar rpm2cpio cpio gcc g++ make && \
+    libxmu-dev freeglut3-dev libglew-dev libgl1-mesa-glx \
+    libgl1-mesa-dri wget ca-certificates tar rpm2cpio cpio gcc g++ make && \
     # Add the Intel OpenCL Installable Client Driver  
     wget -O ${RUNTIME}.tgz "http://registrationcenter-download.intel.com/akdlm/irc_nas/12556/${RUNTIME}.tgz" && \
     tar zxfp ${RUNTIME}.tgz && \
