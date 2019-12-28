@@ -27,7 +27,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     libevent-2.0-5 libevent-pthreads-2.0-5 && \
 	rm -rf /var/lib/apt/lists/* && \
     # Add user "firefox" so we can run as non privileged user.
-    groupadd -r -g 1000 firefox && useradd -u 1000 -r -g firefox -G audio,video firefox && \
+    groupadd -r -g 1000 firefox && \
+    useradd -u 1000 -r -g firefox -G audio,video firefox && \
     mkdir /home/firefox/ && \
     chown -R firefox:firefox /home/firefox
 
