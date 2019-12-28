@@ -24,7 +24,7 @@ FROM debian:stretch-slim
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-    git ca-certificates build-essential g++ \
+    git ca-certificates build-essential g++ libgl1-mesa-dri \
     libxinerama-dev libxext-dev libxrandr-dev libxi-dev \
     libxcursor-dev libxxf86vm-dev libvulkan-dev libgl1-mesa-dev && \
     #
