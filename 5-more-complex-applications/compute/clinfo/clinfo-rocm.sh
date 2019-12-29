@@ -21,7 +21,7 @@
 BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 . $BIN/docker-gpu.sh
 
-$DOCKER_COMMAND run --rm -it \
+$DOCKER_COMMAND run --rm \
     --device=/dev/kfd \
     -u $(id -u):$(id -g) \
     -v /etc/passwd:/etc/passwd:ro \
