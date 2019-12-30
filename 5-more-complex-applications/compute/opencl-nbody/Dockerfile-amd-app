@@ -22,9 +22,10 @@ FROM debian:stretch-slim
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages
     apt-get install -y --no-install-recommends \
-    ocl-icd-libopencl1 ocl-icd-opencl-dev libnuma1 clinfo libxml2 \
-    libxmu-dev freeglut3-dev libglew-dev libgl1-mesa-glx \
-    libgl1-mesa-dri wget bzip2 ca-certificates tar gcc g++ make && \
+    ocl-icd-libopencl1 ocl-icd-opencl-dev libnuma1 clinfo \
+    libxml2 libxmu-dev freeglut3-dev libglew-dev \
+    libgl1-mesa-glx libgl1-mesa-dri wget ca-certificates \
+    bzip2 tar gcc g++ make && \
     # Add the AMD APP OpenCL Installable Client Driver
     mkdir -p /opt/amd/opencl/install && \
     cd /opt/amd/opencl/install && \
@@ -70,7 +71,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     rm -rf /opt/amd/opencl/install && \
     rm -rf /usr/local/src/* && \
     apt-get clean && \
-    apt-get purge -y wget bzip2 ca-certificates gcc g++ make && \
+    apt-get purge -y wget bzip2 ca-certificates \
+        gcc g++ make && \
     apt-get autoremove -y && \
 	rm -rf /var/lib/apt/lists/*
 
@@ -85,5 +87,4 @@ ENTRYPOINT ["oclNbody"]
 # 
 # Build the image
 # docker build -t opencl-nbody-amd-app -f Dockerfile-amd-app .
-
 
