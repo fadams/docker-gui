@@ -26,14 +26,15 @@ LABEL com.nvidia.volumes.needed=nvidia_driver
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	apt-transport-https wget gnupg ca-certificates \
-    kodi libvdpau1 libgl1-mesa-glx libgl1-mesa-dri && \
-	wget -O - https://download.videolan.org/pub/debian/videolan-apt.asc | apt-key add - && \
-	echo "deb [arch=amd64] https://download.videolan.org/pub/debian/stable/ /" > /etc/apt/sources.list.d/videolan.list && \
-	apt-get update && DEBIAN_FRONTEND=noninteractive \
+    apt-transport-https wget gnupg ca-certificates \
+    kodi libvdpau1 mesa-vdpau-drivers \
+    libgl1-mesa-glx libgl1-mesa-dri && \
+    wget -O - https://download.videolan.org/pub/debian/videolan-apt.asc | apt-key add - && \
+    echo "deb [arch=amd64] https://download.videolan.org/pub/debian/stable/ /" > /etc/apt/sources.list.d/videolan.list && \
+    apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-	libdvdcss2 && \
-	rm -rf /var/lib/apt/lists/* && \
+    libdvdcss2 && \
+    rm -rf /var/lib/apt/lists/* && \
     cp /etc/pulse/client.conf /etc/pulse/client-noshm.conf && \
     sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client-noshm.conf
 
