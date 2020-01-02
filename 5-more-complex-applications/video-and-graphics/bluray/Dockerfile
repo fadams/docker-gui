@@ -27,14 +27,16 @@ LABEL com.nvidia.volumes.needed=nvidia_driver
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	software-properties-common wget gnupg \
-	vlc libvdpau1 libgl1-mesa-glx libgl1-mesa-dri && \
-	wget -O - https://download.videolan.org/pub/debian/videolan-apt.asc | apt-key add - && \
-	echo "deb [arch=amd64] https://download.videolan.org/pub/debian/stable/ /" > /etc/apt/sources.list.d/videolan.list && \
+    software-properties-common wget gnupg \
+    vlc libvdpau1 mesa-vdpau-drivers \
+    libgl1-mesa-glx libgl1-mesa-dri && \
+    wget -O - https://download.videolan.org/pub/debian/videolan-apt.asc | apt-key add - && \
+    echo "deb [arch=amd64] https://download.videolan.org/pub/debian/stable/ /" > /etc/apt/sources.list.d/videolan.list && \
     add-apt-repository ppa:heyarje/makemkv-beta && \
     apt-get update && DEBIAN_FRONTEND=noninteractive \
-    apt-get install -y libdvdcss2 makemkv-bin makemkv-oss && \
-	rm -rf /var/lib/apt/lists/* && \
+    apt-get install -y libdvdcss2 \
+    makemkv-bin makemkv-oss && \
+    rm -rf /var/lib/apt/lists/* && \
     # https://www.makemkv.com/forum/viewtopic.php?t=7009
     cd /usr/lib/x86_64-linux-gnu && \
     ln -s libmmbd.so.0 libaacs.so.0 && \
