@@ -24,16 +24,17 @@ FROM debian:stretch-slim
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-    git ca-certificates build-essential g++ libgl1-mesa-dri \
+    git ca-certificates build-essential g++ \
     libxinerama-dev libxext-dev libxrandr-dev libxi-dev \
-    libxcursor-dev libxxf86vm-dev libvulkan-dev libgl1-mesa-dev && \
-    #
+    libxcursor-dev libxxf86vm-dev libvulkan-dev \
+    libgl1-mesa-dri libgl1-mesa-dev && \
     cd /usr/src && \
     git clone https://github.com/NVIDIAGameWorks/GraphicsSamples.git && \
     cd GraphicsSamples && \
-    # Checkout this version as later versions need Vulkan 1.1, but
-    # debian:stretch Vulkan version is 1.0.39.0 so later versions of 
-    # GameWorks won't compile with stretch and need buster or sid.
+    # Checkout this version as later versions need Vulkan 1.1,
+    # but debian:stretch Vulkan version is 1.0.39.0 so later
+    # versions of GameWorks won't compile with stretch and
+    # need buster or sid.
     git checkout 61350521f6b183d9f694f5c72c11efcf1a0cc665 -b build && \
     cd samples/build/linux64 && \
     make -j$(getconf _NPROCESSORS_ONLN) release && \
