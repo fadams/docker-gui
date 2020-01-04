@@ -19,11 +19,21 @@
 
 FROM debian:stretch-slim
 
+ENV LANG=en_GB.UTF-8
+ENV TZ=Europe/London
+
 # Install Thunderbird
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-    thunderbird && \
-    rm -rf /var/lib/apt/lists/*
+    thunderbird thunderbird-l10n-en-gb \
+    locales tzdata hunspell-en-gb && \
+    rm -rf /var/lib/apt/lists/* && \
+    # Generate locales
+    sed -i "s/^# *\($LANG\)/\1/" /etc/locale.gen && locale-gen && \
+    # Set up the timezone
+    echo $TZ > /etc/timezone && \
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    DEBIAN_FRONTEND=noninteractive dpkg-reconfigure tzdata
 
 ENTRYPOINT ["/usr/bin/thunderbird", "--no-remote"]
 
