@@ -29,15 +29,16 @@ RUN sed -i 's/main/main contrib/' /etc/apt/sources.list && \
     mkdir -p /usr/share/man/man1 && \
     apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-    libreoffice libreoffice-pdfimport libreoffice-ogltrans libreoffice-gtk3 \
-    ca-certificates locales tzdata default-jre \
-    fonts-symbola fonts-lmodern fonts-freefont-ttf fonts-noto \
+    libreoffice libreoffice-pdfimport \
+    libreoffice-ogltrans libreoffice-gtk3 \
+    ca-certificates locales tzdata default-jre fonts-noto \
+    fonts-symbola fonts-lmodern fonts-freefont-ttf \
     fonts-liberation fonts-dejavu ttf-mscorefonts-installer \
     libpulse0 libgl1-mesa-glx libgl1-mesa-dri && \
     # Tidy up
     apt-get -y autoremove && \
     apt-get clean && \
-	rm -rf /var/lib/apt/lists/* && \
+    rm -rf /var/lib/apt/lists/* && \
     # Generate locales
     sed -i "s/^# *\($LANG\)/\1/" /etc/locale.gen && locale-gen && \
     # Set up the timezone
