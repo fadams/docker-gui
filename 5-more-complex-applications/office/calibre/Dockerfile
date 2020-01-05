@@ -30,15 +30,17 @@ RUN sed -i 's/main/main contrib/' /etc/apt/sources.list && \
     apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	calibre ca-certificates locales tzdata \
-    fonts-symbola fonts-lmodern fonts-freefont-ttf fonts-noto \
-    fonts-liberation fonts-dejavu ttf-mscorefonts-installer && \
+    calibre ca-certificates locales tzdata fonts-noto \
+    fonts-symbola fonts-lmodern fonts-freefont-ttf \
+    fonts-liberation fonts-dejavu \
+    ttf-mscorefonts-installer && \
     # Tidy up
     apt-get -y autoremove && \
     apt-get clean && \
-	rm -rf /var/lib/apt/lists/* && \
+    rm -rf /var/lib/apt/lists/* && \
     # Generate locales
-    sed -i "s/^# *\($LANG\)/\1/" /etc/locale.gen && locale-gen && \
+    sed -i "s/^# *\($LANG\)/\1/" /etc/locale.gen && \
+    locale-gen && \
     # Set up the timezone
     echo $TZ > /etc/timezone && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
