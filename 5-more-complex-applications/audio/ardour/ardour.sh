@@ -27,7 +27,7 @@ BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 # "home directory" in the container for the current user.
 # Deliberately using JACKD_FLAGS below as this also gives the option of
 # connecting directly to ALSA as it enables /dev/snd and audio group
-mkdir -p $(id -un)
+mkdir -p $(id -un)/.local/share
 $DOCKER_COMMAND run --rm \
     -u $(id -u):$(id -g) \
     -v $PWD/$(id -un):/home/$(id -un) \
