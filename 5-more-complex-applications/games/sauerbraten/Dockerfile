@@ -27,7 +27,8 @@ RUN sed -i 's/main/main non-free/' /etc/apt/sources.list && \
     apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	sauerbraten libpulse0 libgl1-mesa-glx libgl1-mesa-dri && \
+	sauerbraten libpulse0 \
+    libgl1-mesa-glx libgl1-mesa-dri && \
     # Tidy up
     apt-get -y autoremove && \
     apt-get clean && \
