@@ -36,8 +36,10 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Debian ships with esr, so download and install latest Firefox.
     wget -qO - "https://download.mozilla.org/?product=firefox-latest&os=linux64&lang=${FIREFOX_LANG}" | tar -xjv -C /usr/lib && \
 	rm -rf /var/lib/apt/lists/* && \
-    cp /etc/pulse/client.conf /etc/pulse/client-noshm.conf && \
-    sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client-noshm.conf
+    cp /etc/pulse/client.conf \
+       /etc/pulse/client-noshm.conf && \
+    sed -i "s/; enable-shm = yes/enable-shm = no/g" \
+        /etc/pulse/client-noshm.conf
 
 # Debian seems to have some issues with the default font
 # setup. See the following blog:
