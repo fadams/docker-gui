@@ -24,10 +24,10 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
     ca-certificates git make cmake gcc g++ pkg-config ragel \
     libasound2-dev libpulse-dev libssl-dev libglib2.0-dev \
-    libpango1.0-dev libgl1-mesa-dev libevent-dev libgtk2.0-dev \
-    libxrandr-dev libxrender-dev libxcursor-dev libv4l-dev \
-    libgles2-mesa-dev libavcodec-dev libva-dev libvdpau-dev \
-    libdrm-dev libicu-dev && \
+    libpango1.0-dev libgl1-mesa-dev libevent-dev \
+    libgtk2.0-dev libxrandr-dev libxrender-dev libv4l-dev \
+    libxcursor-dev libgles2-mesa-dev libavcodec-dev \
+    libva-dev libvdpau-dev libdrm-dev libicu-dev && \
     # Actually git clone and build freshplayerplugin
     mkdir /src && cd /src && \
     git clone https://github.com/i-rinat/freshplayerplugin.git && \
@@ -40,12 +40,12 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Remove packages used for compiling libfreshwrapper from the image
     rm -rf freshplayerplugin && \
     apt-get clean && \
-    apt-get purge -y ca-certificates git make cmake gcc g++ pkg-config \
-    ragel libasound2-dev libpulse-dev libssl-dev libglib2.0-dev \
-    libpango1.0-dev libgl1-mesa-dev libevent-dev libgtk2.0-dev \
-    libxrandr-dev libxrender-dev libxcursor-dev libv4l-dev \
-    libgles2-mesa-dev libavcodec-dev libva-dev libvdpau-dev \
-    libdrm-dev libicu-dev && \
+    apt-get purge -y ca-certificates git make cmake gcc g++ \
+    pkg-config ragel libasound2-dev libpulse-dev libssl-dev \
+    libglib2.0-dev libpango1.0-dev libgl1-mesa-dev \
+    libevent-dev libgtk2.0-dev libxrandr-dev libxrender-dev \
+    libxcursor-dev libv4l-dev libgles2-mesa-dev libicu-dev \
+    libavcodec-dev libva-dev libvdpau-dev libdrm-dev && \
     apt-get autoremove -y && \
 	rm -rf /var/lib/apt/lists/*
 
