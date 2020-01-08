@@ -29,12 +29,12 @@ LABEL com.nvidia.volumes.needed=nvidia_driver
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-    locales tzdata \
-	dolphin-emu pulseaudio libgl1-mesa-glx libgl1-mesa-dri && \
+    locales tzdata dolphin-emu pulseaudio \
+    libgl1-mesa-glx libgl1-mesa-dri && \
     # Tidy up
     apt-get -y autoremove && \
     apt-get clean && \
-	rm -rf /var/lib/apt/lists/* && \
+    rm -rf /var/lib/apt/lists/* && \
     # Generate locales
     sed -i "s/^# *\($LANG\)/\1/" /etc/locale.gen && locale-gen && \
     # Set up the timezone
