@@ -23,7 +23,8 @@ FROM debian:stretch-slim
 LABEL com.nvidia.volumes.needed=nvidia_driver
 
 # Install Chromium
-RUN sed -i 's/main/main contrib/' /etc/apt/sources.list && \
+RUN sed -i 's/main/main contrib/' \
+        /etc/apt/sources.list && \
     apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
@@ -34,8 +35,10 @@ RUN sed -i 's/main/main contrib/' /etc/apt/sources.list && \
     gsettings-desktop-schemas \
     chromium chromium-l10n chromium-widevine && \
 	rm -rf /var/lib/apt/lists/* && \
-    cp /etc/pulse/client.conf /etc/pulse/client-noshm.conf && \
-    sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client-noshm.conf
+    cp /etc/pulse/client.conf \
+       /etc/pulse/client-noshm.conf && \
+    sed -i "s/; enable-shm = yes/enable-shm = no/g" \
+        /etc/pulse/client-noshm.conf
 
 # Debian seems to have some issues with the default font setup.
 # See the following blog:
