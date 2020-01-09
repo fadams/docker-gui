@@ -26,7 +26,8 @@ ENV TZ=Europe/London
 LABEL com.nvidia.volumes.needed=nvidia_driver
 
 # Install calibre
-RUN sed -i 's/main/main contrib/' /etc/apt/sources.list && \
+RUN sed -i 's/main/main contrib/' \
+        /etc/apt/sources.list && \
     apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
