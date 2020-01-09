@@ -40,7 +40,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     ln -s cuda-${CUDA_VERSION} /usr/local/cuda && \
     # Remove packages used for installation
     apt-get clean && \
-    apt-get purge -y apt-transport-https wget gnupg ca-certificates && \
+    apt-get purge -y apt-transport-https wget gnupg \
+            ca-certificates && \
     apt-get autoremove -y && \
 	rm -rf /var/lib/apt/lists/*
 
