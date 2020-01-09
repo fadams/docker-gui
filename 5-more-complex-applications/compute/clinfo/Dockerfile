@@ -28,7 +28,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     ocl-icd-libopencl1 clinfo && \
     # Add the Nvidia OpenCL Installable Client Driver
     mkdir -p /etc/OpenCL/vendors && \
-    echo "libnvidia-opencl.so.1" > /etc/OpenCL/vendors/nvidia.icd && \
+    echo "libnvidia-opencl.so.1" > \
+         /etc/OpenCL/vendors/nvidia.icd && \
 	rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT ["clinfo"]
