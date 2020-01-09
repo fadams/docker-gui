@@ -30,10 +30,13 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     ocl-icd-libopencl1 ocl-icd-opencl-dev && \
     # Add the Nvidia OpenCL Installable Client Driver
     mkdir -p /etc/OpenCL/vendors && \
-    echo "libnvidia-opencl.so.1" > /etc/OpenCL/vendors/nvidia.icd && \
+    echo "libnvidia-opencl.so.1" > \
+         /etc/OpenCL/vendors/nvidia.icd && \
 	rm -rf /var/lib/apt/lists/* && \
-    cp /etc/pulse/client.conf /etc/pulse/client-noshm.conf && \
-    sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client-noshm.conf
+    cp /etc/pulse/client.conf \
+       /etc/pulse/client-noshm.conf && \
+    sed -i "s/; enable-shm = yes/enable-shm = no/g" \
+        /etc/pulse/client-noshm.conf
 
 # Earlier blender versions used CYCLES_OPENCL_TEST=all
 ENV CYCLES_OPENCL_SPLIT_KERNEL_TEST 1
