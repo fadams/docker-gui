@@ -39,7 +39,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     mv ./opt/intel/opencl_compilers_and_libraries_18.1.0.013/linux/compiler/lib /opt/intel/opencl && \
     # Add ICD to the ICD registry
     mkdir -p /etc/OpenCL/vendors && \
-    echo "/opt/intel/opencl/intel64_lin/libintelocl.so" > /etc/OpenCL/vendors/intel_cpu.icd && \
+    echo "/opt/intel/opencl/intel64_lin/libintelocl.so" > \
+         /etc/OpenCL/vendors/intel_cpu.icd && \
     # Download the Nvidia SDK which includes the OpenCL samples.
     # Note that the samples listed at https://developer.nvidia.com/opencl
     # are incomplete, missing the "shared" and "common" code needed to
@@ -49,11 +50,14 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     wget -O gpucomputingsdk_4.2.9_linux.run "https://developer.download.nvidia.com/compute/cuda/4_2/rel/sdk/gpucomputingsdk_4.2.9_linux.run" && \
     chmod +x gpucomputingsdk_4.2.9_linux.run && \
     ./gpucomputingsdk_4.2.9_linux.run --tar xfp && \
-    rm gpucomputingsdk_4.2.9_linux.run install-sdk-linux.pl && \
+    rm gpucomputingsdk_4.2.9_linux.run && \
+    rm install-sdk-linux.pl && \
     mv sdk/OpenCL sdk/shared . && \
     rm -rf sdk && rm -rf shared/lib/linux && \
-    sed -i 's/GLEW_x86_64/GLEW/' /usr/local/src/OpenCL/common/common_opencl.mk && \
-    sed -i 's/-Wimplicit//' /usr/local/src/OpenCL/common/common_opencl.mk && \
+    sed -i 's/GLEW_x86_64/GLEW/' \
+        /usr/local/src/OpenCL/common/common_opencl.mk && \
+    sed -i 's/-Wimplicit//' \
+        /usr/local/src/OpenCL/common/common_opencl.mk && \
     # Fix issue with oclNbodyKernel.cl
     sed -i 's/mul24(get_local_size(0), get_local_id(1))/mul24((uint)get_local_size(0), get_local_id(1))/' /usr/local/src/OpenCL/src/oclNbody/oclNbodyKernel.cl && \
     # Fix issue with SobelFilter.cl (Not used here, but fixed for info)
@@ -69,15 +73,17 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     make && \
     chmod 777 /usr/local/bin && \
     mkdir -p /usr/local/bin/src && \
-    cp /usr/local/src/OpenCL/bin/linux/release/oclNbody /usr/local/bin/. && \
-    cp /usr/local/src/OpenCL/src/oclNbody/*.cl /usr/local/bin/src/. && \
+    cp /usr/local/src/OpenCL/bin/linux/release/oclNbody \
+       /usr/local/bin/. && \
+    cp /usr/local/src/OpenCL/src/oclNbody/*.cl \
+       /usr/local/bin/src/. && \
     # Remove packages used for installation
     rm /${RUNTIME}.tgz && \
     rm -rf /${RUNTIME} && \
     rm -rf /usr/local/src/* && \
     apt-get clean && \
     apt-get purge -y wget ca-certificates rpm2cpio cpio \
-        gcc g++ make && \
+            gcc g++ make && \
     apt-get autoremove -y && \
 	rm -rf /var/lib/apt/lists/*
 
