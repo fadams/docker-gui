@@ -24,7 +24,8 @@ LABEL com.nvidia.volumes.needed=nvidia_driver
 
 # Install Epiphany from testing as older version in stable doesn't
 # play YouTube videos and seems to suffer with other glitches.
-RUN echo "deb http://ftp.debian.org/debian testing main" > /etc/apt/sources.list.d/stretch-testing.list && \
+RUN echo "deb http://ftp.debian.org/debian testing main" \
+         > /etc/apt/sources.list.d/stretch-testing.list && \
     apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends -t testing \
     ca-certificates epiphany-browser libpulse0 \
@@ -32,8 +33,10 @@ RUN echo "deb http://ftp.debian.org/debian testing main" > /etc/apt/sources.list
     gstreamer1.0-pulseaudio gstreamer1.0-plugins-good \
     gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly && \
 	rm -rf /var/lib/apt/lists/* && \
-    cp /etc/pulse/client.conf /etc/pulse/client-noshm.conf && \
-    sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client-noshm.conf
+    cp /etc/pulse/client.conf \
+       /etc/pulse/client-noshm.conf && \
+    sed -i "s/; enable-shm = yes/enable-shm = no/g" \
+        /etc/pulse/client-noshm.conf
 
 # Debian seems to have some issues with the default font
 # setup. See the following blog:
