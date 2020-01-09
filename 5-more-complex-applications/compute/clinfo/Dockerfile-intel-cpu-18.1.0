@@ -37,7 +37,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     mv ./opt/intel/opencl_compilers_and_libraries_18.1.0.013/linux/compiler/lib /opt/intel/opencl && \
     # Add ICD to the ICD registry
     mkdir -p /etc/OpenCL/vendors && \
-    echo "/opt/intel/opencl/intel64_lin/libintelocl.so" > /etc/OpenCL/vendors/intel_cpu.icd && \
+    echo "/opt/intel/opencl/intel64_lin/libintelocl.so" > \
+         /etc/OpenCL/vendors/intel_cpu.icd && \
     # Remove packages used for installation
     rm /${RUNTIME}.tgz && \
     rm -rf /${RUNTIME} && \
