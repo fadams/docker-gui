@@ -29,7 +29,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     locales tzdata hunspell-en-gb && \
     rm -rf /var/lib/apt/lists/* && \
     # Generate locales
-    sed -i "s/^# *\($LANG\)/\1/" /etc/locale.gen && locale-gen && \
+    sed -i "s/^# *\($LANG\)/\1/" /etc/locale.gen && \
+    locale-gen && \
     # Set up the timezone
     echo $TZ > /etc/timezone && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
