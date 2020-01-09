@@ -37,18 +37,21 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
     libgl1-mesa-glx libgl1-mesa-dri libglu1-mesa freeglut3 \
-    cuda-cudart-${CUDA_VERSION} cuda-samples-${CUDA_VERSION} && \
+    cuda-cudart-${CUDA_VERSION} \
+    cuda-samples-${CUDA_VERSION} && \
     ln -s cuda-${CUDA_VERSION} /usr/local/cuda && \
     # Compile the smokeParticles sample. Note the tweak of findgllib.mk
     # that is needed to find the OpenGL libraries on debian.
-    cd /usr/local/cuda/samples/5_Simulations/smokeParticles && \
-    sed -i 's/grep -i ubuntu/grep -i "ubuntu\\|debian"/' findgllib.mk && \
+    cd /usr/local/cuda/samples/5_Simulations && \
+    cd smokeParticles && \
+    sed -i 's/grep -i ubuntu/grep -i "ubuntu\\|debian"/' \
+        findgllib.mk && \
     make && cp smokeParticles /usr/local/cuda/bin/. && \
     cp -R data /usr/local/cuda/bin/. && make clean && \
     # Remove the packages used for installation and build
     apt-get clean && \
-    apt-get purge -y apt-transport-https wget gnupg ca-certificates \
-    cuda-samples-${CUDA_VERSION} && \
+    apt-get purge -y apt-transport-https wget gnupg \
+            ca-certificates cuda-samples-${CUDA_VERSION} && \
     apt-get autoremove -y && \
 	rm -rf /var/lib/apt/lists/*
 
