@@ -35,7 +35,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     mv lib/x86_64/sdk/libamdocl64.so /opt/amd/opencl && \
     # Add ICD to the ICD registry
     mkdir -p /etc/OpenCL/vendors && \
-    echo "/opt/amd/opencl/libamdocl64.so" > /etc/OpenCL/vendors/amdocl64.icd && \
+    echo "/opt/amd/opencl/libamdocl64.so" > \
+         /etc/OpenCL/vendors/amdocl64.icd && \
     # Download the Nvidia SDK which includes the OpenCL samples.
     # Note that the samples listed at https://developer.nvidia.com/opencl
     # are incomplete, missing the "shared" and "common" code needed to
@@ -45,26 +46,33 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     wget -O gpucomputingsdk_4.2.9_linux.run "https://developer.download.nvidia.com/compute/cuda/4_2/rel/sdk/gpucomputingsdk_4.2.9_linux.run" && \
     chmod +x gpucomputingsdk_4.2.9_linux.run && \
     ./gpucomputingsdk_4.2.9_linux.run --tar xfp && \
-    rm gpucomputingsdk_4.2.9_linux.run install-sdk-linux.pl && \
+    rm gpucomputingsdk_4.2.9_linux.run && \
+    rm install-sdk-linux.pl && \
     mv sdk/OpenCL sdk/shared . && \
     rm -rf sdk && rm -rf shared/lib/linux && \
-    sed -i 's/GLEW_x86_64/GLEW/' /usr/local/src/OpenCL/common/common_opencl.mk && \
-    sed -i 's/-Wimplicit//' /usr/local/src/OpenCL/common/common_opencl.mk && \
+    sed -i 's/GLEW_x86_64/GLEW/' \
+        /usr/local/src/OpenCL/common/common_opencl.mk && \
+    sed -i 's/-Wimplicit//' \
+        /usr/local/src/OpenCL/common/common_opencl.mk && \
     # Replace hard-coded CL_DEVICE_TYPE_GPU with CL_DEVICE_TYPE_CPU
     # so the samples will work (as far as possible) on Intel CPU device.
     for i in $(grep -rwl /usr/local/src/OpenCL/src -e CL_DEVICE_TYPE_GPU); do sed -i 's/CL_DEVICE_TYPE_GPU/CL_DEVICE_TYPE_CPU/' $i; done && \
     cd OpenCL && \
-    mv src/oclParticles . && rm -rf src/* && mv oclParticles src/. && \
+    mv src/oclParticles . && rm -rf src/* && \
+    mv oclParticles src/. && \
     make && \
     chmod 777 /usr/local/bin && \
     mkdir -p /usr/local/bin/src && \
-    cp /usr/local/src/OpenCL/bin/linux/release/oclParticles /usr/local/bin/. && \
-    cp /usr/local/src/OpenCL/src/oclParticles/*.cl /usr/local/bin/src/. && \
+    cp /usr/local/src/OpenCL/bin/linux/release/oclParticles \
+       /usr/local/bin/. && \
+    cp /usr/local/src/OpenCL/src/oclParticles/*.cl \
+       /usr/local/bin/src/. && \
     # Remove packages used for installation
     rm -rf /opt/amd/opencl/install && \
     rm -rf /usr/local/src/* && \
     apt-get clean && \
-    apt-get purge -y wget bzip2 ca-certificates gcc g++ make && \
+    apt-get purge -y wget bzip2 ca-certificates gcc g++ \
+            make && \
     apt-get autoremove -y && \
 	rm -rf /var/lib/apt/lists/*
 
