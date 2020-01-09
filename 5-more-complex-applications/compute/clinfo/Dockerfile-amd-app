@@ -34,7 +34,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     mv lib/x86_64/sdk/libamdocl64.so /opt/amd/opencl && \
     # Add ICD to the ICD registry
     mkdir -p /etc/OpenCL/vendors && \
-    echo "/opt/amd/opencl/libamdocl64.so" > /etc/OpenCL/vendors/amdocl64.icd && \
+    echo "/opt/amd/opencl/libamdocl64.so" > \
+         /etc/OpenCL/vendors/amdocl64.icd && \
     # Remove packages used for installation
     rm -rf /opt/amd/opencl/install && \
     apt-get clean && \
