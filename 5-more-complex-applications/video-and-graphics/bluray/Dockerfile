@@ -41,8 +41,10 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     cd /usr/lib/x86_64-linux-gnu && \
     ln -s libmmbd.so.0 libaacs.so.0 && \
     ln -s libmmbd.so.0 libbdplus.so.0 && \
-    cp /etc/pulse/client.conf /etc/pulse/client-noshm.conf && \
-    sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client-noshm.conf
+    cp /etc/pulse/client.conf \
+       /etc/pulse/client-noshm.conf && \
+    sed -i "s/; enable-shm = yes/enable-shm = no/g" \
+        /etc/pulse/client-noshm.conf
 
 ENTRYPOINT ["vlc"]
 
