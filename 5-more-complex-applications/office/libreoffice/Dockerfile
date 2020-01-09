@@ -25,7 +25,8 @@ ENV TZ=Europe/London
 # nvidia-docker hooks (Only needed for Nvidia Docker V1)
 LABEL com.nvidia.volumes.needed=nvidia_driver
 
-RUN sed -i 's/main/main contrib/' /etc/apt/sources.list && \
+RUN sed -i 's/main/main contrib/' \
+        /etc/apt/sources.list && \
     mkdir -p /usr/share/man/man1 && \
     apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
@@ -40,14 +41,18 @@ RUN sed -i 's/main/main contrib/' /etc/apt/sources.list && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     # Generate locales
-    sed -i "s/^# *\($LANG\)/\1/" /etc/locale.gen && locale-gen && \
+    sed -i "s/^# *\($LANG\)/\1/" /etc/locale.gen && \
+    locale-gen && \
     # Set up the timezone
     echo $TZ > /etc/timezone && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
-    DEBIAN_FRONTEND=noninteractive dpkg-reconfigure tzdata && \
+    DEBIAN_FRONTEND=noninteractive \
+    dpkg-reconfigure tzdata && \
     # Add PulseAudio client config with shm disabled
-    cp /etc/pulse/client.conf /etc/pulse/client-noshm.conf && \
-    sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client-noshm.conf
+    cp /etc/pulse/client.conf \
+       /etc/pulse/client-noshm.conf && \
+    sed -i "s/; enable-shm = yes/enable-shm = no/g" \
+        /etc/pulse/client-noshm.conf
 
 ENTRYPOINT ["libreoffice"]
 
