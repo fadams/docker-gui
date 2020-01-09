@@ -26,11 +26,13 @@ LABEL com.nvidia.volumes.needed=nvidia_driver
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	libcanberra-gtk-module libcanberra-gtk3-module guvcview \
-    pulseaudio libgl1-mesa-glx libgl1-mesa-dri && \
+	libcanberra-gtk-module libcanberra-gtk3-module \
+    guvcview pulseaudio libgl1-mesa-glx libgl1-mesa-dri && \
 	rm -rf /var/lib/apt/lists/* && \
-    cp /etc/pulse/client.conf /etc/pulse/client-noshm.conf && \
-    sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client-noshm.conf
+    cp /etc/pulse/client.conf \
+       /etc/pulse/client-noshm.conf && \
+    sed -i "s/; enable-shm = yes/enable-shm = no/g" \
+        /etc/pulse/client-noshm.conf
 
 ENTRYPOINT ["guvcview"]
 
