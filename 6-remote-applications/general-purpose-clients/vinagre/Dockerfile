@@ -25,11 +25,14 @@ LABEL com.nvidia.volumes.needed=nvidia_driver
 # Install vinagre
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-    vinagre libgl1-mesa-glx libgl1-mesa-dri && \
+    vinagre libvdpau1 mesa-vdpau-drivers \
+    libgl1-mesa-glx libgl1-mesa-dri && \
 	rm -rf /var/lib/apt/lists/* && \
     # vinagre links in libpulse so add this just in case.
-    cp /etc/pulse/client.conf /etc/pulse/client-noshm.conf && \
-    sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client-noshm.conf
+    cp /etc/pulse/client.conf \
+       /etc/pulse/client-noshm.conf && \
+    sed -i "s/; enable-shm = yes/enable-shm = no/g" \
+        /etc/pulse/client-noshm.conf
 
 ENTRYPOINT ["vinagre"]
 
