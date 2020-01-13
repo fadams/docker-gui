@@ -28,6 +28,13 @@ BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 # "home directory" in the container for the current user. 
 mkdir -p $(id -un)/.config/pulse
 mkdir -p $(id -un)/.config/dconf
+
+# Create password if required.
+if ! test -f "$(id -un)/.vnc/passwd"; then
+    echo "creating password"
+    $(cd $(dirname $0); echo $PWD)/tightvnc-storepasswd.sh
+fi
+
 $DOCKER_COMMAND run --rm -it \
     --init \
     --shm-size 2g \
