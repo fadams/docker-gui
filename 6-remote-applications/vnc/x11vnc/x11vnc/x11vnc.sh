@@ -32,9 +32,8 @@ if ! test -f "$(id -un)/.vnc/passwd"; then
     $(cd $(dirname $0); echo $PWD)/x11vnc-storepasswd.sh
 fi
 
-# Launch x11vnc. Use --init to run tini as pid 1
+# Launch x11vnc.
 $DOCKER_COMMAND run --rm -it \
-    --init \
     --ipc=host \
     -p 5900:5900 \
     -u $(id -u):$(id -g) \
