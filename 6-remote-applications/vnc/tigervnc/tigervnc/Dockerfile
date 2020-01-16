@@ -25,19 +25,21 @@ ENV TZ=Europe/London
 # Install tigervnc-standalone-server
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-    libgl1-mesa-glx libgl1-mesa-dri \
-    tigervnc-standalone-server tigervnc-common locales jwm \
-    xfonts-base xfonts-75dpi xfonts-100dpi xfonts-scalable && \
-	rm -rf /var/lib/apt/lists/* && \
+    libgl1-mesa-glx libgl1-mesa-dri tigervnc-common \
+    tigervnc-standalone-server locales jwm xfonts-base \
+    xfonts-75dpi xfonts-100dpi xfonts-scalable && \
+    rm -rf /var/lib/apt/lists/* && \
     # Create simple launch script to start Xtigervnc and jwm
     echo '#!/bin/bash\nXtigervnc $DISPLAY -ac -shmem -geometry $GEOMETRY -rfbport 5900 -rfbauth ~/.vnc/passwd &\nsleep 0.5\njwm' > /usr/local/bin/startup && \
     chmod +x /usr/local/bin/startup && \
     # Generate locales
-    sed -i "s/^# *\($LANG\)/\1/" /etc/locale.gen && locale-gen && \
+    sed -i "s/^# *\($LANG\)/\1/" /etc/locale.gen && \
+    locale-gen && \
     # Set up the timezone
     echo $TZ > /etc/timezone && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
-    DEBIAN_FRONTEND=noninteractive dpkg-reconfigure tzdata && \
+    DEBIAN_FRONTEND=noninteractive \
+    dpkg-reconfigure tzdata && \
     # Tidy up JWM for single app use case
     sed -i "s/Desktops width=\"4\"/Desktops width=\"1\"/g" /etc/jwm/system.jwmrc && \
     sed -i "s/<TrayButton icon=\"\/usr\/share\/jwm\/jwm-red.svg\">root:1<\/TrayButton>//g" /etc/jwm/system.jwmrc && \
