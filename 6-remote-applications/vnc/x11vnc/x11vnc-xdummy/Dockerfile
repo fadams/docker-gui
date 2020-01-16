@@ -27,16 +27,18 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
     libgl1-mesa-glx libgl1-mesa-dri \
     x11vnc xserver-xorg-video-dummy locales jwm && \
-	rm -rf /var/lib/apt/lists/* && \
+    rm -rf /var/lib/apt/lists/* && \
     # Create simple launch script to start Xorg, jwm and x11vnc
     echo '#!/bin/bash\nXorg $DISPLAY -cc 4 &\nsleep 0.5\njwm &\nx11vnc -forever -usepw' > /usr/local/bin/startup && \
     chmod +x /usr/local/bin/startup && \
     # Generate locales
-    sed -i "s/^# *\($LANG\)/\1/" /etc/locale.gen && locale-gen && \
+    sed -i "s/^# *\($LANG\)/\1/" /etc/locale.gen && \
+    locale-gen && \
     # Set up the timezone
     echo $TZ > /etc/timezone && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
-    DEBIAN_FRONTEND=noninteractive dpkg-reconfigure tzdata && \
+    DEBIAN_FRONTEND=noninteractive \
+    dpkg-reconfigure tzdata && \
     # Tidy up JWM for single app use case
     sed -i "s/Desktops width=\"4\"/Desktops width=\"1\"/g" /etc/jwm/system.jwmrc && \
     sed -i "s/<TrayButton icon=\"\/usr\/share\/jwm\/jwm-red.svg\">root:1<\/TrayButton>//g" /etc/jwm/system.jwmrc && \
