@@ -30,13 +30,13 @@ ENV TVNC_WM=/usr/bin/jwm
 # TVNC_VERSION variable could simply be set manually below.
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-	curl ca-certificates locales \
-    libgl1-mesa-glx libgl1-mesa-dri \
-    xauth x11-xkb-utils xkb-data x11-xserver-utils libssl1.0.2 jwm \
-    xfonts-base xfonts-75dpi xfonts-100dpi xfonts-scalable && \
+    curl ca-certificates locales libssl1.0.2 jwm \
+    libgl1-mesa-glx libgl1-mesa-dri xauth \
+    x11-xkb-utils xkb-data x11-xserver-utils xfonts-base \
+    xfonts-75dpi xfonts-100dpi xfonts-scalable && \
     # Attempt to work out the latest turbovnc version from
     # https://sourceforge.net/projects/turbovnc/files/
-	TVNC_VERSION=$(curl -sSL https://sourceforge.net/projects/turbovnc/files/ | grep "<span class=\"name\">[0-9]" | head -n 1 | cut -d \> -f2 | cut -d \< -f1) && \
+    TVNC_VERSION=$(curl -sSL https://sourceforge.net/projects/turbovnc/files/ | grep "<span class=\"name\">[0-9]" | head -n 1 | cut -d \> -f2 | cut -d \< -f1) && \
     echo "turbovnc version: ${TVNC_VERSION}" && \
     # Given the version download and install turbovnc
     curl -sSL https://sourceforge.net/projects/turbovnc/files/${TVNC_VERSION}/turbovnc_${TVNC_VERSION}_amd64.deb -o turbovnc_${TVNC_VERSION}_amd64.deb && \
@@ -46,13 +46,15 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get clean && \
     apt-get purge -y curl ca-certificates && \
     apt-get autoremove -y && \
-	rm -rf /var/lib/apt/lists/* && \
+    rm -rf /var/lib/apt/lists/* && \
     # Generate locales
-    sed -i "s/^# *\($LANG\)/\1/" /etc/locale.gen && locale-gen && \
+    sed -i "s/^# *\($LANG\)/\1/" /etc/locale.gen && \
+    locale-gen && \
     # Set up the timezone
     echo $TZ > /etc/timezone && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
-    DEBIAN_FRONTEND=noninteractive dpkg-reconfigure tzdata && \
+    DEBIAN_FRONTEND=noninteractive \
+    dpkg-reconfigure tzdata && \
     # Tidy up JWM for single app use case
     sed -i "s/Desktops width=\"4\"/Desktops width=\"1\"/g" /etc/jwm/system.jwmrc && \
     sed -i "s/<TrayButton icon=\"\/usr\/share\/jwm\/jwm-red.svg\">root:1<\/TrayButton>//g" /etc/jwm/system.jwmrc && \
