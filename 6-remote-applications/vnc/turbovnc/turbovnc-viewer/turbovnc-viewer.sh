@@ -21,12 +21,15 @@
 BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 . $BIN/docker-command.sh
 . $BIN/docker-xauth.sh
+. $BIN/docker-dbus-all.sh
 
-mkdir -p $(id -un)
+mkdir -p $(id -un)/.config/dconf
 $DOCKER_COMMAND run --rm -it \
     -u $(id -u):$(id -g) \
     -v /etc/passwd:/etc/passwd:ro \
     -v $PWD/$(id -un):/home/$(id -un) \
+    $APPARMOR_FLAGS \
+    $DCONF_FLAGS \
     $X11_FLAGS \
     turbovnc-viewer
 

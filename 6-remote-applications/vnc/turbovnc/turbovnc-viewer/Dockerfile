@@ -29,10 +29,10 @@ FROM debian:stretch-slim
 RUN mkdir -p /usr/share/man/man1 && \
     apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-	curl ca-certificates default-jre && \
+    curl ca-certificates default-jre && \
     # Attempt to work out the latest turbovnc version from
     # https://sourceforge.net/projects/turbovnc/files/
-	TVNC_VERSION=$(curl -sSL https://sourceforge.net/projects/turbovnc/files/ | grep "<span class=\"name\">[0-9]" | head -n 1 | cut -d \> -f2 | cut -d \< -f1) && \
+    TVNC_VERSION=$(curl -sSL https://sourceforge.net/projects/turbovnc/files/ | grep "<span class=\"name\">[0-9]" | head -n 1 | cut -d \> -f2 | cut -d \< -f1) && \
     echo "turbovnc version: ${TVNC_VERSION}" && \
     # Given the version download and install turbovnc
     curl -sSL https://sourceforge.net/projects/turbovnc/files/${TVNC_VERSION}/turbovnc_${TVNC_VERSION}_amd64.deb -o turbovnc_${TVNC_VERSION}_amd64.deb && \
@@ -42,7 +42,7 @@ RUN mkdir -p /usr/share/man/man1 && \
     apt-get clean && \
     apt-get purge -y curl && \
     apt-get autoremove -y && \
-	rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT ["/opt/TurboVNC/bin/vncviewer"]
 
