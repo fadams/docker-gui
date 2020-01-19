@@ -21,11 +21,13 @@
 BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 . $BIN/docker-command.sh
 
-# Create initial /etc/passwd /etc/shadow /etc/group credentials.
-# We use template files from a container spawned from the image we'll
-# be using in the main run so that users and groups will be correct.
-# If we copy from the host we may see problems if the host distro is
-# different to the container distro, so don't do that.
+# Create initial /etc/passwd /etc/shadow /etc/group
+# credentials. We use template files from a container
+# spawned from the image we'll be using in the main
+# run so that users and groups will be correct.
+# If we copy from the host we may see problems if the
+# host distro is different to the container distro,
+# so don't do that.
 $DOCKER_COMMAND run --rm -it \
     -v $PWD:/mnt \
     xrdp sh -c 'adduser --uid '$(id -u)' --no-create-home '$(id -un)'; usermod -aG sudo '$(id -un)'; tar zcf /mnt/etc.tar.gz -C / ./etc/passwd ./etc/shadow ./etc/group'
