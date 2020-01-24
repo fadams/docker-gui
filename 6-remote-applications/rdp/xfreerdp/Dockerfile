@@ -27,15 +27,19 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
     freerdp-x11 libfreerdp-plugins-standard locales && \
     # Generate locales
-    sed -i "s/^# *\($LANG\)/\1/" /etc/locale.gen && locale-gen && \
+    sed -i "s/^# *\($LANG\)/\1/" /etc/locale.gen && \
+    locale-gen && \
     # Set up the timezone
     echo $TZ > /etc/timezone && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
-    DEBIAN_FRONTEND=noninteractive dpkg-reconfigure tzdata && \
-	rm -rf /var/lib/apt/lists/* && \
+    DEBIAN_FRONTEND=noninteractive \
+    dpkg-reconfigure tzdata && \
+    rm -rf /var/lib/apt/lists/* && \
     # xfreerdp links in libpulse so add this just in case.
-    cp /etc/pulse/client.conf /etc/pulse/client-noshm.conf && \
-    sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client-noshm.conf
+    cp /etc/pulse/client.conf \
+       /etc/pulse/client-noshm.conf && \
+    sed -i "s/; enable-shm = yes/enable-shm = no/g" \
+        /etc/pulse/client-noshm.conf
 
 ENTRYPOINT ["xfreerdp"]
 
