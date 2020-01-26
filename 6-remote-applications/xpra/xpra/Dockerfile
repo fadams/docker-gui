@@ -105,7 +105,11 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
             python3-dev gcc && \
     apt-get autoremove -y && \
     rm -rf /root/.cache/pip && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    cp /etc/pulse/client.conf \
+       /etc/pulse/client-noshm.conf && \
+    sed -i "s/; enable-shm = yes/enable-shm = no/g" \
+       /etc/pulse/client-noshm.conf
 
 VOLUME /tmp/.X11-unix
 VOLUME /run/user
