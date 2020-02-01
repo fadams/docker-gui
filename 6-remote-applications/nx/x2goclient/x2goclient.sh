@@ -27,6 +27,7 @@ BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 # "home directory" in the container for the current user.
 mkdir -p $(id -un)/.config/dconf
 $DOCKER_COMMAND run --rm \
+    --init \
     -u $(id -u):$(id -g) \
     -v /etc/passwd:/etc/passwd:ro \
     -v $PWD/$(id -un):/home/$(id -un) \

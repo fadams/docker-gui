@@ -19,12 +19,21 @@
 
 FROM debian:stretch-slim
 
-# Install x2goclient. Note that x2goclient needs xauth and fails to connect
+# Install x2goclient.
+# Note that x2goclient needs xauth and fails to connect
 # in a fairly hard to diagnose way without it.
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-    x2goclient xauth libgl1-mesa-glx libgl1-mesa-dri && \
-	rm -rf /var/lib/apt/lists/*
+    ca-certificates gnupg dirmngr xauth \
+    openssh-sftp-server openssh-server \
+    libgl1-mesa-glx libgl1-mesa-dri && \
+    # Set up the repositories for x2go
+    echo "deb http://packages.x2go.org/debian stretch extras main\n" > /etc/apt/sources.list.d/x2go.list && \
+    apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 E1F958385BFE2B6E && \
+    apt-get update && DEBIAN_FRONTEND=noninteractive \
+    apt-get install -y --no-install-recommends \
+    x2goclient && \
+    rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT ["x2goclient"]
 
