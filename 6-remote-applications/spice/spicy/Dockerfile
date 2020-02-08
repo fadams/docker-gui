@@ -22,10 +22,13 @@ FROM debian:stretch-slim
 # Install spice-client-gtk
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-    spice-client-gtk libgl1-mesa-glx libgl1-mesa-dri && \
-	rm -rf /var/lib/apt/lists/* && \
-    cp /etc/pulse/client.conf /etc/pulse/client-noshm.conf && \
-    sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client-noshm.conf
+    spice-client-gtk libvdpau1 mesa-vdpau-drivers \
+    libgl1-mesa-glx libgl1-mesa-dri && \
+    rm -rf /var/lib/apt/lists/* && \
+    cp /etc/pulse/client.conf \
+       /etc/pulse/client-noshm.conf && \
+    sed -i "s/; enable-shm = yes/enable-shm = no/g" \
+        /etc/pulse/client-noshm.conf
 
 ENTRYPOINT ["spicy"]
 
