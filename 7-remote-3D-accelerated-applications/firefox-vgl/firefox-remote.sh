@@ -28,7 +28,6 @@ BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 . $BIN/docker-dbus-session-launch.sh # Run before dbus-all
 . $BIN/docker-xauth.sh
 . $BIN/docker-gpu.sh
-#. $BIN/docker-pulseaudio.sh
 . $BIN/docker-dbus-all.sh
 
 # Create a directory on the host that we can mount as a
