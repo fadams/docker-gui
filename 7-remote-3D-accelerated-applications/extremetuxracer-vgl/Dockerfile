@@ -30,14 +30,17 @@ LABEL com.nvidia.volumes.needed=nvidia_driver
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	extremetuxracer libpulse0 libgl1-mesa-glx libgl1-mesa-dri && \
+    extremetuxracer libpulse0 \
+    libgl1-mesa-glx libgl1-mesa-dri && \
     # Tidy up
     apt-get -y autoremove && \
     apt-get clean && \
-	rm -rf /var/lib/apt/lists/* && \
+    rm -rf /var/lib/apt/lists/* && \
     # Add PulseAudio client config with shm disabled
-    cp /etc/pulse/client.conf /etc/pulse/client-noshm.conf && \
-    sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client-noshm.conf
+    cp /etc/pulse/client.conf \
+       /etc/pulse/client-noshm.conf && \
+    sed -i "s/; enable-shm = yes/enable-shm = no/g" \
+        /etc/pulse/client-noshm.conf
 
 ENTRYPOINT ["vglrun", "/usr/games/etr"]
 
