@@ -23,10 +23,10 @@ FROM debian:stretch-slim
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
     libcanberra-gtk3-module packagekit-gtk3-module \
-	ca-certificates gnome-calculator libgtk-3-bin && \
+    ca-certificates gnome-calculator libgtk-3-bin && \
     echo '#!/bin/bash\nbroadwayd :0 &\nexec gnome-calculator' > /usr/local/bin/start-server && \
     chmod +x /usr/local/bin/start-server && \
-	rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/*
 
 CMD ["/usr/local/bin/start-server"]
 
