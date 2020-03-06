@@ -37,7 +37,7 @@ $DOCKER_COMMAND run --rm -it \
     -v /etc/passwd:/etc/passwd:ro \
     $APPARMOR_FLAGS \
     $DCONF_FLAGS \
-    combined-broadwayd-gnome-calculator
+    broadwayd-gnome-calculator
 
 # Point browser to http://<host>:8080
 
