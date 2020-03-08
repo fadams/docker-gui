@@ -19,31 +19,39 @@
 
 FROM debian:stretch-slim
 
-# git clone and build guacd
-RUN mkdir -p /usr/share/man/man1 && mkdir -p /usr/share/man/man7 && \
+RUN mkdir -p /usr/share/man/man1 && \
+    mkdir -p /usr/share/man/man7 && \
     apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-	git autoconf automake gcc libcairo2-dev libfreerdp-dev libjpeg62-turbo-dev \
-    libossp-uuid-dev libpango1.0-dev libpulse-dev libssh2-1-dev libssl-dev \
-    libtelnet-dev libtool libvncserver-dev libwebsockets-dev libwebp-dev make \
-    libavcodec-dev libswscale-dev libvorbis-dev curl \
-    ca-certificates ghostscript libfreerdp-plugins-standard \
-    fonts-liberation fonts-dejavu xfonts-terminus default-jre \
-    libossp-uuid16 libpangocairo-1.0-0 libpango-1.0-0 libwebsockets8 \
-    libavcodec57 libswscale4 libvorbisenc2 libvorbisfile3 libssh2-1 libtelnet2 \
-    libvncclient1 libfreerdp-client1.1 libfreerdp-cache1.1 && \
+    autoconf automake gcc libcairo2-dev libfreerdp-dev \
+    libjpeg62-turbo-dev libossp-uuid-dev libpango1.0-dev \
+    libpulse-dev libssh2-1-dev libssl-dev libtelnet-dev \
+    libtool libvncserver-dev libwebsockets-dev libwebp-dev \
+    make libavcodec-dev libswscale-dev libvorbis-dev curl \
+    ca-certificates libfreerdp-plugins-standard \
+    ghostscript fonts-liberation fonts-dejavu default-jre \
+    xfonts-terminus libossp-uuid16 libpangocairo-1.0-0 \
+    libpango-1.0-0 libwebsockets8 libavcodec57 \
+    libswscale4 libvorbisenc2 libvorbisfile3 libssh2-1 \
+    libtelnet2 libvncclient1 libfreerdp-client1.1 \
+    libfreerdp-cache1.1 && \
+    GUACAMOLE_VERSION=1.0.0 && \
     cd /usr/local/src && \
-    git clone https://github.com/apache/guacamole-server.git && \
-    cd guacamole-server && autoreconf -fi && ./configure && \
-    make -j$(getconf _NPROCESSORS_ONLN) && make install && ldconfig && \
-    # Download Tomcat
-    TOMCAT_VERSION=9.0.27 && \
+    curl -sSL "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/${GUACAMOLE_VERSION}/source/guacamole-server-${GUACAMOLE_VERSION}.tar.gz" | tar -xzv -C /usr/local/src && \
+    mv /usr/local/src/guacamole-server-${GUACAMOLE_VERSION} \
+       /usr/local/src/guacamole-server && \
+    cd guacamole-server && \
+    ./configure && \
+    make -j$(getconf _NPROCESSORS_ONLN) && make install && \
+    ldconfig && \
+    # Download Tomcat. If build fails try updating version
+    TOMCAT_VERSION=9.0.31 && \
     CATALINA_HOME=/usr/local/tomcat && \
     curl -sSL https://apache.mirrors.nublue.co.uk/tomcat/tomcat-9/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz | tar -xzv -C /usr/local && \
-    mv /usr/local/apache-tomcat-${TOMCAT_VERSION} /usr/local/tomcat && \
+    mv /usr/local/apache-tomcat-${TOMCAT_VERSION} \
+       /usr/local/tomcat && \
     chmod -R ugo=rwX ${CATALINA_HOME} && \
     # Download and install guacamole-client war
-    GUACAMOLE_VERSION=1.0.0 && \
     curl -sSL "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/${GUACAMOLE_VERSION}/binary/guacamole-${GUACAMOLE_VERSION}.war" -o ${CATALINA_HOME}/webapps/ROOT.war && \
     rm -rf ${CATALINA_HOME}/webapps/ROOT && \
     # Create simple launch script to start guacd and Tomcat
@@ -53,12 +61,14 @@ RUN mkdir -p /usr/share/man/man1 && mkdir -p /usr/share/man/man7 && \
     rm -rf /usr/local/src/guacamole-server && \
     apt-get clean && \
     apt-get purge -y \
-    git autoconf automake gcc libcairo2-dev libfreerdp-dev libjpeg62-turbo-dev \
-    libossp-uuid-dev libpango1.0-dev libpulse-dev libssh2-1-dev libssl-dev \
-    libtelnet-dev libtool libvncserver-dev libwebsockets-dev libwebp-dev make \
-    libavcodec-dev libswscale-dev libvorbis-dev curl && \
+    autoconf automake gcc libcairo2-dev libfreerdp-dev \
+    libjpeg62-turbo-dev libossp-uuid-dev libpango1.0-dev \
+    libpulse-dev libssh2-1-dev libssl-dev libtelnet-dev \
+    libtool libvncserver-dev libwebsockets-dev \
+    libwebp-dev make libavcodec-dev libswscale-dev \
+    libvorbis-dev curl && \
     apt-get autoremove -y && \
-	rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/*
 
 CMD ["/usr/local/bin/startup"]
 
