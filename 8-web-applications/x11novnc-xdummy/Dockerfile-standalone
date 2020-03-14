@@ -17,12 +17,17 @@
 # under the License.
 #
 
-FROM x11vnc-xdummy
+FROM debian:stretch-slim
 
-# Install noVNC
+ENV LANG=en_GB.UTF-8
+ENV TZ=Europe/London
+
+# Install x11vnc and xserver-xorg-video-dummy
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-    curl xz-utils ca-certificates && \
+    curl xz-utils ca-certificates \
+    libgl1-mesa-glx libgl1-mesa-dri \
+    x11vnc xserver-xorg-video-dummy locales jwm && \
     # Download noVNC.
     NOVNC_VERSION=1.1.0 && \
     NOVNC=/usr/local/bin/noVNC-${NOVNC_VERSION} && \
@@ -74,9 +79,27 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # option to change this.
     mv ${NOVNC}/vnc.html \
        /usr/local/bin/noVNC/index.vnc && \
+    #
     # Create script to start Xorg, jwm and x11vnc
     echo '#!/bin/bash\nXorg $DISPLAY -cc 4 &\nsleep 0.5\njwm &\nx11vnc -forever -usepw -httpdir /usr/local/bin/noVNC' > /usr/local/bin/startup && \
     chmod +x /usr/local/bin/startup && \
+    # Generate locales
+    sed -i "s/^# *\($LANG\)/\1/" /etc/locale.gen && \
+    locale-gen && \
+    # Set up the timezone
+    echo $TZ > /etc/timezone && \
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    DEBIAN_FRONTEND=noninteractive \
+    dpkg-reconfigure tzdata && \
+    # Tidy up JWM for single app use case
+    sed -i "s/Desktops width=\"4\"/Desktops width=\"1\"/g" /etc/jwm/system.jwmrc && \
+    sed -i "s/<TrayButton icon=\"\/usr\/share\/jwm\/jwm-red.svg\">root:1<\/TrayButton>//g" /etc/jwm/system.jwmrc && \
+    sed -i "s/<TrayButton label=\"_\">showdesktop<\/TrayButton>//g" /etc/jwm/system.jwmrc && \
+    sed -i "s/<Include>\/etc\/jwm\/debian-menu<\/Include>//g" /etc/jwm/system.jwmrc && \
+    # We export /tmp/.X11-unix as a volume and we need
+    # the mode of /tmp/.X11-unix to be set to 1777
+    mkdir /tmp/.X11-unix && \
+    chmod 1777 /tmp/.X11-unix && \
     # Tidy up
     rm -rf ${NOVNC} && \
     rm -rf /usr/local/lib/node-v10.16.3-linux-x64 && \
@@ -89,11 +112,15 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get autoremove -y && \
     rm -rf /var/lib/apt/lists/*
 
+VOLUME /tmp/.X11-unix
+
+COPY xorg.conf /etc/X11/xorg.conf
+
 CMD ["/usr/local/bin/startup"]
 
 #-------------------------------------------------------------------------------
 # 
 # To build the image
-# docker build -t x11novnc-xdummy .
+# docker build -t x11novnc-xdummy -f Dockerfile-standalone .
 #
 
