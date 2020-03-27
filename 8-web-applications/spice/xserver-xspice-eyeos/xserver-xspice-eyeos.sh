@@ -58,8 +58,6 @@ $DOCKER_COMMAND run --rm -it -d \
     -e DISPLAY=:1 \
     xserver-xspice-eyeos
 
-#-v $PWD/spice-web-client:/usr/local/bin/spice-web-client:ro \
-
 # Launch firefox. Use --volumes-from to mount /tmp/.X11-unix
 # from xserver-xspice-eyeos and also use that container's IPC
 $DOCKER_COMMAND run --rm \
