@@ -27,6 +27,7 @@ RUN \
     sed -i 's/# deb http:\/\/archive.canonical.com\/ubuntu bionic partner/deb http:\/\/archive.canonical.com\/ubuntu bionic partner/' /etc/apt/sources.list && \
     # Remove "This system has been minimized" warning.
     rm -f /etc/update-motd.d/60-unminimize && \
+    rm -f /etc/update-motd.d/98-fsck-at-reboot && \
     # Update base packages.
     apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get -fy -o Dpkg::Options::="--force-confnew" \
@@ -96,8 +97,6 @@ RUN \
     # E: _cache->open() failed, please report.
     sed -i 's/Dir::Cache::pkgcache ""; //' \
         /etc/apt/apt.conf.d/docker-clean && \
-    # Remove unnecessary file from /etc/update-motd.d
-    rm /etc/update-motd.d/98-fsck-at-reboot && \
     # Disable getty@tty1.service to speed up desktop loading.
     rm -f /etc/systemd/system/getty.target.wants/getty@tty1.service && \
     # Fix issues with slow shutdown
