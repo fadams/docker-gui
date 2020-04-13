@@ -19,12 +19,7 @@
 
 FROM centos-gnome:7.7
 
-ENV LANG=en_GB.UTF-8
-ENV TZ=Europe/London
-
 RUN \
-    # Dependencies needed by VirtualGL
-    yum -y install mesa-libGLU && \
     # Attempt to work out the latest VirtualGL version from
     # https://sourceforge.net/projects/virtualgl/files/
 	VGL_VERSION=$(curl -sSL https://sourceforge.net/projects/virtualgl/files/ | grep "<span class=\"name\">[0-9]" | head -n 1 | cut -d \> -f2 | cut -d \< -f1) && \
@@ -33,8 +28,9 @@ RUN \
     curl -sSL https://sourceforge.net/projects/virtualgl/files/${VGL_VERSION}/VirtualGL-${VGL_VERSION}.x86_64.rpm -o VirtualGL-${VGL_VERSION}.x86_64.rpm && \
     rpm -i VirtualGL-${VGL_VERSION}.x86_64.rpm && \
     rm VirtualGL-${VGL_VERSION}.x86_64.rpm && \
-    # Enable VirtualGL access to host X server needed for 3D rendering
-    echo 'XAUTHORITY=$HOME/.Xauthority.docker' > /etc/profile.d/Xauthority-fix.sh && \
+    # Give VGL access to host X Server for 3D rendering
+    echo 'XAUTHORITY=$HOME/.Xauthority.docker' > \
+         /etc/profile.d/Xauthority-fix.sh && \
     echo 'export LD_PRELOAD=libdlfaker.so:libvglfaker.so:$LD_PRELOAD' > /etc/profile.d/virtualgl.sh 
 
 #-------------------------------------------------------------------------------

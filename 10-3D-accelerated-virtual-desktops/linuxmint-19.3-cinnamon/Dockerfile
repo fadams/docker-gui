@@ -19,10 +19,7 @@
 
 FROM linuxmint-cinnamon:19.3
 
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
-    apt-get install -y --no-install-recommends \
-    # Dependencies needed by VirtualGL
-    libglu1-mesa libxv1 libxtst6 && \
+RUN \
     # Attempt to work out the latest VirtualGL version from
     # https://sourceforge.net/projects/virtualgl/files/
 	VGL_VERSION=$(curl -sSL https://sourceforge.net/projects/virtualgl/files/ | grep "<span class=\"name\">[0-9]" | head -n 1 | cut -d \> -f2 | cut -d \< -f1) && \
@@ -31,8 +28,9 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     curl -sSL https://sourceforge.net/projects/virtualgl/files/${VGL_VERSION}/virtualgl_${VGL_VERSION}_amd64.deb -o virtualgl_${VGL_VERSION}_amd64.deb && \
     dpkg -i virtualgl_*_amd64.deb && \
     rm virtualgl_*_amd64.deb && \
-    # Enable VirtualGL access to host X server needed for 3D rendering
-    echo 'XAUTHORITY=$HOME/.Xauthority.docker' > /etc/profile.d/Xauthority-fix.sh && \
+    # Give VGL access to host X Server for 3D rendering
+    echo 'XAUTHORITY=$HOME/.Xauthority.docker' > \
+         /etc/profile.d/Xauthority-fix.sh && \
     echo 'export LD_PRELOAD=libdlfaker.so:libvglfaker.so:$LD_PRELOAD' > /etc/profile.d/virtualgl.sh 
 
 #-------------------------------------------------------------------------------
