@@ -60,7 +60,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     libreoffice openoffice.org-hyphenation thunderbird \
     thunderbird-locale-en thunderbird-gnome-support \
     gucharmap remmina remmina-common remmina-plugin-rdp \
-    remmina-plugin-vnc remmina-plugin-nx \
+    remmina-plugin-vnc remmina-plugin-nx gvfs-backends \
     remmina-plugin-spice remmina-plugin-xdmcp drawing \
     transmission-gtk pix rhythmbox gnome-calculator \
     gnome-screenshot xreader xviewer xplayer gnote \
