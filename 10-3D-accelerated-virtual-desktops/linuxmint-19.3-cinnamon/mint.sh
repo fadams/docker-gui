@@ -23,15 +23,15 @@ BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 . $BIN/docker-gpu.sh
 
 IMAGE=linuxmint-cinnamon-vgl:19.3
-CONTAINER=mint
+CONTAINER=mint-vgl
 
-# Create initial /etc/passwd /etc/shadow /etc/group credentials if they
-# don't already exist in this path. We use template files from a container
-# spawned from the image we'll be using in the main run so that users and
-# groups will be correct. If we copy from the host we may see problems if
-# the host distro is different to the container distro, so don't do that.
-# Note that the command below creates a new user and group in the cloned
-# credentials files that match the user running this script.
+# Create initial /etc/passwd /etc/shadow /etc/group
+# credentials. We use template files from a container
+# spawned from the image we'll be using in the main
+# run so that users and groups will be correct.
+# If we copy from the host we may see problems if the
+# host distro is different to the container distro,
+# so don't do that.
 if ! test -f "etc.tar.gz"; then
     echo "Creating /etc/passwd /etc/shadow and /etc/group for container."
     $DOCKER_COMMAND run --rm -it \
@@ -42,9 +42,10 @@ fi
 # Create home directory
 mkdir -p $(id -un)
 
-# Launch container as root to init core Linux services and launch the
-# Display Manager and greeter. Switches to unprivileged user after login
-# --device=/dev/tty0 is used to make session creation cleaner.
+# Launch container as root to init core Linux services and
+# launch the Display Manager and greeter. Switches to
+# unprivileged user after login.
+# --device=/dev/tty0 makes session creation cleaner.
 # --ipc=host is set to allow Xephyr to use SHM XImages
 $DOCKER_COMMAND run --rm -d \
     --device=/dev/tty0 \
@@ -52,7 +53,8 @@ $DOCKER_COMMAND run --rm -d \
     --ipc=host \
     --shm-size 2g \
     --security-opt apparmor=unconfined \
-    --cap-add=SYS_ADMIN --cap-add=SYS_BOOT -v /sys/fs/cgroup:/sys/fs/cgroup \
+    --cap-add=SYS_ADMIN --cap-add=SYS_BOOT \
+    -v /sys/fs/cgroup:/sys/fs/cgroup \
     -v $PWD/$(id -un):/home/$(id -un) \
     -v $DOCKER_XAUTHORITY:/root/.Xauthority.docker:ro \
     -v $DOCKER_XAUTHORITY:/home/$(id -un)/.Xauthority.docker:ro \
