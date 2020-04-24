@@ -66,7 +66,7 @@ RUN \
     echo '#!/bin/bash\nexport XAUTHORITY=/root/.Xauthority.docker\nexport DISPLAY=:0\nexec Xephyr $1 -ac -dpi 48 >> /var/log/lightdm/x-1.log' > /usr/bin/Xephyr-lightdm-wrapper && \
     chmod +x /usr/bin/Xephyr-lightdm-wrapper && \
     # Debian LightDM config is in /etc/lightdm/lightdm.conf
-    echo '[LightDM]\nminimum-display-number=1\n[Seat:*]\nsession-setup-script=xrandr --output default --mode 1600x1200\ngreeter-hide-users=false\nxserver-command=/usr/bin/Xephyr-lightdm-wrapper' > /etc/lightdm/lightdm.conf && \
+    echo '[LightDM]\nminimum-display-number=1\n[Seat:*]\nsession-setup-script=sh -c "xdpyinfo | grep -q RANDR && exec xrandr --output default --mode 1600x1200 || true"\ngreeter-hide-users=false\nxserver-command=/usr/bin/Xephyr-lightdm-wrapper' > /etc/lightdm/lightdm.conf && \
     # Ensure LightDM is set as Display Manager
     rm -f /etc/systemd/system/display-manager.service && \
     ln -s /lib/systemd/system/lightdm.service \
