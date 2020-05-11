@@ -20,6 +20,7 @@
 FROM centos:7.7.1908
 
 ENV LANG=en_GB.UTF-8
+ENV LC_ALL=en_GB.UTF-8
 ENV TZ=Europe/London
 
 RUN \
