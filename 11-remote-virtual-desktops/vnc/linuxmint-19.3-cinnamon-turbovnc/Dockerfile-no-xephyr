@@ -22,21 +22,28 @@ FROM linuxmint-cinnamon-vgl:19.3
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
     xfonts-base xfonts-75dpi xfonts-100dpi \
-    xfonts-scalable && \
+    xfonts-scalable xvfb && \
     # Attempt to work out the latest turbovnc version from
     # https://sourceforge.net/projects/turbovnc/files/
     TVNC_VERSION=$(curl -sSL https://sourceforge.net/projects/turbovnc/files/ | grep "<span class=\"name\">[0-9]" | head -n 1 | cut -d \> -f2 | cut -d \< -f1) && \
     echo "turbovnc version: ${TVNC_VERSION}" && \
     curl -sSL https://sourceforge.net/projects/turbovnc/files/${TVNC_VERSION}/turbovnc_${TVNC_VERSION}_amd64.deb -o turbovnc_${TVNC_VERSION}_amd64.deb && \
     dpkg -i turbovnc_*_amd64.deb && \
+#
+#
+    # LightDM needs an X Server, though we don't use it.
+    echo '#!/bin/bash\nXvfb $1 -ac -screen 0 1280x720x24 -cc 4' > /usr/bin/Xvfb-lightdm-wrapper && \
+    chmod +x /usr/bin/Xvfb-lightdm-wrapper && \
+#
+#
     ln -snf /opt/TurboVNC/bin/Xvnc /usr/bin/Xvnc && \
     echo '#!/bin/bash\nRFBPORT=$((5900+${1#:}))\nXvnc $1 -ac -nolisten tcp -localhost -rfbport $RFBPORT -rfbauth /tmp/lightdm/.vnc/passwd&\nXVNC_PID=$!\ncleanup() {\n  kill -TERM $XVNC_PID\n}\ntrap cleanup SIGINT SIGTERM EXIT\nsleep 0.25\nkill -USR1 $PPID\nsocat - TCP:localhost:$RFBPORT' > /usr/bin/Turbovnc-lightdm-wrapper && \
     chmod +x /usr/bin/Turbovnc-lightdm-wrapper && \
-    echo '[LightDM]\nminimum-display-number=1\n[Seat:*]\nxserver-command=/usr/bin/Xephyr-lightdm-wrapper\n[VNCServer]\nenabled=true\ndepth=24\ncommand=Turbovnc-lightdm-wrapper' > /etc/lightdm/lightdm.conf.d/70-linuxmint.conf
+    echo '[LightDM]\nminimum-display-number=1\n[Seat:*]\nxserver-command=/usr/bin/Xvfb-lightdm-wrapper\n[VNCServer]\nenabled=true\ndepth=24\ncommand=Turbovnc-lightdm-wrapper' > /etc/lightdm/lightdm.conf.d/70-linuxmint.conf
 
 #-------------------------------------------------------------------------------
 # Example usage
 # 
 # Build the image
-# docker build -t linuxmint-cinnamon-turbovnc:19.3 .
+# docker build -t linuxmint-cinnamon-turbovnc:19.3 -f Dockerfile-no-xephyr .
 

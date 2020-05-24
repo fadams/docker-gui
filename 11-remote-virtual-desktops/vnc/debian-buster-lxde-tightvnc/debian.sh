@@ -40,7 +40,7 @@ if ! test -f "etc.tar.gz"; then
 fi
 
 # Create home directory
-mkdir -p $(id -un)
+mkdir -p $(id -un)/.vnc
 
 # Create VNC password if required.
 if ! test -f "$(id -un)/.vnc/passwd"; then

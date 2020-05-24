@@ -40,7 +40,17 @@ if ! test -f "etc.tar.gz"; then
 fi
 
 # Create home directory
-mkdir -p $(id -un)
+mkdir -p $(id -un)/.vnc
+
+# Create VNC password if required.
+if ! test -f "$(id -un)/.vnc/passwd"; then
+    echo "creating VNC password"
+    $DOCKER_COMMAND run --rm -it \
+    -u $(id -u):$(id -g) \
+    -v /etc/passwd:/etc/passwd:ro \
+    -v $PWD/$(id -un):/home/$(id -un) \
+    $IMAGE /opt/TurboVNC/bin/vncpasswd
+fi
 
 # Launch container as root to init core Linux services and
 # launch the Display Manager and greeter. Switches to
@@ -58,6 +68,7 @@ $DOCKER_COMMAND run --rm -d \
     --cap-add=SYS_ADMIN --cap-add=SYS_BOOT \
     -v /sys/fs/cgroup:/sys/fs/cgroup \
     -v $PWD/$(id -un):/home/$(id -un) \
+    -v $PWD/$(id -un)/.vnc:/tmp/lightdm/.vnc \
     -v $DOCKER_XAUTHORITY:/root/.Xauthority.docker:ro \
     -v $DOCKER_XAUTHORITY:/home/$(id -un)/.Xauthority.docker:ro \
     -v /tmp/.X11-unix/X0:/tmp/.X11-unix/X0:ro \
@@ -67,4 +78,3 @@ $DOCKER_COMMAND run --rm -d \
 # cp credentials bundle to container
 cat etc.tar.gz | $DOCKER_COMMAND cp - $CONTAINER:/
 
-# -v $PWD/$(id -un)/.vnc/passwd:/root/.vnc/passwd \
