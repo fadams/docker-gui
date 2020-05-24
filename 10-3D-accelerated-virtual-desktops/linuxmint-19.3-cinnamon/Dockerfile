@@ -19,7 +19,9 @@
 
 FROM linuxmint-cinnamon:19.3
 
-RUN \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
+    apt-get install -y --no-install-recommends \
+    libvdpau1 mesa-vdpau-drivers && \
     # Attempt to work out the latest VirtualGL version from
     # https://sourceforge.net/projects/virtualgl/files/
 	VGL_VERSION=$(curl -sSL https://sourceforge.net/projects/virtualgl/files/ | grep "<span class=\"name\">[0-9]" | head -n 1 | cut -d \> -f2 | cut -d \< -f1) && \
