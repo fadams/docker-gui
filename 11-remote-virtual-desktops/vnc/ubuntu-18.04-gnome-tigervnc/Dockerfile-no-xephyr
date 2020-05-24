@@ -23,12 +23,15 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
     tigervnc-common tigervnc-standalone-server \
     xfonts-base xfonts-75dpi xfonts-100dpi \
-    xfonts-scalable && \
-    echo '[LightDM]\nminimum-display-number=1\n[Seat:*]\nuser-session=ubuntu-xorg\nxserver-command=/usr/bin/Xephyr-lightdm-wrapper\n[VNCServer]\nenabled=true\ndepth=24\ncommand=Xvnc -ac -rfbauth /tmp/lightdm/.vnc/passwd' > /etc/lightdm/lightdm.conf.d/70-ubuntu.conf
+    xfonts-scalable xvfb && \
+    # LightDM needs an X Server, though we don't use it.
+    echo '#!/bin/bash\nXvfb $1 -ac -screen 0 1280x720x24 -cc 4' > /usr/bin/Xvfb-lightdm-wrapper && \
+    chmod +x /usr/bin/Xvfb-lightdm-wrapper && \
+    echo '[LightDM]\nminimum-display-number=1\n[Seat:*]\nuser-session=ubuntu-xorg\nxserver-command=/usr/bin/Xvfb-lightdm-wrapper\n[VNCServer]\nenabled=true\ndepth=24\ncommand=Xvnc -ac -rfbauth /tmp/lightdm/.vnc/passwd' > /etc/lightdm/lightdm.conf.d/70-ubuntu.conf
 
 #-------------------------------------------------------------------------------
 # Example usage
 # 
 # Build the image
-# docker build -t ubuntu-gnome-tigervnc:18.04 .
+# docker build -t ubuntu-gnome-tigervnc:18.04 -f Dockerfile-no-xephyr .
 

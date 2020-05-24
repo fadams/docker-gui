@@ -42,6 +42,16 @@ fi
 # Create home directory
 mkdir -p $(id -un)
 
+# Create VNC password if required.
+if ! test -f "$(id -un)/.vnc/passwd"; then
+    echo "creating VNC password"
+    $DOCKER_COMMAND run --rm -it \
+    -u $(id -u):$(id -g) \
+    -v /etc/passwd:/etc/passwd:ro \
+    -v $PWD/$(id -un):/home/$(id -un) \
+    $IMAGE vncpasswd
+fi
+
 # Launch container as root to init core Linux services and
 # launch the Display Manager and greeter. Switches to
 # unprivileged user after login.
@@ -57,6 +67,7 @@ $DOCKER_COMMAND run --rm -d \
     --cap-add=SYS_ADMIN --cap-add=SYS_BOOT \
     -v /sys/fs/cgroup:/sys/fs/cgroup \
     -v $PWD/$(id -un):/home/$(id -un) \
+    -v $PWD/$(id -un)/.vnc:/tmp/lightdm/.vnc \
     -v $DOCKER_XAUTHORITY:/root/.Xauthority.docker:ro \
     -v $DOCKER_XAUTHORITY:/home/$(id -un)/.Xauthority.docker:ro \
     -v /tmp/.X11-unix/X0:/tmp/.X11-unix/X0:ro \
