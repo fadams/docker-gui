@@ -20,7 +20,6 @@
 
 BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 . $BIN/docker-command.sh
-. $BIN/docker-xauth.sh
 
 IMAGE=debian-lxde-tightvnc:buster
 CONTAINER=debian-tightvnc
@@ -56,20 +55,15 @@ fi
 # launch the Display Manager and greeter. Switches to
 # unprivileged user after login.
 # --device=/dev/tty0 makes session creation cleaner.
-# --ipc=host is set to allow Xephyr to use SHM XImages
 $DOCKER_COMMAND run --rm -d \
     -p 5900:5900 \
     --device=/dev/tty0 \
     --name $CONTAINER \
-    --ipc=host \
-    --shm-size 2g \
     --security-opt apparmor=unconfined \
     --cap-add=SYS_ADMIN --cap-add=SYS_BOOT \
     -v /sys/fs/cgroup:/sys/fs/cgroup \
     -v $PWD/$(id -un):/home/$(id -un) \
     -v $PWD/$(id -un)/.vnc:/tmp/lightdm/.vnc \
-    -v $DOCKER_XAUTHORITY:/root/.Xauthority.docker:ro \
-    -v /tmp/.X11-unix/X0:/tmp/.X11-unix/X0:ro \
     $IMAGE /sbin/init
 
 # Trivial wait for container to be running before cp credentials
