@@ -17,12 +17,15 @@
 # under the License.
 #
 
-FROM ubuntu-gnome-vgl:18.04
+FROM linuxmint-cinnamon-vgl:19.3
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
     python-numpy python-setuptools \
     xserver-xspice-hwe-18.04 spice-vdagent && \
+    # LightDM complains if Xvnc isn't present, even if
+    # [VNCServer] config. specifies a command= option.
+    ln -snf /usr/bin/Xspice /usr/bin/Xvnc && \
     mkdir /tmp/audio-fifo && \
     chmod 1777 /tmp/audio-fifo && \
     # Modify PulseAudio daemon config to support SPICE.
@@ -68,10 +71,10 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     echo '[Unit]\nDescription=HTML5 SPICE WebSocket proxy\nAfter=syslog.target network.target\n\n[Service]\nUser=lightdm\nType=simple\nExecStart=/usr/local/bin/websockify 5800 localhost:5900 --web /usr/local/bin/spice-web-client\nTimeoutStopSec=20\nKillMode=process\nRestart=always\nRestartSec=2\n\n[Install]\nWantedBy=multi-user.target\nAlias=websocket.service\n' > /lib/systemd/system/websocket.service && \
     ln -snf /lib/systemd/system/websocket.service \
        /etc/systemd/system/multi-user.target.wants/websocket.service && \
-    # Script to launch Xspice as primary X Server
-    echo '#!/bin/bash\nXspice $1 -ac -noreset -nolisten tcp --password $(cat /tmp/lightdm/.xserver-xspice-passwd) --vdagent --video-codecs ${SPICE_VIDEO_CODECS:-gstreamer:h264;gstreamer:vp8;gstreamer:mjpeg;spice:mjpeg} --deferred-fps 60 > /dev/null&\nsleep 0.25\nkill -USR1 $PPID\nsleep infinity' > /usr/bin/Xspice-lightdm-wrapper && \
+    # Script to launch Xspice "pretending" to be Xvnc
+    echo '#!/bin/bash\nif [ "$1" == ":2" ]; then\n  Xspice $1 -ac -noreset -nolisten tcp --port 5902 --password $(cat /tmp/lightdm/.xserver-xspice-passwd) --vdagent --video-codecs ${SPICE_VIDEO_CODECS:-gstreamer:h264;gstreamer:vp8;gstreamer:mjpeg;spice:mjpeg} --deferred-fps 60 > /dev/null &\n  XSPICE_PID=$!\n  cleanup() {\n    kill -TERM $XSPICE_PID\n  }\n  trap cleanup SIGINT SIGTERM EXIT\n  sleep 0.25\n  kill -USR1 $PPID\nfi\nsocat - TCP:localhost:5902' > /usr/bin/Xspice-lightdm-wrapper && \
     chmod +x /usr/bin/Xspice-lightdm-wrapper && \
-    echo '[LightDM]\nminimum-display-number=1\n[Seat:*]\nuser-session=ubuntu-xorg\nxserver-command=/usr/bin/Xspice-lightdm-wrapper' > /etc/lightdm/lightdm.conf.d/70-ubuntu.conf
+    echo '[LightDM]\nminimum-display-number=1\n[Seat:*]\nxserver-command=/usr/bin/Xephyr-lightdm-wrapper\n[VNCServer]\nenabled=true\ncommand=Xspice-lightdm-wrapper' > /etc/lightdm/lightdm.conf.d/70-linuxmint.conf
 
 VOLUME /tmp/audio-fifo
 
@@ -79,5 +82,5 @@ VOLUME /tmp/audio-fifo
 # Example usage
 # 
 # Build the image
-# docker build -t ubuntu-gnome-spice:18.04 -f Dockerfile-no-xephyr .
+# docker build -t linuxmint-cinnamon-spice:19.3 .
 

@@ -17,7 +17,7 @@
 # under the License.
 #
 
-FROM ubuntu-gnome-vgl:18.04
+FROM linuxmint-cinnamon-vgl:19.3
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
@@ -71,7 +71,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Script to launch Xspice as primary X Server
     echo '#!/bin/bash\nXspice $1 -ac -noreset -nolisten tcp --password $(cat /tmp/lightdm/.xserver-xspice-passwd) --vdagent --video-codecs ${SPICE_VIDEO_CODECS:-gstreamer:h264;gstreamer:vp8;gstreamer:mjpeg;spice:mjpeg} --deferred-fps 60 > /dev/null&\nsleep 0.25\nkill -USR1 $PPID\nsleep infinity' > /usr/bin/Xspice-lightdm-wrapper && \
     chmod +x /usr/bin/Xspice-lightdm-wrapper && \
-    echo '[LightDM]\nminimum-display-number=1\n[Seat:*]\nuser-session=ubuntu-xorg\nxserver-command=/usr/bin/Xspice-lightdm-wrapper' > /etc/lightdm/lightdm.conf.d/70-ubuntu.conf
+    echo '[LightDM]\nminimum-display-number=1\n[Seat:*]\nxserver-command=/usr/bin/Xspice-lightdm-wrapper' > /etc/lightdm/lightdm.conf.d/70-linuxmintlinuxmint.conf
 
 VOLUME /tmp/audio-fifo
 
@@ -79,5 +79,5 @@ VOLUME /tmp/audio-fifo
 # Example usage
 # 
 # Build the image
-# docker build -t ubuntu-gnome-spice:18.04 -f Dockerfile-no-xephyr .
+# docker build -t linuxmint-cinnamon-spice:19.3 -f Dockerfile-no-xephyr .
 

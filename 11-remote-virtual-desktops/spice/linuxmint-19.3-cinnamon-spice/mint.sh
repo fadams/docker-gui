@@ -22,8 +22,8 @@ BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 . $BIN/docker-xauth.sh
 . $BIN/docker-gpu.sh
 
-IMAGE=ubuntu-gnome-spice:18.04
-CONTAINER=ubuntu-spice
+IMAGE=linuxmint-cinnamon-spice:19.3
+CONTAINER=mint-spice
 
 # Create initial /etc/passwd /etc/shadow /etc/group
 # credentials. We use template files from a container
