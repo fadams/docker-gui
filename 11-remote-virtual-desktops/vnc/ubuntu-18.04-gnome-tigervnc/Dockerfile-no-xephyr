@@ -25,7 +25,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     xfonts-base xfonts-75dpi xfonts-100dpi \
     xfonts-scalable xvfb && \
     # LightDM needs an X Server, though we don't use it.
-    echo '#!/bin/bash\nXvfb $1 -ac -screen 0 1280x720x24 -cc 4' > /usr/bin/Xvfb-lightdm-wrapper && \
+    echo '#!/bin/bash\nXvfb $1 -ac' > \
+         /usr/bin/Xvfb-lightdm-wrapper && \
     chmod +x /usr/bin/Xvfb-lightdm-wrapper && \
     echo '[LightDM]\nminimum-display-number=1\n[Seat:*]\nuser-session=ubuntu-xorg\nxserver-command=/usr/bin/Xvfb-lightdm-wrapper\n[VNCServer]\nenabled=true\ndepth=24\ncommand=Xvnc -ac -rfbauth /tmp/lightdm/.vnc/passwd' > /etc/lightdm/lightdm.conf.d/70-ubuntu.conf
 
