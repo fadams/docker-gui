@@ -52,17 +52,18 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     ln -s ${NODE}/compile-modules \
           /usr/local/bin/compile-modules && \
     cd ${NOVNC} && \
-    echo '{"presets": ["@babel/preset-env"]}' > .babelrc && \
     # Tweak noVNC configuration as the defaults point to 
     # websockify not the built-in x11vnc websocket support.
     sed -i "s/UI.initSetting('port', port)/UI.initSetting('port', 5900)/g" app/ui.js && \
     sed -i "s/UI.initSetting('path', 'websockify')/UI.initSetting('path', '')/g" app/ui.js && \
-    # Tweak the vnc.html to use the transpiled app.js instead of modules.
+    # Tweak the vnc.html to use the transpiled app.js
+    # instead of modules.
     sed -i 's/type="module" crossorigin="anonymous" src="app\/ui.js"/src="app.js"/g' vnc.html && \
     sed -i 's/<script src="vendor\/promise.js"><\/script>//g' vnc.html && \
     sed -i 's/if (window._noVNC_has_module_support) //g' vnc.html && \
-    # Transpile the Javascript to speed up loading and allow it to work on
-    # a wider variety of browsers.
+    # Transpile the Javascript to speed up loading and
+    # allow it to work on a wider variety of browsers.
+    echo '{"presets": ["@babel/preset-env"]}' > .babelrc && \
     compile-modules convert app/ui.js > app.js && \
     babel app.js --out-file app.js && \
     mkdir -p ${APP} && \
