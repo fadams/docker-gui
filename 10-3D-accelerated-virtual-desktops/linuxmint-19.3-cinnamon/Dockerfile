@@ -33,7 +33,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Give VGL access to host X Server for 3D rendering
     echo 'XAUTHORITY=$HOME/.Xauthority.docker' > \
          /etc/profile.d/Xauthority-fix.sh && \
-    echo 'export LD_PRELOAD=libdlfaker.so:libvglfaker.so:$LD_PRELOAD' > /etc/profile.d/virtualgl.sh 
+    echo 'export LD_PRELOAD=/usr/lib/libdlfaker.so:/usr/lib/libvglfaker.so:$LD_PRELOAD' > /etc/profile.d/virtualgl.sh 
 
 #-------------------------------------------------------------------------------
 # Example usage
