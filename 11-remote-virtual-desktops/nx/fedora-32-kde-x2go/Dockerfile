@@ -19,7 +19,7 @@
 
 FROM fedora-kde-vgl:32
 
-RUN yum -y install \
+RUN dnf -y install \
     x2goserver x2goserver-xsession
 
 #-------------------------------------------------------------------------------

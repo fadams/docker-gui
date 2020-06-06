@@ -19,7 +19,7 @@
 
 FROM fedora-kde-vgl:32
 
-RUN yum -y install xorg-x11-drv-dummy \
+RUN dnf -y install xorg-x11-drv-dummy \
     x2goserver x2goserver-xsession && \
     echo -e '[LightDM]\nminimum-display-number=1\n[Seat:*]\nuser-session=gnome\nxserver-command=Xorg -ac' > /etc/lightdm/lightdm.conf.d/70-fedora.conf
 
