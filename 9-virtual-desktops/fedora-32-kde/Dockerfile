@@ -108,6 +108,12 @@ RUN dnf -y update && \
     echo -e "[dnf]\nIdentity=unix-user:*\nAction=org.baseurl.DnfSystem.write;org.baseurl.DnfSystem.read\nResultAny=auth_admin_keep\nResultInactive=auth_admin_keep\nResultActive=auth_admin_keep\n" > /etc/polkit-1/localauthority/50-local.d/10-dnf.pkla && \
     # PCSC
     echo -e "[PCSC]\nIdentity=unix-user:*\nAction=org.debian.pcsc-lite.access_pcsc;org.org.debian.pcsc-lite.access_card\nResultAny=yes\nResultInactive=yes\nResultActive=yes\n" > /etc/polkit-1/localauthority/50-local.d/10-pcsc.pkla && \
+    # NetworkManager
+    echo -e "[NetworkManager]\nIdentity=unix-user:*\nAction=org.freedesktop.NetworkManager.network-control\nResultAny=yes\nResultInactive=yes\nResultActive=yes\n" > /etc/polkit-1/localauthority/50-local.d/10-NetworkManager.pkla && \
+    # packagekit refresh
+    echo -e "[packagekit]\nIdentity=unix-user:*\nAction=org.freedesktop.packagekit.system-sources-refresh\nResultAny=yes\nResultInactive=yes\nResultActive=yes\n" > /etc/polkit-1/localauthority/50-local.d/10-packagekit.pkla && \
+    # System Color Manager
+    echo -e "[System Color Manager]\nIdentity=unix-user:*\nAction=org.freedesktop.color-manager.create-device;org.freedesktop.color-manager.create-profile;org.freedesktop.color-manager.delete-device;org.freedesktop.color-manager.delete-profile;org.freedesktop.color-manager.modify-device;org.freedesktop.color-manager.modify-profile;org.freedesktop.color-manager.device-inhibit;org.freedesktop.color-manager.sensor-lock\nResultAny=yes\nResultInactive=yes\nResultActive=yes\n" > /etc/polkit-1/localauthority/50-local.d/10-color.pkla && \
     # Shutdown & Restart
     # Note that auth_admin_keep may be better than yes
     # here, but there seems to be an issue with the
