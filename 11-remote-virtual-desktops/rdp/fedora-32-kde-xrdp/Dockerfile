@@ -101,3 +101,9 @@ RUN dnf -y install \
 # Build the image
 # docker build -t fedora-kde-xrdp:32 .
 
+# Still a work in progress. Everything works fine except for audio,
+# which compiles but clients report:
+# [ERROR][com.freerdp.channels.rdpsnd.client] - unknown msgType 39
+#
+# Using v13.99.1 branch for PulseAudio GitHub doesn't work either.
+
