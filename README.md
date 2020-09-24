@@ -1,4 +1,4 @@
-#Running GUI Applications in Docker
+# Running GUI Applications in Docker
 
 ![book cover](cover.jpg)
 
