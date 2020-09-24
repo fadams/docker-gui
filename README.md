@@ -1,4 +1,4 @@
-<p align="center"><img src="cover.jpg" style="width:50%"></p>
+<p align="center"><img src="cover.jpg" style="width:300px"></p>
 This is the code repository for a book providing a detailed step-by-step guide to packaging and running GUI applications as Docker containers.
 
 - US [http://www.amazon.com/dp/B08DSX72JV](http://www.amazon.com/dp/B08DSX72JV)
