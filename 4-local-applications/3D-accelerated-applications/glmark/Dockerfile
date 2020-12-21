@@ -39,7 +39,7 @@ ENV LIBGL_DEBUG verbose
 ENTRYPOINT ["glmark2"]
 
 #-------------------------------------------------------------------------------
-# 
+#
 # To build the image
 # docker build -t glmark .
 #
