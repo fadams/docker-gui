@@ -33,7 +33,10 @@ if test -c "/dev/nvidia-modeset"; then
 
     # Attempt to find the actual Nvidia library path. It should be
     # something like /usr/lib/nvidia-<driver version>
-    SRC=$(cat /etc/ld.so.conf.d/x86_64-linux-gnu_GL.conf | grep /lib/)
+    SRC=/usr/lib/x86_64-linux-gnu
+    if test -f "/etc/ld.so.conf.d/x86_64-linux-gnu_GL.conf"; then
+      SRC=$(cat /etc/ld.so.conf.d/x86_64-linux-gnu_GL.conf | grep /lib/)
+    fi
 
     GPU_FLAGS+="--runtime=nvidia "
     GPU_FLAGS+="-e NVIDIA_VISIBLE_DEVICES=all "
