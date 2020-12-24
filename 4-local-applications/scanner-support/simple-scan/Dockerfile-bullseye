@@ -20,10 +20,14 @@
 FROM debian:bullseye-slim
 
 # Install simple-scan
+# librsvg2-common fixes the warning message: Could not load a pixbuf
+# from /org/gtk/libgtk/theme/Adwaita/assets/bullet-symbolic.svg.
+# This may indicate that pixbuf loaders or the mime database could
+# not be found.
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	libcanberra-gtk3-module simple-scan && \
+	librsvg2-common libcanberra-gtk3-module simple-scan && \
 	rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT ["simple-scan"]

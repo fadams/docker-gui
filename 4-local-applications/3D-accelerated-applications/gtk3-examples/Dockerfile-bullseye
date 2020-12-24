@@ -29,10 +29,15 @@ FROM debian:bullseye-slim
 LABEL com.nvidia.volumes.needed=nvidia_driver
 
 # Install gtk-3-examples
+# librsvg2-common fixes the warning message: Could not load a pixbuf
+# from /org/gtk/libgtk/theme/Adwaita/assets/bullet-symbolic.svg.
+# This may indicate that pixbuf loaders or the mime database could
+# not be found.
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	gtk-3-examples libgl1-mesa-glx libgl1-mesa-dri && \
+	libgl1-mesa-glx libgl1-mesa-dri \
+    librsvg2-common gtk-3-examples && \
 	rm -rf /var/lib/apt/lists/*
 
 CMD ["gtk3-demo"]
