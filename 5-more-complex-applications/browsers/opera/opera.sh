@@ -28,7 +28,19 @@ BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 # "home directory" in the container for the current user. 
 mkdir -p $(id -un)/.config/pulse
 mkdir -p $(id -un)/.config/dconf
+
+# The default Docker seccomp profile defined at:
+# https://github.com/moby/moby/blob/master/profiles/seccomp/default.json
+# requires CAP_SYS_ADMIN to run clone with the CLONE_NEWUSER flag
+# in other words CAP_SYS_ADMIN is needed for a process in a container
+# to be able to create user namespaces (used by the Opera sandbox).
+# The seccomp-enable-clone.json profile minimally changes the default
+# profile to allow "clone" and "unshare". Using a modified seccomp
+# seems a better approach than --cap-add SYS_ADMIN or launching Opera
+# with --no-sandbox especially as from Linux 3.8, unprivileged processes
+# can create user namespaces.
 $DOCKER_COMMAND run --rm \
+    --security-opt seccomp=$PWD/seccomp-enable-clone.json \
     --shm-size 2g \
     -u $(id -u):$(id -g) \
     -v $PWD/$(id -un):/home/$(id -un) \

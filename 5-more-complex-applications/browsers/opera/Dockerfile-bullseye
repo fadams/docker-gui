@@ -17,20 +17,18 @@
 # under the License.
 #
 
-FROM debian:stretch-slim
+FROM debian:bullseye-slim
 
 # nvidia-docker hooks (Only needed for Nvidia Docker V1)
 LABEL com.nvidia.volumes.needed=nvidia_driver
 
 # Install Opera
-RUN echo "deb http://ftp.debian.org/debian stretch-backports main" > /etc/apt/sources.list.d/stretch-backports.list && \
-    apt-get update && DEBIAN_FRONTEND=noninteractive \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-            -t stretch-backports \
 	apt-transport-https wget gnupg ca-certificates \
     fonts-symbola fonts-lmodern fonts-freefont-ttf \
-    fonts-liberation fonts-dejavu gsfonts libgbm1 \
+    fonts-liberation fonts-dejavu gsfonts \
     libpulse0 libv4l-0 libgl1-mesa-glx libgl1-mesa-dri && \
 	wget -O - https://deb.opera.com/archive.key | apt-key add - && \
 	echo "deb [arch=amd64] http://deb.opera.com/opera-stable/ stable non-free" > /etc/apt/sources.list.d/opera.list && \
@@ -53,6 +51,6 @@ ENTRYPOINT ["opera"]
 #-------------------------------------------------------------------------------
 # 
 # To build the image
-# docker build -t opera .
+# docker build -t opera -f Dockerfile-bullseye .
 #
 
