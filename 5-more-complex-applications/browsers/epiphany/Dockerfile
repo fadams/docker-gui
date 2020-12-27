@@ -31,7 +31,8 @@ RUN echo "deb http://ftp.debian.org/debian testing main" \
     ca-certificates epiphany-browser libpulse0 \
     libgl1-mesa-glx libgl1-mesa-dri gstreamer1.0-libav \
     gstreamer1.0-pulseaudio gstreamer1.0-plugins-good \
-    gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly && \
+    gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly \
+    gstreamer1.0-gl && \
 	rm -rf /var/lib/apt/lists/* && \
     cp /etc/pulse/client.conf \
        /etc/pulse/client-noshm.conf && \
