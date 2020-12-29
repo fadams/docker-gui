@@ -30,8 +30,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     fonts-symbola fonts-lmodern fonts-freefont-ttf \
     fonts-liberation fonts-dejavu gsfonts \
     libpulse0 libv4l-0 libgl1-mesa-glx libgl1-mesa-dri && \
-	wget -O - https://deb.opera.com/archive.key | apt-key add - && \
-	echo "deb [arch=amd64] http://deb.opera.com/opera-stable/ stable non-free" > /etc/apt/sources.list.d/opera.list && \
+    wget -O /usr/share/keyrings/opera-archive.key https://deb.opera.com/archive.key && \
+	echo "deb [arch=amd64 signed-by=/usr/share/keyrings/opera-archive.key] http://deb.opera.com/opera-stable/ stable non-free" > /etc/apt/sources.list.d/opera.list && \
 	apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
 	opera-stable && \
