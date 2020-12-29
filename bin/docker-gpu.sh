@@ -53,7 +53,6 @@ if test -c "/dev/nvidia-modeset"; then
         GPU_FLAGS+="-v $SRC/libGLX.so.0:$DST/libGLX.so.0:ro "
         GPU_FLAGS+="-v $SRC/libGLdispatch.so.0:$DST/libGLdispatch.so.0:ro "
         GPU_FLAGS+="-v $SRC/libEGL.so.1:$DST/libEGL.so.1:ro "
-        GPU_FLAGS+="-v $SRC/libGLESv1_CM.so.1:$DST/libGLESv1_CM.so.1:ro "
         GPU_FLAGS+="-v $SRC/libGLESv2.so.2:$DST/libGLESv2.so.2:ro "
         GPU_FLAGS+="-v $SRC/vdpau/libvdpau_nvidia.so:$DST/libvdpau_nvidia.so:ro "
     else
