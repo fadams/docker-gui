@@ -34,6 +34,9 @@ DBUS_FLAGS="-v /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:r
 if test -f "/etc/apparmor.d/docker-dbus"; then
     APPARMOR_FLAGS="--security-opt apparmor:docker-dbus"
 else
+    echo "Warning: Enabling D-bus by setting --security-opt apparmor=unconfined"
+    echo "For improved security enable the docker-dbus AppArmor profile available in"
+    echo "${PWD%docker-gui*}docker-gui/bin/docker-dbus"
     APPARMOR_FLAGS="--security-opt apparmor=unconfined"
 fi
 
