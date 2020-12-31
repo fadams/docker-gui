@@ -51,6 +51,7 @@
 #include <tunables/global>
 
 profile docker-dbus flags=(attach_disconnected,mediate_deleted) {
+  #include <abstractions/base>
   #include <abstractions/dbus-session>
   #include <abstractions/dbus-accessibility>
 
@@ -58,6 +59,13 @@ profile docker-dbus flags=(attach_disconnected,mediate_deleted) {
   capability,
   file,
   umount,
+
+  # Host (privileged) processes may send signals to container processes.
+  signal (receive) peer=unconfined,
+
+  # Container processes may send signals amongst themselves.
+  signal (send,receive) peer=docker-dbus,
+  signal (send,receive) peer=docker-default,
 
   deny @{PROC}/* w,   # deny write for all files directly in /proc (not in a subdir)
   # deny write to files not in /proc/<number>/** or /proc/sys/**
@@ -74,4 +82,8 @@ profile docker-dbus flags=(attach_disconnected,mediate_deleted) {
   deny /sys/fs/cg[^r]*/** wklx,
   deny /sys/firmware/** rwklx,
   deny /sys/kernel/security/** rwklx,
+
+  # suppress ptrace denials when using 'docker ps' or using 'ps' inside a container
+  ptrace (trace,read) peer=docker-dbus,
+  ptrace (trace,read) peer=docker-default,
 }
