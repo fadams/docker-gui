@@ -24,6 +24,22 @@ BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 . $BIN/docker-pulseaudio.sh
 . $BIN/docker-dbus-all.sh
 
+# If Docker --security-opt apparmor=unconfined is set the process is
+# still confined by any relevant AppArmor profile present on the host.
+# On Linux Mint 20, and probably other distros, the host's libreoffice
+# AppArmor profile appears to deny filesystem X11 sockets /tmp/.X11-unix/
+# and allow only the abstract sockets. This prevents libreoffice
+# connecting to the display from a container. A workaround is to add
+# --network=host, though this reduces security even more. A better
+# approach is to enable the docker-dbus AppArmor profile available
+# in docker-gui/bin/docker-dbus
+if [[ $APPARMOR_FLAGS == "--security-opt apparmor=unconfined" ]]; then
+    echo "Warning: Host's libreoffice AppArmor profile only allows abstract X11"
+    echo "socket @/tmp/.X11-unix/ and denies filesystem X11 socket /tmp/.X11-unix/"
+    echo "Adding --network=host flag to allow connection to the abstract socket."
+    APPARMOR_FLAGS+=" --network=host"
+fi
+
 # Create a directory on the host that we can mount as a
 # "home directory" in the container for the current user. 
 mkdir -p $(id -un)/.config/pulse
