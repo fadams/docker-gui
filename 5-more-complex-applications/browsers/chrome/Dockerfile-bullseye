@@ -28,7 +28,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
 	apt-transport-https wget gnupg ca-certificates \
     fonts-symbola fonts-lmodern fonts-freefont-ttf \
-    fonts-liberation fonts-dejavu gsfonts \
+    fonts-liberation fonts-dejavu gsfonts librsvg2-common \
     libpulse0 libv4l-0 libgl1-mesa-glx libgl1-mesa-dri && \
     wget -O /usr/share/keyrings/chrome-archive.key https://dl.google.com/linux/linux_signing_key.pub && \
     echo "deb [arch=amd64 signed-by=/usr/share/keyrings/chrome-archive.key] https://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list && \
@@ -52,5 +52,5 @@ ENTRYPOINT ["google-chrome"]
 # 
 # To build the image
 # docker build -t chrome -f Dockerfile-bullseye .
-#
+# 
 
