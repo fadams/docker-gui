@@ -52,6 +52,7 @@
 
 profile docker-dbus flags=(attach_disconnected,mediate_deleted) {
   #include <abstractions/base>
+  #include <abstractions/dbus>
   #include <abstractions/dbus-session>
   #include <abstractions/dbus-accessibility>
 
