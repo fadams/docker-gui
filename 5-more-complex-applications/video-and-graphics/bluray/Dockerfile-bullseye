@@ -39,11 +39,19 @@ RUN sed -i 's/main/main contrib/' \
     echo "deb [arch=amd64 signed-by=/usr/share/keyrings/makemkv-archive.key] https://ramses.hjramses.com/deb/makemkv bullseye main" > /etc/apt/sources.list.d/makemkv.list && \
     apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y makemkv-bin makemkv-oss && \
+    # Remove packages needed only for installing libdvdcss
+    cp /usr/lib/x86_64-linux-gnu/libdvdcss.so.2.2.0 \
+       /usr/lib/x86_64-linux-gnu/libdvdcss.so.2.2.0.bak && \
+    apt-get clean && \
+    apt-get purge -y apt-transport-https wget libdvd-pkg && \
+    apt-get autoremove -y && \
 	rm -rf /var/lib/apt/lists/* && \
     # https://www.makemkv.com/forum/viewtopic.php?t=7009
     cd /usr/lib/x86_64-linux-gnu && \
     ln -s libmmbd.so.0 libaacs.so.0 && \
     ln -s libmmbd.so.0 libbdplus.so.0 && \
+    mv libdvdcss.so.2.2.0.bak libdvdcss.so.2.2.0 && \
+    ln -s libdvdcss.so.2.2.0 libdvdcss.so && \
     cp /etc/pulse/client.conf \
        /etc/pulse/client-noshm.conf && \
     sed -i "s/; enable-shm = yes/enable-shm = no/g" \
