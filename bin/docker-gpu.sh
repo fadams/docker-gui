@@ -40,8 +40,12 @@ if test -c "/dev/nvidia-modeset"; then
         # See https://github.com/NVIDIA/nvidia-container-runtime.
 
         # Attempt to find the actual Nvidia library path. It should be
-        # something like /usr/lib/nvidia-<driver version>
-        SRC=/usr/lib/x86_64-linux-gnu
+        # something like /usr/lib/nvidia-<driver version> or
+        # /usr/lib/x86_64-linux-gnu. This has only been tested on
+        # Linux Mint and YMMV depending on host distro it may be
+        # necessary to manually set the SRC, e.g. with:
+        #SRC=/usr/lib/x86_64-linux-gnu
+        SRC=$(dirname $(ldconfig -p | grep libGL.so.1 | head -n 1 | tr ' ' '\n' | grep /))
         if test -f "/etc/ld.so.conf.d/x86_64-linux-gnu_GL.conf"; then
             SRC=$(cat /etc/ld.so.conf.d/x86_64-linux-gnu_GL.conf | grep /lib/)
         fi
