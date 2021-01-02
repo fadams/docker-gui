@@ -17,7 +17,7 @@
 # under the License.
 #
 
-FROM debian:stretch-slim
+FROM debian:bullseye-slim
 
 # NVIDIA GameWorks Graphics Samples
 # https://github.com/NVIDIAGameWorks/GraphicsSamples
@@ -49,6 +49,6 @@ WORKDIR /usr/src/GraphicsSamples/samples/bin/linux64
 #-------------------------------------------------------------------------------
 # 
 # To build the image
-# docker build -t gameworks-graphics-samples .
+# docker build -t gameworks-graphics-samples -f Dockerfile-bullseye .
 #
 
