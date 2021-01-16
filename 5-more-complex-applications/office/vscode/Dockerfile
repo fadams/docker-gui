@@ -65,7 +65,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     libxss1 libgbm1 libx11-xcb1 libxcb-dri3-0 \
     libxtst6 libasound2 pulseaudio librsvg2-common \
     fonts-symbola fonts-lmodern fonts-freefont-ttf \
-    fonts-liberation fonts-dejavu gsfonts procps && \
+    fonts-liberation fonts-dejavu gsfonts git && \
     # Download and install vscode.
     VERSION=code_1.52.1-1608136922 && \
     PACKAGE=${VERSION}_amd64.deb && \
