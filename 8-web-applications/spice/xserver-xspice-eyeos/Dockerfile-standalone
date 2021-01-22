@@ -22,20 +22,19 @@ FROM debian:stretch-slim
 ENV LANG=en_GB.UTF-8
 ENV TZ=Europe/London
 
-# Install xserver-xspice from testing as it's not in stretch stable.
 # Uses the flexVDI fork of the eyeos spice-web-client as that seems to be
 # slightly more up to date and also has a release version to track.
-RUN \
-    echo "deb http://ftp.debian.org/debian testing main" > \
-         /etc/apt/sources.list.d/stretch-testing.list && \
-    apt-get update && DEBIAN_FRONTEND=noninteractive \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
     pulseaudio ca-certificates locales jwm \
     libgl1-mesa-glx libgl1-mesa-dri spice-vdagent \
     gstreamer1.0-plugins-good gstreamer1.0-plugins-ugly \
     curl python-numpy python-setuptools && \
+    # Install xserver-xspice from buster as it's not in stretch stable.
+    echo "deb http://ftp.debian.org/debian buster main" > \
+         /etc/apt/sources.list.d/buster.list && \
     apt-get update && DEBIAN_FRONTEND=noninteractive \
-    apt-get install -y --no-install-recommends -t testing \
+    apt-get install -y --no-install-recommends -t buster \
     xserver-xspice && \
     # Download websockify and flexVDI fork of eyeos spice-web-client.
     WS_VERSION=0.9.0 && \
