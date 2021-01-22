@@ -30,7 +30,6 @@ FROM debian:buster-slim
 ENV LANG=en_GB.UTF-8
 ENV TZ=Europe/London
 
-# Install xserver-xspice from testing as it's not in stretch stable.
 # Uses the flexVDI fork of the eyeos spice-web-client as that seems to be
 # slightly more up to date and also has a release version to track.
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
