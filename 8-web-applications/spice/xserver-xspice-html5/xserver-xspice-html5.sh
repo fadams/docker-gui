@@ -56,6 +56,7 @@ $DOCKER_COMMAND run --rm -it -d \
     -v /etc/passwd:/etc/passwd:ro \
     -e XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR \
     -e DISPLAY=:1 \
+    --ipc=shareable \
     xserver-xspice-html5
 
 # Launch firefox. Use --volumes-from to mount /tmp/.X11-unix
