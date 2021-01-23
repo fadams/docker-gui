@@ -18,14 +18,14 @@
 #
 
 # Use this Dockerfile if the xserver-xspice base image is
-# based on debian:stretch as it uses Python 2 dependencies.
+# based on debian:bullseye as it uses Python 3 dependencies.
 
 FROM xserver-xspice
 
 # Install eyeos spice-web-client.
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-    curl python-numpy python-setuptools && \
+    curl python3-numpy python3-setuptools && \
     # Download websockify and flexVDI fork of
     # eyeos spice-web-client.
     WS_VERSION=0.9.0 && \
@@ -33,7 +33,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     curl -sSL https://github.com/novnc/websockify/archive/v${WS_VERSION}.tar.gz | tar -xzv -C /usr/local/bin && \
     curl -sSL https://github.com/flexVDI/spice-web-client/archive/${SPICE}.tar.gz | tar -xzv -C /usr/local/bin && \
     cd /usr/local/bin/websockify-${WS_VERSION} && \
-    python setup.py install && \
+    python3 setup.py install && \
     mv /usr/local/bin/spice-web-client-${SPICE} \
        /usr/local/bin/spice-web-client && \
     # Tweak spice-web-client to add a basic
@@ -67,6 +67,6 @@ CMD ["/usr/local/bin/start-server"]
 #-------------------------------------------------------------------------------
 # 
 # To build the image
-# docker build -t xserver-xspice-eyeos .
+# docker build -t xserver-xspice-eyeos -f Dockerfile-bullseye .
 #
 

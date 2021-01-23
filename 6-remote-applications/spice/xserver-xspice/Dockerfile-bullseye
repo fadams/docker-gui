@@ -17,7 +17,7 @@
 # under the License.
 #
 
-FROM debian:stretch-slim
+FROM debian:bullseye-slim
 
 ENV LANG=en_GB.UTF-8
 ENV TZ=Europe/London
@@ -26,18 +26,17 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
     pulseaudio ca-certificates locales jwm \
     libgl1-mesa-glx libgl1-mesa-dri spice-vdagent \
-    gstreamer1.0-plugins-good gstreamer1.0-plugins-ugly && \
-    # Install xserver-xspice from buster as it's not in stretch stable.
-    echo "deb http://ftp.debian.org/debian buster main" > \
-         /etc/apt/sources.list.d/buster.list && \
-    apt-get update && DEBIAN_FRONTEND=noninteractive \
-    apt-get install -y --no-install-recommends -t buster \
+    gstreamer1.0-plugins-good gstreamer1.0-plugins-ugly \
     xserver-xspice && \
     #
     # Modify PulseAudio daemon config to support xserver-xspice.
     sed -i "s/; exit-idle-time = 20/exit-idle-time = -1/g" \
         /etc/pulse/daemon.conf && \
     sed -i "s/load-module module-console-kit/#load-module module-console-kit/g" /etc/pulse/default.pa && \
+    #
+    # For Python3 /usr/bin/Xspice needs to be patched as follows
+    # as spawnlpe is being called with an incorrect number of args.
+    sed -i "s/os.spawnlpe(os.P_NOWAIT, args.xsession, environ)/os.spawnlpe(os.P_NOWAIT, args.xsession, args.xsession, environ)/" /usr/bin/Xspice && \
     #
     # Create simple launch script to start pulseaudio,
     # xserver-xspice and the spice vdagent used to support
@@ -79,6 +78,6 @@ CMD ["/usr/local/bin/start-server"]
 #-------------------------------------------------------------------------------
 # 
 # To build the image
-# docker build -t xserver-xspice .
+# docker build -t xserver-xspice -f Dockerfile-bullseye .
 #
 
