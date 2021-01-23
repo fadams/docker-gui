@@ -87,9 +87,9 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     #
     # We'll be exporting /tmp/.X11-unix and /run/user as volumes
     # and we need the mode of these to be set to 1777
-    mkdir /tmp/.X11-unix && \
+    mkdir -p /tmp/.X11-unix && \
     chmod 1777 /tmp/.X11-unix && \
-    mkdir /run/user && \
+    mkdir -p /run/user && \
     chmod 1777 /run/user && \
     # Tidy up
     apt-get clean && \
