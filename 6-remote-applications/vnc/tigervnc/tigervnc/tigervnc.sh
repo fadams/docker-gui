@@ -47,6 +47,7 @@ $DOCKER_COMMAND run --rm -it -d \
     -v /etc/passwd:/etc/passwd:ro \
     -e DISPLAY=:1 \
     -e GEOMETRY=1280x720 \
+    --ipc=shareable \
     tigervnc
 
 # Launch firefox. Use --volumes-from to mount /tmp/.X11-unix
