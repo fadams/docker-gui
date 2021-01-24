@@ -46,6 +46,7 @@ $DOCKER_COMMAND run --rm -it -d \
     -v $PWD/$(id -un):/home/$(id -un) \
     -v /etc/passwd:/etc/passwd:ro \
     -e DISPLAY=:1 \
+    --ipc=shareable \
     tigervnc-xdummy
 
 # Launch firefox. Use --volumes-from to mount /tmp/.X11-unix
