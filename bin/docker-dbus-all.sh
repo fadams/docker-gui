@@ -29,6 +29,8 @@
 ################################################################################
 
 if [[ $DBUS_SESSION_BUS_ADDRESS == *"abstract"* ]]; then
+    echo "Warning: ${DBUS_SESSION_BUS_ADDRESS} is an abstract socket"
+    echo "Adding --network=host flag so container can connect to abstract socket"
     DBUS_FLAGS="--network=host -e NO_AT_BRIDGE=1 "
 else
     DBUS_FLAGS="-v $XDG_RUNTIME_DIR/bus:$XDG_RUNTIME_DIR/bus:ro -e NO_AT_BRIDGE=1 "

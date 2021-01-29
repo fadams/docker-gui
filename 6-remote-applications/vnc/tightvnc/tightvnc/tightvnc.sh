@@ -48,6 +48,7 @@ $DOCKER_COMMAND run --rm -it -d \
     -e DISPLAY=:1 \
     -e GEOMETRY=1280x720 \
     -e USER=$(id -un) \
+    --ipc=shareable \
     tightvnc
 
 # Launch firefox. Use --volumes-from to mount /tmp/.X11-unix
