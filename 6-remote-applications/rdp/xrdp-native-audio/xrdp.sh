@@ -51,6 +51,7 @@ $DOCKER_COMMAND run --rm -it -d \
     -v $PWD/etc/group:/etc/group:ro \
     -e XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR \
     -e DISPLAY=:1 \
+    --ipc=shareable \
     xrdp-native-audio
 
 $DOCKER_COMMAND run --rm \

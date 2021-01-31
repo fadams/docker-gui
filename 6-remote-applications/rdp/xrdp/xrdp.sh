@@ -50,6 +50,7 @@ $DOCKER_COMMAND run --rm -it -d \
     -v $PWD/etc/shadow:/etc/shadow:ro \
     -v $PWD/etc/group:/etc/group:ro \
     -e DISPLAY=:1 \
+    --ipc=shareable \
     xrdp
 
 # Launch firefox. Use --volumes-from to mount /tmp/.X11-unix
