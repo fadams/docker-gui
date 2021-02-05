@@ -26,12 +26,12 @@
 # On a desktop environment connecting is usually fairly straightforward as D-bus
 # will be running and DBUS_SESSION_BUS_ADDRESS will be set, but when running
 # remote applications, e.g. over ssh, D-bus won't usually be running for that
-# session nor will the DBUS_SESSION_BUS_ADDRESS be set.
+# remote session.
 #
 # The script launches a D-bus session bus instance for the ssh client connection
 # It uses ${SSH_CLIENT//[. ]/} as a key which concatenates the IP address and
 # port of the client, so should be unique for each connection. The script checks
-# if a key file for the connection exists and if not launches D-bus and
+# if a key file for the connection exists and if not it launches D-bus and
 # writes a key file to $XDG_RUNTIME_DIR/ssh-dbus containing the address.
 # 
 # Note: This script needs to be run before docker-remote-xauth.sh because
@@ -40,9 +40,11 @@
 # to fail to authenticate. In practice we don't actually need this D-bus to
 # connect to the X server, but the error message is annoying.
 # This script also needs to run before docker-dbus-all.sh as that script needs
-# DBUS_SESSION_BUS_ADDRESS to be set.
+# the correct DBUS_SESSION_BUS_ADDRESS to be set.
 #
 # Another issue is that on some systems DBUS_SESSION_BUS_ADDRESS seems to get
+# set to $XDG_RUNTIME_DIR/bus
+
 # "randomly" (and incorrectly) set to $XDG_RUNTIME_DIR/bus when doing ssh
 # even though a normal desktop session might be an abstract socket and although
 # DBUS_SESSION_BUS_ADDRESS might be getting set there is no bus instance.
@@ -52,9 +54,12 @@
 # being set incorrectly and we ignore it and launch our own D-bus instance.
 ################################################################################
 
-UNIX_SOCKET_DIR=$([ -d $XDG_RUNTIME_DIR/bus ] && [ $(ls -A $XDG_RUNTIME_DIR/bus) ] && echo "true")
+CLIENT_KEY=${SSH_CLIENT% *}
+#echo "CLIENT_KEY: $CLIENT_KEY"
 
-if [[ $DBUS_SESSION_BUS_ADDRESS == "" || ($DBUS_SESSION_BUS_ADDRESS == "unix:path=$XDG_RUNTIME_DIR/bus" && $UNIX_SOCKET_DIR == "") ]]; then
+# If the application has been launched via ssh then launch a D-bus
+# session if one doesn't already exist for the ssh session.
+if [[ $CLIENT_KEY ]]; then
 
 mkdir -p $XDG_RUNTIME_DIR/ssh-dbus
 
@@ -66,8 +71,9 @@ mkdir -p $XDG_RUNTIME_DIR/ssh-dbus
 # in $XDG_RUNTIME_DIR/ssh-dbus, as any key files that
 # exist in that directory that don't match established
 # ssh connections are "dead" so any associated D-bus
-# instance should be killed. Could also use "ss -t"
-NETWORK_STATUS=$(netstat -t | grep ssh)
+# instance should be killed.
+NETWORK_STATUS=$(ss -t | grep ssh)
+#echo "NETWORK_STATUS:"
 #echo $NETWORK_STATUS
 
 pushd $XDG_RUNTIME_DIR/ssh-dbus/ > /dev/null
@@ -85,13 +91,13 @@ pushd $XDG_RUNTIME_DIR/ssh-dbus/ > /dev/null
 popd > /dev/null
 
 
-CLIENT_KEY=${SSH_CLIENT% *}
+# Replace the space with a :
 CLIENT_KEY=${CLIENT_KEY// /:}
-#echo $CLIENT_KEY
+#echo "CLIENT_KEY: $CLIENT_KEY"
 
 KEY_FILE=$XDG_RUNTIME_DIR/ssh-dbus/$CLIENT_KEY
+#echo "KEY_FILE: $KEY_FILE"
 
-#echo $KEY_FILE
 if [ -f $KEY_FILE ]; then
     # Read KEY_FILE to get DBUS_SESSION_BUS_ADDRESS
     DBUS_SESSION_BUS_ADDRESS=$(cat $KEY_FILE)
@@ -106,6 +112,6 @@ else
 fi
 fi
 
-#echo $DBUS_SESSION_BUS_ADDRESS
-#echo $DBUS_SESSION_BUS_PID
+#echo "DBUS_SESSION_BUS_ADDRESS:$DBUS_SESSION_BUS_ADDRESS"
+#echo "DBUS_SESSION_BUS_PID: $DBUS_SESSION_BUS_PID"
 

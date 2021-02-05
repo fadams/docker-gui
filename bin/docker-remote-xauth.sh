@@ -35,14 +35,14 @@ cp --preserve=all $XAUTH $DOCKER_XAUTHORITY.$$
 xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY.$$ nmerge -
 mv $DOCKER_XAUTHORITY.$$ $DOCKER_XAUTHORITY
 
-# Modify the DISPLAY to replace the hostname part with the
-# IP of the docker0 interface on the remote host.
-DOCKER_NETWORK=172.17.0.1
-DISPLAY=$(echo $DISPLAY | sed "s/^[^:]*\(.*\)/$DOCKER_NETWORK\1/")
-
 if ! grep -Fxq "X11UseLocalhost no" /etc/ssh/sshd_config; then
     echo "Warning /etc/ssh/sshd_config does not contain \"X11UseLocalhost no\""
     echo "Containers will therefore need --network=host to do X11 forwarding."
+else
+    # Modify the DISPLAY to replace the hostname part with the
+    # IP of the docker0 interface on the remote host.
+    DOCKER_NETWORK=172.17.0.1
+    DISPLAY=$(echo $DISPLAY | sed "s/^[^:]*\(.*\)/$DOCKER_NETWORK\1/")
 fi
 
 # Populate the X11_FLAGS variable as a short cut instead of
