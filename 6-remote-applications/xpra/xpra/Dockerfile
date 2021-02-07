@@ -25,6 +25,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     curl xvfb cups-client libgl1-mesa-glx libgl1-mesa-dri \
     xserver-xorg-core x11-xserver-utils gir1.2-gtk-3.0 \
     gir1.2-notify-0.7 libturbojpeg0 liblzo2-dev \
+    cmake make gcc g++ \
     python-minimal python3 python3-rencode \
     python3-pyinotify python3-pil python3-lz4 \
     python3-dbus python3-cups python3-netifaces \
@@ -34,11 +35,11 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     gstreamer1.0-plugins-good gstreamer1.0-plugins-bad \
     gstreamer1.0-plugins-ugly gstreamer1.0-libav \
     xfonts-75dpi xfonts-100dpi xfonts-scalable \
-    python3-pip python3-setuptools python3-dev gcc && \
+    python3-pip python3-setuptools python3-dev && \
     # Install python packages not available in debian repo via
     # pip. Although crypto and paramiko are in debian repo the
     # versions are old and don't work correctly with xpra.
-    pip3 --no-cache-dir install wheel && \
+    pip3 --no-cache-dir install wheel scikit-build && \
     pip3 --no-cache-dir install PyOpenGL-accelerate==3.1.0 \
     opencv-python python-lzo cryptography paramiko-ng \
     python-uinput && \
@@ -102,7 +103,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
        xpra_${XPRA_VERSION}_amd64.deb && \
     apt-get clean && \
     apt-get purge -y curl python3-pip python3-setuptools \
-            python3-dev gcc && \
+            python3-dev cmake make gcc g++ && \
     apt-get autoremove -y && \
     rm -rf /root/.cache/pip && \
     rm -rf /var/lib/apt/lists/* && \

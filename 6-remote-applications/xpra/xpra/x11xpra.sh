@@ -54,6 +54,7 @@ $DOCKER_COMMAND run --rm -it -d \
     -v $PWD/$(id -un)/machine-id:/etc/machine-id \
     -e XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR \
     -e DISPLAY=:1 \
+    --ipc=shareable \
     xpra start --bind=$HOME/.xpra/xpra-socket --bind-tcp=0.0.0.0:10000
 
 # Test for the presence of $XDG_RUNTIME_DIR/pulse/pid to wait until
