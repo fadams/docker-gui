@@ -17,40 +17,27 @@
 # under the License.
 #
 
-FROM debian:stretch-slim
-
-ENV CUDA_VERSION 9.0
-ENV NVIDIA_REQUIRE_CUDA "cuda>=${CUDA_VERSION}"
-ENV CUDA_FULL_VERSION ${CUDA_VERSION}.176
+FROM ubuntu:20.04
 
 # nvidia-docker hooks (Only needed for Nvidia Docker V1)
 LABEL com.nvidia.volumes.needed=nvidia_driver
-LABEL com.nvidia.cuda.version="${CUDA_FULL_VERSION}"
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
-    # Add the packages used to install CUDA
+    # Add the packages
     apt-get install -y --no-install-recommends \
-    apt-transport-https wget gnupg ca-certificates && \
-    # Add the CUDA packages and signing key
-	wget -O /usr/share/keyrings/cuda-archive.key https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/3bf863cc.pub && \
-    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/cuda-archive.key] https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64 /" > /etc/apt/sources.list.d/cuda.list && \
-    apt-get update && DEBIAN_FRONTEND=noninteractive \
-    apt-get install -y --no-install-recommends \
-    cuda-cudart-${CUDA_VERSION} && \
-    ln -s cuda-${CUDA_VERSION} /usr/local/cuda && \
-    # Remove packages used for installation
-    apt-get clean && \
-    apt-get purge -y apt-transport-https wget gnupg \
-            ca-certificates && \
-    apt-get autoremove -y && \
+    ocl-icd-libopencl1 clinfo && \
+    # Add the Nvidia OpenCL Installable Client Driver
+    mkdir -p /etc/OpenCL/vendors && \
+    echo "libnvidia-opencl.so.1" > \
+         /etc/OpenCL/vendors/nvidia.icd && \
 	rm -rf /var/lib/apt/lists/*
 
-ENTRYPOINT ["nvidia-smi"]
+ENTRYPOINT ["clinfo"]
 
 #-------------------------------------------------------------------------------
 # Example usage
 # 
 # Build the image
-# docker build -t nvidia-smi .
+# docker build -t clinfo -f Dockerfile-focal .
 
 
