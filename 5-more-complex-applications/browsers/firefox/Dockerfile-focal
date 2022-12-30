@@ -17,7 +17,7 @@
 # under the License.
 #
 
-FROM debian:bullseye-slim
+FROM ubuntu:20.04
 
 ENV FIREFOX_LANG=en-GB
 
@@ -51,6 +51,6 @@ ENTRYPOINT ["/usr/lib/firefox/firefox", "--no-remote"]
 #-------------------------------------------------------------------------------
 # 
 # To build the image
-# docker build -t firefox -f Dockerfile-bullseye .
+# docker build -t firefox -f Dockerfile-focal .
 #
 
