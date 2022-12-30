@@ -17,7 +17,7 @@
 # under the License.
 #
 
-FROM debian:bullseye-slim
+FROM ubuntu:20.04
 
 # nvidia-docker hooks (Only needed for Nvidia Docker V1)
 LABEL com.nvidia.volumes.needed=nvidia_driver
@@ -51,6 +51,6 @@ ENTRYPOINT ["opera"]
 #-------------------------------------------------------------------------------
 # 
 # To build the image
-# docker build -t opera -f Dockerfile-bullseye .
+# docker build -t opera -f Dockerfile-focal .
 #
 
