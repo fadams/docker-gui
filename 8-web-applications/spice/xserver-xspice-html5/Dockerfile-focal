@@ -1,0 +1,65 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+# 
+#   http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+# Use this Dockerfile if the xserver-xspice base image is
+# based on ubuntu:20.04 as it uses Python 3 dependencies.
+
+FROM xserver-xspice
+
+# Install spice-html5.
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
+    apt-get install -y --no-install-recommends \
+    curl python3-numpy python3-setuptools && \
+    # Download websockify and spice-html5.
+    WS_VERSION=0.9.0 && \
+    SPICE_HTML5_VERSION=0.2.2 && \
+    SPICE=spice-html5-${SPICE_HTML5_VERSION} && \
+    curl -sSL https://github.com/novnc/websockify/archive/v${WS_VERSION}.tar.gz | tar -xzv -C /usr/local/bin && \
+    curl -sSL https://github.com/freedesktop/spice-html5/archive/${SPICE}.tar.gz | tar -xzv -C /usr/local/bin && \
+    cd /usr/local/bin/websockify-${WS_VERSION} && \
+    python3 setup.py install && \
+    mv /usr/local/bin/spice-html5-${SPICE} \
+       /usr/local/bin/spice-html5 && \
+    mv /usr/local/bin/spice-html5/spice.html \
+       /usr/local/bin/spice-html5/index.html && \
+    # Tweak spice-html5 configuration as defaults to the
+    # wrong host and port.
+    sed -i "s/toggle_console;/toggle_console;\ndocument.getElementById('host').value = window.location.hostname;\ndocument.getElementById('port').value = window.location.port;/g" /usr/local/bin/spice-html5/index.html && \
+    # Create simple launch script to start pulseaudio,
+    # xserver-xspice and the spice vdagent used to support
+    # server resizing and copy/paste. Note that the exec
+    # before /usr/bin/Xspice is important to ensure that
+    # signals get correctly handled - without it the
+    # container may hang on exit.
+    echo '#!/bin/bash\npulseaudio &\nwebsockify 5800 localhost:5900 --web /usr/local/bin/spice-html5 -D\nexec /usr/bin/Xspice --auto $DISPLAY --password $(cat ${HOME}/.xserver-xspice-passwd) --xsession /usr/local/bin/xsession --vdagent --video-codecs ${SPICE_VIDEO_CODECS:-gstreamer:h264;gstreamer:vp8;gstreamer:mjpeg;spice:mjpeg} --audio-fifo-dir $XDG_RUNTIME_DIR/pulse > /dev/null' > /usr/local/bin/start-server && \
+    chmod +x /usr/local/bin/start-server && \
+    # Tidy up
+    apt-get clean && \
+    apt-get purge -y curl && \
+    apt-get autoremove -y && \
+    rm -rf /var/lib/apt/lists/*
+
+CMD ["/usr/local/bin/start-server"]
+
+#-------------------------------------------------------------------------------
+# 
+# To build the image
+# docker build -t xserver-xspice-html5 -f Dockerfile-focal .
+#
+
