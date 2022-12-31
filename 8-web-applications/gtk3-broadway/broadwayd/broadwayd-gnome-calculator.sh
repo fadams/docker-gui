@@ -18,6 +18,10 @@
 # under the License.
 #
 
+# Note that for some reason gnome-calculator for bullseye and focal
+# doesn't export display to broadway correctly, however gedit, epiphany
+# and remmina all work fine TODO work out why???
+
 BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 . $BIN/docker-dbus-session-launch.sh # Run before dbus-all
 . $BIN/docker-command.sh
@@ -36,6 +40,7 @@ $DOCKER_COMMAND run --rm -it -d \
     -p 8080:8080 \
     -u $(id -u):$(id -g) \
     -v /etc/passwd:/etc/passwd:ro \
+    --ipc=shareable \
     broadwayd :0
 
 # Launch gnome-calculator. Use the broadwayd container's IPC and network.

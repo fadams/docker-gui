@@ -38,6 +38,7 @@ $DOCKER_COMMAND run --rm -it -d \
     -p 8080:8080 \
     -u $(id -u):$(id -g) \
     -v /etc/passwd:/etc/passwd:ro \
+    --ipc=shareable \
     broadwayd :0
 
 # Launch remmina. Use the broadwayd container's IPC and network.
