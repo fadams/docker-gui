@@ -60,6 +60,9 @@ $DOCKER_COMMAND run --rm -d \
     -v /tmp/.X11-unix/X0:/tmp/.X11-unix/X0:ro \
     $IMAGE /sbin/init
 
+# Trivial wait for container to be running before cp credentials
+sleep 0.5
+
 # cp credentials bundle to container
 cat etc.tar.gz | $DOCKER_COMMAND cp - $CONTAINER:/
 
