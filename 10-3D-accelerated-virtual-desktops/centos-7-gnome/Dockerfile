@@ -22,7 +22,7 @@ FROM centos-gnome:7.7
 RUN yum -y install libvdpau mesa-vdpau-drivers && \
     # Attempt to work out the latest VirtualGL version from
     # https://sourceforge.net/projects/virtualgl/files/
-	VGL_VERSION=$(curl -sSL https://sourceforge.net/projects/virtualgl/files/ | grep "<span class=\"name\">[0-9]" | head -n 1 | cut -d \> -f2 | cut -d \< -f1) && \
+	VGL_VERSION=$(curl -sSL https://sourceforge.net/projects/virtualgl/files/ | grep -E "<span class=\"name\">[0-9](.[0-9]+)+<" | head -n 1 | cut -d \> -f2 | cut -d \< -f1) && \
     echo "VirtualGL version: ${VGL_VERSION}" && \
     # Given the version download and install VirtualGL
     curl -sSL https://sourceforge.net/projects/virtualgl/files/${VGL_VERSION}/VirtualGL-${VGL_VERSION}.x86_64.rpm -o VirtualGL-${VGL_VERSION}.x86_64.rpm && \
