@@ -24,7 +24,8 @@
 # gives performance that is equivalent to running the application directly
 # (i.e. not in a container) on the host.
 
-FROM debian:stretch-slim
+#FROM debian:stretch-slim # Deprecated
+FROM ubuntu:24.04
 
 # Install x11-apps
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
