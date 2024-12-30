@@ -23,13 +23,24 @@
 # gives performance that is equivalent to running the application directly
 # (i.e. not in a container) on the host.
 
-FROM debian:stretch-slim
+#FROM debian:stretch-slim # Deprecated
+FROM ubuntu:24.04
 
 # Install gnome-calculator
+# librsvg2-common fixes the warning message: Could not load a pixbuf
+# from /org/gtk/libgtk/theme/Adwaita/assets/bullet-symbolic.svg.
+# This may indicate that pixbuf loaders or the mime database could
+# not be found and some graphics/icons fail to load.
+# Note that moving to ubuntu:24.04 gives libEGL not available and
+# GskVulkanRenderer warnings. I *think* this might be to do with moving to
+# GTK4. The approaches from the 3D-accelerated-applications section should
+# hopefully fix this, the gtk3-examples needed GPU support to work without
+# warnings, but up until ubuntu:24.04 gnome-calculator did not.
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	ca-certificates libcanberra-gtk3-module packagekit-gtk3-module gnome-calculator && \
+	ca-certificates libcanberra-gtk3-module packagekit-gtk3-module \
+    librsvg2-common gnome-calculator && \
 	rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT ["gnome-calculator"]
@@ -39,5 +50,4 @@ ENTRYPOINT ["gnome-calculator"]
 # 
 # Build the image
 # docker build -t gnome-calculator .
-
 
