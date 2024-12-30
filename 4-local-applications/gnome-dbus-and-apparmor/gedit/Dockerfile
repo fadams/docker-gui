@@ -23,13 +23,19 @@
 # gives performance that is equivalent to running the application directly
 # (i.e. not in a container) on the host.
 
-FROM debian:stretch-slim
+#FROM debian:stretch-slim # Deprecated
+FROM ubuntu:24.04
 
 # Install gedit
+# librsvg2-common fixes the warning message: Could not load a pixbuf
+# from /org/gtk/libgtk/theme/Adwaita/assets/bullet-symbolic.svg.
+# This may indicate that pixbuf loaders or the mime database could
+# not be found and some graphics/icons fail to load.
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	libcanberra-gtk3-module packagekit-gtk3-module gedit gedit-common && \
+	libcanberra-gtk3-module packagekit-gtk3-module librsvg2-common \
+    gedit gedit-common && \
 	rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT ["gedit"]
