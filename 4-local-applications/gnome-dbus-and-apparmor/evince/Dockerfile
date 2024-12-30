@@ -23,13 +23,19 @@
 # gives performance that is equivalent to running the application directly
 # (i.e. not in a container) on the host.
 
-FROM debian:stretch-slim
+#FROM debian:stretch-slim # Deprecated
+FROM ubuntu:24.04
 
 # Install evince
+# librsvg2-common fixes the warning message: Could not load a pixbuf
+# from /org/gtk/libgtk/theme/Adwaita/assets/bullet-symbolic.svg.
+# This may indicate that pixbuf loaders or the mime database could
+# not be found and some graphics/icons fail to load.
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	evince evince-common gir1.2-evince-3.0 libgxps2 && \
+	librsvg2-common gir1.2-evince-3.0 libgxps2 \
+    evince evince-common && \
 	rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT ["evince"]
