@@ -22,7 +22,8 @@
 # display to be on the same host, but gives performance that is equivalent to
 # running the application directly (i.e. not in a container) on the host.
 
-FROM debian:stretch-slim
+#FROM debian:stretch-slim # Deprecated
+FROM ubuntu:24.04
 
 # nvidia-docker hooks
 LABEL com.nvidia.volumes.needed=nvidia_driver
@@ -31,10 +32,11 @@ LABEL com.nvidia.volumes.needed=nvidia_driver
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	mesa-utils libgl1-mesa-glx libgl1-mesa-dri && \
+    # No libgl1-mesa-glx in ubuntu:24.04, explicitly install libglx-mesa0 libgl1
+	mesa-utils libglx-mesa0 libgl1 libgl1-mesa-dri && \
 	rm -rf /var/lib/apt/lists/*
 
-ENV LIBGL_DEBUG verbose
+ENV LIBGL_DEBUG=verbose
 ENTRYPOINT ["glxgears"]
 
 #-------------------------------------------------------------------------------
