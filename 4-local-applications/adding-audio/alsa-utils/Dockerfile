@@ -18,7 +18,8 @@
 #
 # Run aplay in a container to enumerate ALSA PCM devices.
 
-FROM debian:stretch-slim
+#FROM debian:stretch-slim # Deprecated
+FROM ubuntu:24.04
 
 # Install alsa-utils
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
