@@ -18,7 +18,8 @@
 #
 # Run aplay in a container using pulseaudio as the default device.
 
-FROM debian:stretch-slim
+#FROM debian:stretch-slim # Deprecated
+FROM ubuntu:24.04
 
 # Install alsa-utils and pulseaudio
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
