@@ -23,16 +23,19 @@
 # gives performance that is equivalent to running the application directly
 # (i.e. not in a container) on the host.
 
-FROM debian:stretch-slim
-
-# nvidia-docker hooks
-LABEL com.nvidia.volumes.needed=nvidia_driver
+# glmark2 binaries not available in Debian repository
+FROM ubuntu:24.04
 
 # Install gtk-3-examples
+# librsvg2-common fixes the warning message: Could not load a pixbuf
+# from /org/gtk/libgtk/theme/Adwaita/assets/bullet-symbolic.svg.
+# This may indicate that pixbuf loaders or the mime database could
+# not be found and some graphics/icons fail to load.
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	gtk-3-examples libgl1-mesa-glx libgl1-mesa-dri && \
+    # No libgl1-mesa-glx in ubuntu:24.04, explicitly install libglx-mesa0 libgl1
+	librsvg2-common gtk-3-examples libglx-mesa0 libgl1 libgl1-mesa-dri && \
 	rm -rf /var/lib/apt/lists/*
 
 CMD ["gtk3-demo"]
