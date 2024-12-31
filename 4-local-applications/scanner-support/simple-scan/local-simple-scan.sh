@@ -46,7 +46,7 @@ fi
 if [[ $DBUS_SESSION_BUS_ADDRESS == *"abstract"* ]]; then
     DBUS_FLAGS="--net=host"
 else
-    DBUS_FLAGS="-v $XDG_RUNTIME_DIR/bus:$XDG_RUNTIME_DIR/bus:ro -e NO_AT_BRIDGE=1"
+    DBUS_FLAGS="-v $XDG_RUNTIME_DIR/bus:$XDG_RUNTIME_DIR/bus:ro -v $XDG_RUNTIME_DIR/at-spi:$XDG_RUNTIME_DIR/at-spi:ro"
 fi
 
 # Add flags for connecting to the D-bus system bus.
@@ -55,6 +55,11 @@ fi
 # profiles to accurately colour manage devices. 
 # https://www.freedesktop.org/software/colord/intro.html
 DBUS_FLAGS="-v /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro "$DBUS_FLAGS
+
+# After updating my host to Mint 22 (based on Ubuntu 24.04) printer wasn't
+# visible via dbus alone and I needed to explicitly mount cups socket.
+# Not sure why TBH, dbus is a bit like "magic" unfortunately.
+DBUS_FLAGS="-v /run/cups/cups.sock:/run/cups/cups.sock "$DBUS_FLAGS
 
 if test -f "/etc/apparmor.d/docker-dbus"; then
     APPARMOR_FLAGS="--security-opt apparmor:docker-dbus"
