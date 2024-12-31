@@ -30,7 +30,10 @@
 ################################################################################
 
 # Replace with real device name
-ALSA_DEVICE=hw:CARD=NVidia,DEV=7
+#ALSA_DEVICE=hw:CARD=NVidia,DEV=7
+
+# Works for built in audio card
+ALSA_DEVICE=hw:CARD=PCH,DEV=0
 
 # This seems to work with VMWare VM Virtual Audio Device
 #ALSA_DEVICE=hw:CARD=AudioPCI,DEV=1
@@ -56,7 +59,7 @@ fi
 
 # Check is pasuspender (and therefore pulseaudio) is present, if so then
 # prefix with pasuspender to suspend pulseaudio for the duration of the test.
-if test -f /usr/bin/pasuspender; then
+if test -x /usr/bin/pulseaudio && test -x /usr/bin/pasuspender; then
     DOCKER_COMMAND="pasuspender -- "$DOCKER_COMMAND
 fi
 

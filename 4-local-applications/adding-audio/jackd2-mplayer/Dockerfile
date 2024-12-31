@@ -18,7 +18,8 @@
 #
 # Run jackd and mplayer for JACK 2 in a container.
 
-FROM debian:stretch-slim
+#FROM debian:stretch-slim # Deprecated
+FROM ubuntu:24.04
 
 # Install mplayer and jack
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
