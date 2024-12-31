@@ -37,27 +37,36 @@ if test -c "/dev/nvidia-modeset"; then
     # Nvidia GPU
     GPU_FLAGS="--device=/dev/nvidia-modeset "
     if test -f "/usr/bin/nvidia-container-runtime"; then
-        # Nvidia Docker Version 2
+        # Nvidia Docker Version 2 or nvidia-container-toolkit
         # See https://github.com/NVIDIA/nvidia-container-runtime.
+        # https://github.com/NVIDIA/nvidia-container-toolkit
+        # https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/docker-specialized.html#specialized-configurations-with-docker
 
         # Attempt to find the actual Nvidia library path. It should be
         # something like /usr/lib/nvidia-<driver version>
-        SRC=/usr/lib/x86_64-linux-gnu
-        if test -f "/etc/ld.so.conf.d/x86_64-linux-gnu_GL.conf"; then
-            SRC=$(cat /etc/ld.so.conf.d/x86_64-linux-gnu_GL.conf | grep /lib/)
-        fi
+        #SRC=/usr/lib/x86_64-linux-gnu
+        #if test -f "/etc/ld.so.conf.d/x86_64-linux-gnu_GL.conf"; then
+        #    SRC=$(cat /etc/ld.so.conf.d/x86_64-linux-gnu_GL.conf | grep /lib/)
+        #fi
 
         GPU_FLAGS+="--runtime=nvidia "
         GPU_FLAGS+="-e NVIDIA_VISIBLE_DEVICES=all "
-        GPU_FLAGS+="-e NVIDIA_DRIVER_CAPABILITIES=graphics "
-        GPU_FLAGS+="-v $SRC/libGL.so.1:$DST/libGL.so.1:ro "
-        GPU_FLAGS+="-v $SRC/libGLX.so.0:$DST/libGLX.so.0:ro "
-        GPU_FLAGS+="-v $SRC/libGLdispatch.so.0:$DST/libGLdispatch.so.0:ro "
+        GPU_FLAGS+="-e NVIDIA_DRIVER_CAPABILITIES=graphics,video "
+
+        # Previous version using Nvidia Docker Version 2 needed to mount
+        # libraries nvidia-container-toolkit doesn't seem to need that.
+        # Weirdly though that seems to need graphics,video not just graphics???
+        #GPU_FLAGS+="-e NVIDIA_DRIVER_CAPABILITIES=graphics "
+        #GPU_FLAGS+="-v $SRC/libGL.so.1:$DST/libGL.so.1:ro "
+        #GPU_FLAGS+="-v $SRC/libGLX.so.0:$DST/libGLX.so.0:ro "
+        #GPU_FLAGS+="-v $SRC/libGLdispatch.so.0:$DST/libGLdispatch.so.0:ro "
     else
         # Nvidia Docker Version 1
-        DOCKER_COMMAND=nvidia-docker
-        SRC=/usr/local/nvidia
-        GPU_FLAGS+="-e LD_LIBRARY_PATH=$SRC/lib:$SRC/lib64:${LD_LIBRARY_PATH} "
+        echo "Nvidia Docker Version 1 not supported"
+        exit 1
+        #DOCKER_COMMAND=nvidia-docker
+        #SRC=/usr/local/nvidia
+        #GPU_FLAGS+="-e LD_LIBRARY_PATH=$SRC/lib:$SRC/lib64:${LD_LIBRARY_PATH} "
     fi
 else
     # Non-Nvidia GPU path
@@ -91,6 +100,7 @@ xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY nmer
 # Create a directory on the host that we can mount as a
 # "home directory" in the container for the current user. 
 mkdir -p $(id -un)
+mkdir -p /tmp/$(id -un)
 $DOCKER_COMMAND run --rm \
     -u $(id -u):$(id -g) \
     -v $PWD/$(id -un):/home/$(id -un) \
@@ -98,6 +108,7 @@ $DOCKER_COMMAND run --rm \
     -e DISPLAY=unix$DISPLAY \
     -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
     -e XAUTHORITY=$DOCKER_XAUTHORITY \
+    -e XDG_RUNTIME_DIR=/tmp/$(id -un) \
     -v $DOCKER_XAUTHORITY:$DOCKER_XAUTHORITY:ro \
     $GPU_FLAGS \
     kcalc
