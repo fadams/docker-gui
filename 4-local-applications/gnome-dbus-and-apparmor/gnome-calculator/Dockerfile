@@ -33,14 +33,13 @@ FROM ubuntu:24.04
 # not be found and some graphics/icons fail to load.
 # Note that moving to ubuntu:24.04 gives libEGL not available and
 # GskVulkanRenderer warnings. I *think* this might be to do with moving to
-# GTK4. The approaches from the 3D-accelerated-applications section should
-# hopefully fix this, the gtk3-examples needed GPU support to work without
-# warnings, but up until ubuntu:24.04 gnome-calculator did not.
+# GTK4. Adding libglx-mesa0 libgl1 libgl1-mesa-dri fixes those warnings.
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
 	ca-certificates libcanberra-gtk3-module packagekit-gtk3-module \
-    librsvg2-common gnome-calculator && \
+    # No libgl1-mesa-glx in ubuntu:24.04, explicitly install libglx-mesa0 libgl1
+    librsvg2-common libglx-mesa0 libgl1 libgl1-mesa-dri  gnome-calculator && \
 	rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT ["gnome-calculator"]
