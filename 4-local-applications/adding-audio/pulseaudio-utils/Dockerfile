@@ -20,7 +20,8 @@
 # example in a container and forwarding the audio via the pulseaudio socket
 # to the host.
 
-FROM debian:stretch-slim
+#FROM debian:stretch-slim # Deprecated
+FROM ubuntu:24.04
 
 # Install pulseaudio-utils
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
