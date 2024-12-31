@@ -36,7 +36,7 @@ fi
 
 # Check is pasuspender (and therefore pulseaudio) is present, if so then
 # prefix with pasuspender to suspend pulseaudio for the duration of the test.
-if test -f /usr/bin/pasuspender; then
+if test -x /usr/bin/pulseaudio && test -x /usr/bin/pasuspender; then
     DOCKER_COMMAND="pasuspender -- "$DOCKER_COMMAND
 fi
 
