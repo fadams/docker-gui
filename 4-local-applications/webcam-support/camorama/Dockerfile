@@ -21,13 +21,28 @@
 # based distros such as Ubuntu 18.04 as gconf is deprecated, so it must be
 # explicitly added using sudo apt-get install gconf2.
 
-FROM debian:stretch-slim
+FROM ubuntu:24.04
 
 # Install camorama
+# Unfortunately camorama isn't in the buster or bullseye repos so we
+# have to built it from source ourselves.
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	libcanberra-gtk-module camorama && \
+	libcanberra-gtk-module git ca-certificates autoconf automake \
+    make gnome-common libv4l-dev gdk-pixbuf-2.0 gtk+-3.0 \
+    librsvg2-common && \
+    cd /usr/src && \
+    git clone https://github.com/alessio/camorama.git && \
+    cd camorama && ./autogen.sh --disable-nls && \
+    make -j$(getconf _NPROCESSORS_ONLN) && make install && \
+    # Remove miscellaneous packages used for installation and build.
+    rm -rf /usr/src/camorama && \
+    apt-get purge -y git ca-certificates autoconf automake make \
+    autoconf-archive autotools-dev gcc-10 libllvm18 iso-codes \
+    perl-modules-5.38 python3.12-minimal libpython3.12-minimal \
+    tzdata && \
+    apt-get autoremove -y && \
 	rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT ["camorama"]
