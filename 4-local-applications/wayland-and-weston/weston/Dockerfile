@@ -17,15 +17,17 @@
 # under the License.
 #
 
-FROM debian:stretch-slim
+#FROM debian:stretch-slim # Deprecated
+FROM ubuntu:24.04
 
 # Install weston
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-    weston xwayland dmz-cursor-theme libgl1-mesa-glx libgl1-mesa-dri && \
+    # No libgl1-mesa-glx in ubuntu:24.04, explicitly install libglx-mesa0 libgl1
+    weston xwayland dmz-cursor-theme libglx-mesa0 libgl1 libgl1-mesa-dri && \
     rm -rf /var/lib/apt/lists/*
 
-CMD weston --modules=xwayland.so
+ENTRYPOINT ["weston", "--xwayland"]
 
 #-------------------------------------------------------------------------------
 # Example usage

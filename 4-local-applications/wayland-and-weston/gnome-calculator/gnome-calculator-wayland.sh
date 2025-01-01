@@ -30,7 +30,7 @@ fi
 if [[ $DBUS_SESSION_BUS_ADDRESS == *"abstract"* ]]; then
     DBUS_FLAGS="--net=host"
 else
-    DBUS_FLAGS="-v $XDG_RUNTIME_DIR/bus:$XDG_RUNTIME_DIR/bus:ro -e NO_AT_BRIDGE=1"
+    DBUS_FLAGS="-v $XDG_RUNTIME_DIR/bus:$XDG_RUNTIME_DIR/bus:ro -v $XDG_RUNTIME_DIR/at-spi:$XDG_RUNTIME_DIR/at-spi:ro"
 fi
 
 if test -f "/etc/apparmor.d/docker-dbus"; then
@@ -52,6 +52,6 @@ $DOCKER_COMMAND run --rm \
   -v /etc/passwd:/etc/passwd:ro \
   -e XDG_RUNTIME_DIR=/tmp \
   -e WAYLAND_DISPLAY=$WAYLAND_DISPLAY \
-  -v $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY:/tmp/$WAYLAND_DISPLAY  \
+  -v $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY:/tmp/$WAYLAND_DISPLAY \
   gnome-calculator $@
 

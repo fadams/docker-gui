@@ -26,30 +26,39 @@ if test -c "/dev/nvidia-modeset"; then
   # Nvidia GPU
   GPU_FLAGS="--device=/dev/nvidia-modeset "
   if test -f "/usr/bin/nvidia-container-runtime"; then
-    # Nvidia Docker Version 2
+    # Nvidia Docker Version 2 or nvidia-container-toolkit
     # See https://github.com/NVIDIA/nvidia-container-runtime.
+    # https://github.com/NVIDIA/nvidia-container-toolkit
+    # https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/docker-specialized.html#specialized-configurations-with-docker
 
     # Attempt to find the actual Nvidia library path. It should be
     # something like /usr/lib/nvidia-<driver version>
-    SRC=/usr/lib/x86_64-linux-gnu
-    if test -f "/etc/ld.so.conf.d/x86_64-linux-gnu_GL.conf"; then
-      SRC=$(cat /etc/ld.so.conf.d/x86_64-linux-gnu_GL.conf | grep /lib/)
-    fi
+    #SRC=/usr/lib/x86_64-linux-gnu
+    #if test -f "/etc/ld.so.conf.d/x86_64-linux-gnu_GL.conf"; then
+    #  SRC=$(cat /etc/ld.so.conf.d/x86_64-linux-gnu_GL.conf | grep /lib/)
+    #fi
 
     GPU_FLAGS+="--runtime=nvidia "
     GPU_FLAGS+="-e NVIDIA_VISIBLE_DEVICES=all "
-    GPU_FLAGS+="-e NVIDIA_DRIVER_CAPABILITIES=graphics "
-    GPU_FLAGS+="-v $SRC/libGL.so.1:$DST/libGL.so.1:ro "
-    GPU_FLAGS+="-v $SRC/libGLX.so.0:$DST/libGLX.so.0:ro "
-    GPU_FLAGS+="-v $SRC/libGLdispatch.so.0:$DST/libGLdispatch.so.0:ro "
-    GPU_FLAGS+="-v $SRC/libEGL.so.1:$DST/libEGL.so.1:ro "
-    GPU_FLAGS+="-v $SRC/libGLESv1_CM.so.1:$DST/libGLESv1_CM.so.1:ro "
-    GPU_FLAGS+="-v $SRC/libGLESv2.so.2:$DST/libGLESv2.so.2:ro "
+    GPU_FLAGS+="-e NVIDIA_DRIVER_CAPABILITIES=graphics,video "
+
+    # Previous version using Nvidia Docker Version 2 needed to mount
+    # libraries nvidia-container-toolkit doesn't seem to need that.
+    # Weirdly though that seems to need graphics,video not just graphics???
+    #GPU_FLAGS+="-e NVIDIA_DRIVER_CAPABILITIES=graphics "
+    #GPU_FLAGS+="-v $SRC/libGL.so.1:$DST/libGL.so.1:ro "
+    #GPU_FLAGS+="-v $SRC/libGLX.so.0:$DST/libGLX.so.0:ro "
+    #GPU_FLAGS+="-v $SRC/libGLdispatch.so.0:$DST/libGLdispatch.so.0:ro "
+    #GPU_FLAGS+="-v $SRC/libEGL.so.1:$DST/libEGL.so.1:ro "
+    #GPU_FLAGS+="-v $SRC/libGLESv1_CM.so.1:$DST/libGLESv1_CM.so.1:ro "
+    #GPU_FLAGS+="-v $SRC/libGLESv2.so.2:$DST/libGLESv2.so.2:ro "
   else
     # Nvidia Docker Version 1
-    DOCKER_COMMAND=nvidia-docker
-    SRC=/usr/local/nvidia
-    GPU_FLAGS+="-e LD_LIBRARY_PATH=$SRC/lib:$SRC/lib64:${LD_LIBRARY_PATH} "
+    echo "Nvidia Docker Version 1 not supported"
+    exit 1
+    #DOCKER_COMMAND=nvidia-docker
+    #SRC=/usr/local/nvidia
+    #GPU_FLAGS+="-e LD_LIBRARY_PATH=$SRC/lib:$SRC/lib64:${LD_LIBRARY_PATH} "
   fi
 else
   # Non-Nvidia GPU path
@@ -80,6 +89,9 @@ DOCKER_XAUTHORITY=${XAUTH}.docker
 cp --preserve=all $XAUTH $DOCKER_XAUTHORITY
 xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $DOCKER_XAUTHORITY nmerge -
 
+# The -Swayland-0 starts weston on wayland-0. It used to do that by default
+# but that behaviour changed to default to wayland-1 as per
+# https://gitlab.freedesktop.org/wayland/weston/-/merge_requests/486
 $DOCKER_COMMAND run --rm \
   --ipc=host \
   -u $(id -u):$(id -g) \
@@ -92,5 +104,5 @@ $DOCKER_COMMAND run --rm \
   -e XDG_RUNTIME_DIR=/tmp \
   -v $XDG_RUNTIME_DIR:/tmp \
   $GPU_FLAGS \
-  weston
+  weston -Swayland-0
 

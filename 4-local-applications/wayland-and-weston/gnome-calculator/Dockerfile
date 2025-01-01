@@ -17,14 +17,23 @@
 # under the License.
 #
 
-FROM debian:stretch-slim
+#FROM debian:stretch-slim # Deprecated
+FROM ubuntu:24.04
 
 # Install gnome-calculator
+# librsvg2-common fixes the warning message: Could not load a pixbuf
+# from /org/gtk/libgtk/theme/Adwaita/assets/bullet-symbolic.svg.
+# This may indicate that pixbuf loaders or the mime database could
+# not be found and some graphics/icons fail to load.
+# Note that moving to ubuntu:24.04 gives libEGL not available and
+# GskVulkanRenderer warnings. I *think* this might be to do with moving to
+# GTK4. Adding libglx-mesa0 libgl1 libgl1-mesa-dri fixes those warnings.
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	ca-certificates libcanberra-gtk3-module \
-    packagekit-gtk3-module gnome-calculator && \
+	ca-certificates libcanberra-gtk3-module packagekit-gtk3-module \
+    # No libgl1-mesa-glx in ubuntu:24.04, explicitly install libglx-mesa0 libgl1
+    librsvg2-common libglx-mesa0 libgl1 libgl1-mesa-dri  gnome-calculator && \
 	rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT ["gnome-calculator"]
