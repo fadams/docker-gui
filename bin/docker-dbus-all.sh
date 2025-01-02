@@ -33,12 +33,17 @@ if [[ $DBUS_SESSION_BUS_ADDRESS == *"abstract"* ]]; then
     echo "Adding --network=host flag so container can connect to abstract socket"
     DBUS_FLAGS="--network=host -e NO_AT_BRIDGE=1 "
 else
-    DBUS_FLAGS="-v $XDG_RUNTIME_DIR/bus:$XDG_RUNTIME_DIR/bus:ro -e NO_AT_BRIDGE=1 "
+    DBUS_FLAGS="-v $XDG_RUNTIME_DIR/bus:$XDG_RUNTIME_DIR/bus:ro -v $XDG_RUNTIME_DIR/at-spi:$XDG_RUNTIME_DIR/at-spi:ro "
 fi
 
 # Add flags for connecting to the D-bus system bus.
 DBUS_FLAGS+="-v /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro "
 DBUS_FLAGS+="-e DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS "
+
+# After updating my host to Mint 22 (based on Ubuntu 24.04) printer wasn't
+# visible via dbus alone and I needed to explicitly mount cups socket.
+# Not sure why TBH, dbus is a bit like "magic" unfortunately.
+DBUS_FLAGS+="-v /run/cups/cups.sock:/run/cups/cups.sock "
 
 if test -f "/etc/apparmor.d/docker-dbus"; then
     APPARMOR_FLAGS="--security-opt apparmor:docker-dbus"

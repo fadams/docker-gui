@@ -53,7 +53,7 @@ PA_HOST=$(echo ${SSH_CLIENT%% *})
 if [ -z $PA_HOST ]; then
 # SSH_CLIENT not set, so set flags for local application.
 
-PULSE_VERSION=$(pulseaudio --version | sed 's/[^0-9.]*\([0-9]*\).*/\1/')
+PULSE_VERSION=$(test -x /usr/bin/pulseaudio && pulseaudio --version | sed 's/[^0-9.]*\([0-9]*\).*/\1/')
 if ([[ $PULSE_VERSION -gt 6 ]] && [[ $PULSE_VERSION -lt 10 ]]); then
     PULSE_FLAGS="-e PULSE_CLIENTCONFIG=/etc/pulse/client-noshm.conf"
 fi
