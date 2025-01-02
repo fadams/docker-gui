@@ -52,7 +52,7 @@
 	"syscalls": [
 		{
 			"names": [
-                "clone", "unshare",
+                "clone", "clone3", "unshare",
 				"accept",
 				"accept4",
 				"access",
