@@ -45,6 +45,7 @@ $DOCKER_COMMAND run --rm \
     -u $(id -u):$(id -g) \
     -v $PWD/$(id -un):/home/$(id -un) \
     -v /etc/passwd:/etc/passwd:ro \
+    -e XDG_RUNTIME_DIR=/tmp/$(id -un) \
     $APPARMOR_FLAGS \
     $DCONF_FLAGS \
     $PULSEAUDIO_FLAGS \

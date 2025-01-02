@@ -17,23 +17,21 @@
 # under the License.
 #
 
-FROM debian:stretch-slim
-
-# nvidia-docker hooks (Only needed for Nvidia Docker V1)
-LABEL com.nvidia.volumes.needed=nvidia_driver
+#FROM debian:stretch-slim # Deprecated
+FROM ubuntu:24.04
 
 # Install Opera
-RUN echo "deb http://ftp.debian.org/debian stretch-backports main" > /etc/apt/sources.list.d/stretch-backports.list && \
-    apt-get update && DEBIAN_FRONTEND=noninteractive \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-            -t stretch-backports \
 	apt-transport-https wget gnupg ca-certificates \
-    fonts-symbola fonts-lmodern fonts-freefont-ttf \
-    fonts-liberation fonts-dejavu gsfonts libgbm1 \
-    libpulse0 libv4l-0 libgl1-mesa-glx libgl1-mesa-dri && \
-	wget -O - https://deb.opera.com/archive.key | apt-key add - && \
-	echo "deb [arch=amd64] http://deb.opera.com/opera-stable/ stable non-free" > /etc/apt/sources.list.d/opera.list && \
+    fonts-symbola fonts-lmodern fonts-freefont-ttf librsvg2-common \
+    fonts-liberation fonts-dejavu gsfonts gsettings-desktop-schemas \
+    # No libgl1-mesa-glx in ubuntu:24.04, explicitly install libglx-mesa0 libgl1
+    libpulse0 libv4l-0 libglx-mesa0 libgl1 libgl1-mesa-dri \
+    libvpx9 libegl1 libgles2 libvdpau1 && \
+    wget -O /usr/share/keyrings/opera-archive.key https://deb.opera.com/archive.key && \
+	echo "deb [arch=amd64 signed-by=/usr/share/keyrings/opera-archive.key] http://deb.opera.com/opera-stable/ stable non-free" > /etc/apt/sources.list.d/opera.list && \
 	apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
 	opera-stable && \
