@@ -17,23 +17,19 @@
 # under the License.
 #
 
-FROM debian:stretch-slim
+#FROM debian:stretch-slim # Deprecated
+FROM ubuntu:24.04
 
-ENV CUDA_VERSION 9.0
+ENV CUDA_VERSION 12.4
 ENV NVIDIA_REQUIRE_CUDA "cuda>=${CUDA_VERSION}"
-ENV CUDA_FULL_VERSION ${CUDA_VERSION}.176
-
-# nvidia-docker hooks (Only needed for Nvidia Docker V1)
-LABEL com.nvidia.volumes.needed=nvidia_driver
-LABEL com.nvidia.cuda.version="${CUDA_FULL_VERSION}"
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used to install CUDA
     apt-get install -y --no-install-recommends \
     apt-transport-https wget gnupg ca-certificates && \
     # Add the CUDA packages and signing key
-	wget -O /usr/share/keyrings/cuda-archive.key https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/3bf863cc.pub && \
-    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/cuda-archive.key] https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64 /" > /etc/apt/sources.list.d/cuda.list && \
+	wget -O /usr/share/keyrings/cuda-archive.key https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/3bf863cc.pub && \
+    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/cuda-archive.key] https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64 /" > /etc/apt/sources.list.d/cuda.list && \
     apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
     cuda-cudart-${CUDA_VERSION} && \
