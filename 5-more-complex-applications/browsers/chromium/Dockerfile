@@ -20,27 +20,6 @@
 #FROM debian:stretch-slim # Deprecated
 FROM ubuntu:24.04
 
-# nvidia-docker hooks (Only needed for Nvidia Docker V1)
-LABEL com.nvidia.volumes.needed=nvidia_driver
-
-# Install Chromium
-#RUN sed -i 's/main/main contrib/' \
-#        /etc/apt/sources.list && \
-#    apt-get update && DEBIAN_FRONTEND=noninteractive \
-#    # Add the packages used
-#    apt-get install -y --no-install-recommends \
-#	apt-transport-https gnupg ca-certificates \
-#    fonts-symbola fonts-lmodern fonts-freefont-ttf \
-#    fonts-liberation fonts-dejavu gsfonts \
-#    libpulse0 libv4l-0 libgl1-mesa-glx libgl1-mesa-dri \
-#    gsettings-desktop-schemas \
-#    chromium chromium-l10n chromium-widevine && \
-#	rm -rf /var/lib/apt/lists/* && \
-#    cp /etc/pulse/client.conf \
-#       /etc/pulse/client-noshm.conf && \
-#    sed -i "s/; enable-shm = yes/enable-shm = no/g" \
-#        /etc/pulse/client-noshm.conf
-
 # Install Chromium
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
