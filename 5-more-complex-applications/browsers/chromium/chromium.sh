@@ -39,7 +39,7 @@ mkdir -p $(id -un)/.config/dconf
 # seems a better approach than --cap-add SYS_ADMIN or launching Chromium
 # with --no-sandbox especially as from Linux 3.8, unprivileged processes
 # can create user namespaces.
-$DOCKER_COMMAND run --rm \
+$DOCKER_COMMAND run --rm -it \
     --security-opt seccomp=$PWD/seccomp-enable-clone.json \
     --shm-size 2g \
     -u $(id -u):$(id -g) \
