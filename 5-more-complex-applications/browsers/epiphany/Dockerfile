@@ -17,22 +17,17 @@
 # under the License.
 #
 
-FROM debian:stretch-slim
+#FROM debian:stretch-slim # Deprecated
+FROM ubuntu:24.04
 
-# nvidia-docker hooks (Only needed for Nvidia Docker V1)
-LABEL com.nvidia.volumes.needed=nvidia_driver
-
-# Install Epiphany from testing as older version in stable doesn't
-# play YouTube videos and seems to suffer with other glitches.
-RUN echo "deb http://ftp.debian.org/debian testing main" \
-         > /etc/apt/sources.list.d/stretch-testing.list && \
-    apt-get update && DEBIAN_FRONTEND=noninteractive \
-    apt-get install -y --no-install-recommends -t testing \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
+    apt-get install -y --no-install-recommends \
     ca-certificates epiphany-browser libpulse0 \
-    libgl1-mesa-glx libgl1-mesa-dri gstreamer1.0-libav \
+    # No libgl1-mesa-glx in ubuntu:24.04, explicitly install libglx-mesa0 libgl1
+    libvpx9 libglx-mesa0 libgl1 libgl1-mesa-dri gstreamer1.0-libav \
     gstreamer1.0-pulseaudio gstreamer1.0-plugins-good \
     gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly \
-    gstreamer1.0-gl && \
+    gstreamer1.0-gl gstreamer1.0-fdkaac librsvg2-common && \
 	rm -rf /var/lib/apt/lists/* && \
     cp /etc/pulse/client.conf \
        /etc/pulse/client-noshm.conf && \

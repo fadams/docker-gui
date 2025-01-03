@@ -28,7 +28,14 @@ BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 # "home directory" in the container for the current user. 
 mkdir -p $(id -un)/.config/pulse
 mkdir -p $(id -un)/.config/dconf
+# The -e WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS=1 is a workaround for
+# changes in ubuntu:24.04 and related distros that gate unprivileged
+# user namespaces by apparmor confinement. This applies at the application
+# level so applies even if docker's --security-opt apparmor=unconfined is
+# set. A better approach would be a custom apparmor profile for epiphany
+# but for now just disable the user namespace sandbox :-(
 $DOCKER_COMMAND run --rm \
+    -e WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS=1 \
     --shm-size 2g \
     -u $(id -u):$(id -g) \
     -v $PWD/$(id -un):/home/$(id -un) \
