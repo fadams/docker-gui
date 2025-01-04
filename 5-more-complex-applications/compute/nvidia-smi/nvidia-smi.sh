@@ -21,9 +21,10 @@
 BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 . $BIN/docker-gpu.sh
 
+# nvidia-smi seems to be included with ubuntu:24.04 base image.
 $DOCKER_COMMAND run --rm \
     -u $(id -u):$(id -g) \
     -v /etc/passwd:/etc/passwd:ro \
     $GPU_FLAGS \
-    nvidia-smi $@
+    ubuntu:24.04 nvidia-smi $@
 
