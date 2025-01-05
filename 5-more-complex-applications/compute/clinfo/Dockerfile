@@ -17,10 +17,8 @@
 # under the License.
 #
 
-FROM debian:stretch-slim
-
-# nvidia-docker hooks (Only needed for Nvidia Docker V1)
-LABEL com.nvidia.volumes.needed=nvidia_driver
+#FROM debian:stretch-slim # Deprecated
+FROM ubuntu:24.04
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages
