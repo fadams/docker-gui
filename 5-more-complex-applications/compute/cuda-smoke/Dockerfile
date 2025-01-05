@@ -17,43 +17,38 @@
 # under the License.
 #
 
-FROM debian:stretch-slim
-
-ENV CUDA_VERSION 9.0
-ENV NVIDIA_REQUIRE_CUDA "cuda>=${CUDA_VERSION}"
-ENV CUDA_FULL_VERSION ${CUDA_VERSION}.176
-
-# nvidia-docker hooks (Only needed for Nvidia Docker V1)
-LABEL com.nvidia.volumes.needed=nvidia_driver
-LABEL com.nvidia.cuda.version="${CUDA_FULL_VERSION}"
+FROM ubuntu:24.04
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used to install CUDA
     apt-get install -y --no-install-recommends \
-    apt-transport-https wget gnupg ca-certificates && \
-    # Add the CUDA packages and signing key
-	wget -O /usr/share/keyrings/cuda-archive.key https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/3bf863cc.pub && \
-    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/cuda-archive.key] https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64 /" > /etc/apt/sources.list.d/cuda.list && \
+    apt-transport-https wget gnupg git make ca-certificates && \
+    # Install CUDA packages via the new cuda-keyring package as per:
+    # https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#network-repo-installation-for-ubuntu
+    wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb && \
+    dpkg -i cuda-keyring_1.1-1_all.deb && rm cuda-keyring_1.1-1_all.deb && \
     apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-    libgl1-mesa-glx libgl1-mesa-dri libglu1-mesa freeglut3 \
-    cuda-cudart-${CUDA_VERSION} \
-    cuda-samples-${CUDA_VERSION} && \
-    ln -s cuda-${CUDA_VERSION} /usr/local/cuda && \
-    # Compile the smokeParticles sample. Note the tweak of findgllib.mk
-    # that is needed to find the OpenGL libraries on debian.
-    cd /usr/local/cuda/samples/5_Simulations && \
-    cd smokeParticles && \
-    sed -i 's/grep -i ubuntu/grep -i "ubuntu\\|debian"/' \
-        findgllib.mk && \
+    # No libgl1-mesa-glx in ubuntu:24.04, explicitly install libglx-mesa0 libgl1
+    libglx-mesa0 libgl1 libgl1-mesa-dri libglu1-mesa-dev freeglut3-dev \
+    # Install cuda runtime and nvcc
+    cuda-cudart-12-6 cuda-nvcc-12-6 && \
+    # Install cuda-samples from git repo
+    cd /usr/local && \
+    git clone https://github.com/NVIDIA/cuda-samples.git && \
+    cd cuda-samples && git checkout v12.5 -b build && \
+    # Compile the smokeParticles sample.
+    cd /usr/local/cuda-samples/Samples/5_Domain_Specific/smokeParticles && \
     make && cp smokeParticles /usr/local/cuda/bin/. && \
     cp -R data /usr/local/cuda/bin/. && make clean && \
+    # Remove cuda-samples source code after compilation
+    rm -rf /usr/local/cuda-samples && \
     # Remove the packages used for installation and build
     apt-get clean && \
-    apt-get purge -y apt-transport-https wget gnupg \
-            ca-certificates cuda-samples-${CUDA_VERSION} && \
+    apt-get purge -y apt-transport-https wget gnupg git make \
+            ca-certificates cuda-nvcc-12-6 && \
     apt-get autoremove -y && \
-	rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/*
 
 # Set WORKDIR and use relative path as this example uses Nvidia's
 # sdkFindFilePath to find the data directory and using the absolute
