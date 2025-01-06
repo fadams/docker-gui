@@ -22,14 +22,19 @@ FROM ubuntu:24.04
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages
     apt-get install -y --no-install-recommends \
-    ocl-icd-libopencl1 ocl-icd-opencl-dev clinfo tar \
+    ocl-icd-libopencl1 ocl-icd-opencl-dev libnuma1 clinfo \
+    libxml2 libxmu-dev freeglut3-dev libglew-dev \
     # No libgl1-mesa-glx in ubuntu:24.04, explicitly install libglx-mesa0 libgl1
-    libxmu-dev freeglut3-dev libglew-dev libglx-mesa0 libgl1 \
-    libgl1-mesa-dri wget ca-certificates gcc g++ make && \
-    # Add the Nvidia OpenCL Installable Client Driver
-    mkdir -p /etc/OpenCL/vendors && \
-    echo "libnvidia-opencl.so.1" > \
-         /etc/OpenCL/vendors/nvidia.icd && \
+    libglx-mesa0 libgl1 libgl1-mesa-dri wget ca-certificates \
+    tar gcc g++ make gpg && \
+    # Add the Intel OpenCL packages and signing key using instructions from:
+    # https://www.intel.com/content/www/us/en/developer/articles/technical/intel-cpu-runtime-for-opencl-applications-with-sycl-support.html
+    # https://www.intel.com/content/www/us/en/docs/oneapi/installation-guide-linux/2023-0/apt.html#GUID-560A487B-1B5B-4406-BB93-22BC7B526BCD
+	wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor > /usr/share/keyrings/oneapi-archive-keyring.gpg && \
+    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main /" > /etc/apt/sources.list.d/oneAPI.list && \
+    apt-get update && DEBIAN_FRONTEND=noninteractive \
+    apt-get install -y --no-install-recommends \
+    intel-oneapi-runtime-opencl && \
     # Download the Nvidia SDK which includes the OpenCL samples.
     # Note that the samples listed at https://developer.nvidia.com/opencl
     # are incomplete, missing the "shared" and "common" code needed to
@@ -47,25 +52,24 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
         /usr/local/src/OpenCL/common/common_opencl.mk && \
     sed -i 's/-Wimplicit//' \
         /usr/local/src/OpenCL/common/common_opencl.mk && \
-    # Fix issue with oclNbodyKernel.cl
-    sed -i 's/mul24(get_local_size(0), get_local_id(1))/mul24((uint)get_local_size(0), get_local_id(1))/' /usr/local/src/OpenCL/src/oclNbody/oclNbodyKernel.cl && \
-    # Fix issue with SobelFilter.cl (Not used here, but fixed for info)
-    sed -i 's/mul24(get_local_size(1), get_global_size(0))/mul24((uint)get_local_size(1), get_global_size(0))/' /usr/local/src/OpenCL/src/oclSobelFilter/SobelFilter.cl && \
-    sed -i 's/mul24((get_group_id(0) + 1)/mul24((uint)(get_group_id(0) + 1)/' /usr/local/src/OpenCL/src/oclSobelFilter/SobelFilter.cl && \
-    sed -i 's/mul24(get_group_id(0)/mul24((uint)get_group_id(0)/' /usr/local/src/OpenCL/src/oclSobelFilter/SobelFilter.cl && \
+    # Replace hard-coded CL_DEVICE_TYPE_GPU with CL_DEVICE_TYPE_CPU
+    # so the samples will work (as far as possible) on Intel CPU device.
+    for i in $(grep -rwl /usr/local/src/OpenCL/src -e CL_DEVICE_TYPE_GPU); do sed -i 's/CL_DEVICE_TYPE_GPU/CL_DEVICE_TYPE_CPU/' $i; done && \
     cd OpenCL && \
-    mv src/oclNbody . && rm -rf src/* && mv oclNbody src/. && \
+    mv src/oclParticles . && rm -rf src/* && \
+    mv oclParticles src/. && \
     make && \
     chmod 777 /usr/local/bin && \
     mkdir -p /usr/local/bin/src && \
-    cp /usr/local/src/OpenCL/bin/linux/release/oclNbody \
+    cp /usr/local/src/OpenCL/bin/linux/release/oclParticles \
        /usr/local/bin/. && \
-    cp /usr/local/src/OpenCL/src/oclNbody/*.cl \
+    cp /usr/local/src/OpenCL/src/oclParticles/*.cl \
        /usr/local/bin/src/. && \
     # Remove packages used for installation
     rm -rf /usr/local/src/* && \
     apt-get clean && \
-    apt-get purge -y wget ca-certificates gcc g++ make && \
+    apt-get purge -y wget ca-certificates \
+            gcc g++ make gpg && \
     apt-get autoremove -y && \
 	rm -rf /var/lib/apt/lists/*
 
@@ -73,12 +77,11 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
 # shrFindFilePath to find the kernel directory and using the absolute
 # path doesn't work correctly.
 WORKDIR /usr/local/bin/
-ENTRYPOINT ["oclNbody"]
+ENTRYPOINT ["oclParticles"]
 
 #-------------------------------------------------------------------------------
 # Example usage
 # 
 # Build the image
-# docker build -t opencl-nbody .
-
+# docker build -t opencl-particles-intel-cpu -f Dockerfile-intel-cpu-noble .
 

@@ -17,16 +17,14 @@
 # under the License.
 #
 
-FROM debian:stretch-slim
-
-# nvidia-docker hooks (Only needed for Nvidia Docker V1)
-LABEL com.nvidia.volumes.needed=nvidia_driver
+FROM ubuntu:24.04
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages
     apt-get install -y --no-install-recommends \
     ocl-icd-libopencl1 ocl-icd-opencl-dev clinfo tar \
-    libxmu-dev freeglut3-dev libglew-dev libgl1-mesa-glx \
+    # No libgl1-mesa-glx in ubuntu:24.04, explicitly install libglx-mesa0 libgl1
+    libxmu-dev freeglut3-dev libglew-dev libglx-mesa0 libgl1 \
     libgl1-mesa-dri wget ca-certificates gcc g++ make && \
     # Add the Nvidia OpenCL Installable Client Driver
     mkdir -p /etc/OpenCL/vendors && \
