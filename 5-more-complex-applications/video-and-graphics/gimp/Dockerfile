@@ -17,13 +17,14 @@
 # under the License.
 #
 
-FROM debian:stretch-slim
+#FROM debian:stretch-slim # Deprecated
+FROM ubuntu:24.04
 
 # Install gimp
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	gimp && \
+	gimp librsvg2-common iso-codes libasound2t64 gtk2-engines-pixbuf && \
 	rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT ["gimp"]
