@@ -17,13 +17,14 @@
 # under the License.
 #
 
-FROM debian:stretch-slim
+#FROM debian:stretch-slim # Deprecated
+FROM ubuntu:24.04
 
 # Install inkscape
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
-	inkscape && \
+	inkscape librsvg2-common && \
 	rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT ["inkscape"]
