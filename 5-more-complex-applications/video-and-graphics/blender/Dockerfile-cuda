@@ -17,28 +17,21 @@
 # under the License.
 #
 
-FROM debian:stretch-slim
-
-ENV CUDA_VERSION 9.0
-ENV NVIDIA_REQUIRE_CUDA "cuda>=${CUDA_VERSION}"
-ENV CUDA_FULL_VERSION ${CUDA_VERSION}.176
-
-# nvidia-docker hooks (Only needed for Nvidia Docker V1)
-LABEL com.nvidia.volumes.needed=nvidia_driver
-LABEL com.nvidia.cuda.version="${CUDA_FULL_VERSION}"
+FROM ubuntu:24.04
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-	blender libgl1-mesa-glx libgl1-mesa-dri \
+    # No libgl1-mesa-glx in ubuntu:24.04, explicitly install libglx-mesa0 libgl1
+	blender libglx-mesa0 libgl1 libgl1-mesa-dri \
     apt-transport-https wget gnupg ca-certificates && \
-    # Add the CUDA packages and signing key
-	wget -O /usr/share/keyrings/cuda-archive.key https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/3bf863cc.pub && \
-    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/cuda-archive.key] https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64 /" > /etc/apt/sources.list.d/cuda.list && \
+    # Install CUDA packages via the new cuda-keyring package as per:
+    # https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#network-repo-installation-for-ubuntu
+    wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb && \
+    dpkg -i cuda-keyring_1.1-1_all.deb && rm cuda-keyring_1.1-1_all.deb && \
     apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-    cuda-cudart-${CUDA_VERSION} \
-    cuda-command-line-tools-${CUDA_VERSION} && \
-    ln -s cuda-${CUDA_VERSION} /usr/local/cuda && \
+    # Install cuda runtime and nvcc
+    cuda-cudart-12-6 cuda-nvcc-12-6 cuda-command-line-tools-12-6 && \
     # Remove packages used for CUDA installation
     apt-get clean && \
     apt-get purge -y apt-transport-https wget gnupg \
