@@ -26,7 +26,12 @@ BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 # Create a directory on the host that we can mount as a
 # "home directory" in the container for the current user. 
 mkdir -p $(id -un)/.config/pulse
+
+# smplayer seems to need --ipc=host without it we get
+# X Error of failed request: BadShmSeg (invalid shared segment parameter)
+# as it seems to be using X11 shared memory which I think uses SysV shm.
 $DOCKER_COMMAND run --rm \
+    --ipc=host \
     --device=/dev/sr0 \
     --group-add $(cut -d: -f3 < <(getent group cdrom)) \
     -u $(id -u):$(id -g) \
