@@ -17,24 +17,30 @@
 # under the License.
 #
 
-FROM debian:stretch-slim
-
-# nvidia-docker hooks (Only needed for Nvidia Docker V1)
-LABEL com.nvidia.volumes.needed=nvidia_driver
+#FROM debian:stretch-slim # Deprecated
+FROM ubuntu:24.04
 
 # Install vlc
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
-    # Add the packages used
+RUN sed -i 's/main/main contrib/' \
+        /etc/apt/sources.list && \
+    apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
 	vlc apt-transport-https wget gnupg ca-certificates \
-    libv4l-0 libvdpau1 mesa-vdpau-drivers \
-    libgl1-mesa-glx libgl1-mesa-dri && \
-	wget -O - https://download.videolan.org/pub/debian/videolan-apt.asc | apt-key add - && \
-	echo "deb [arch=amd64] https://download.videolan.org/pub/debian/stable/ /" > /etc/apt/sources.list.d/videolan.list && \
-	apt-get update && DEBIAN_FRONTEND=noninteractive \
-    apt-get install -y --no-install-recommends \
-	libdvdcss2 && \
+    libdvd-pkg libv4l-0 libvdpau1 mesa-vdpau-drivers \
+    nvidia-vaapi-driver libvdpau-va-gl1 \
+    # No libgl1-mesa-glx in ubuntu:24.04, explicitly install libglx-mesa0 libgl1
+    libglx-mesa0 libgl1 libgl1-mesa-dri && \
+    dpkg-reconfigure libdvd-pkg && \
+    # Remove packages needed only for installing libdvdcss
+    cp /usr/lib/x86_64-linux-gnu/libdvdcss.so.2.2.0 \
+       /usr/lib/x86_64-linux-gnu/libdvdcss.so.2.2.0.bak && \
+    apt-get clean && \
+    apt-get purge -y apt-transport-https wget libdvd-pkg && \
+    apt-get autoremove -y && \
 	rm -rf /var/lib/apt/lists/* && \
+    cd /usr/lib/x86_64-linux-gnu && \
+    mv libdvdcss.so.2.2.0.bak libdvdcss.so.2.2.0 && \
+    ln -s libdvdcss.so.2.2.0 libdvdcss.so && \
     cp /etc/pulse/client.conf \
        /etc/pulse/client-noshm.conf && \
     sed -i "s/; enable-shm = yes/enable-shm = no/g" \
