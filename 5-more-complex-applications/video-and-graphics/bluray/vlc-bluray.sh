@@ -28,6 +28,20 @@ BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 # "home directory" in the container for the current user. 
 mkdir -p $(id -un)/.config/pulse
 mkdir -p $(id -un)/.config/dconf
+
+# Create aacs config directory and copy keydb.cfg if it doesn't exist
+# https://askubuntu.com/questions/140080/playing-blu-ray-using-vlc
+mkdir -p $(id -un)/.config/aacs
+if [ ! -f $(id -un)/.config/aacs/KEYDB.cfg ]; then
+    #wget -O $(id -un)/.config/aacs/KEYDB.cfg http://vlc-bluray.whoknowsmy.name/files/KEYDB.cfg
+
+    # http://fvonline-db.bplaced.net/ has a larger more up to date database
+    wget -O keydb_eng.zip http://fvonline-db.bplaced.net/fv_download.php?lang=eng
+    unzip keydb_eng.zip
+    mv keydb.cfg $(id -un)/.config/aacs/KEYDB.cfg
+    rm keydb_eng.zip
+fi
+
 $DOCKER_COMMAND run --rm \
     --device=/dev/sr0 \
     --device=/dev/sg1 \

@@ -17,30 +17,31 @@
 # under the License.
 #
 
-# Use Ubuntu so we can get makemkv from ppa to keep things simple
-FROM ubuntu:18.04
+#FROM debian:stretch-slim # Deprecated
+FROM ubuntu:24.04
 
-# nvidia-docker hooks (Only needed for Nvidia Docker V1)
-LABEL com.nvidia.volumes.needed=nvidia_driver
-
-# Install vlc and makemkv
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
-    # Add the packages used
-    apt-get install -y --no-install-recommends \
-    software-properties-common wget gnupg \
-    vlc libvdpau1 mesa-vdpau-drivers \
-    libgl1-mesa-glx libgl1-mesa-dri && \
-    wget -O - https://download.videolan.org/pub/debian/videolan-apt.asc | apt-key add - && \
-    echo "deb [arch=amd64] https://download.videolan.org/pub/debian/stable/ /" > /etc/apt/sources.list.d/videolan.list && \
-    add-apt-repository ppa:heyarje/makemkv-beta && \
+# Install vlc with libaacs0 libbluray2
+RUN sed -i 's/main/main contrib/' \
+        /etc/apt/sources.list && \
     apt-get update && DEBIAN_FRONTEND=noninteractive \
-    apt-get install -y libdvdcss2 \
-    makemkv-bin makemkv-oss && \
-    rm -rf /var/lib/apt/lists/* && \
-    # https://www.makemkv.com/forum/viewtopic.php?t=7009
+    apt-get install -y --no-install-recommends \
+	vlc apt-transport-https wget gnupg ca-certificates \
+    libaacs0 libbluray2 \
+    libdvd-pkg libv4l-0 libvdpau1 mesa-vdpau-drivers \
+    nvidia-vaapi-driver libvdpau-va-gl1 \
+    # No libgl1-mesa-glx in ubuntu:24.04, explicitly install libglx-mesa0 libgl1
+    libglx-mesa0 libgl1 libgl1-mesa-dri && \
+    dpkg-reconfigure libdvd-pkg && \
+    # Remove packages needed only for installing libdvdcss
+    cp /usr/lib/x86_64-linux-gnu/libdvdcss.so.2.2.0 \
+       /usr/lib/x86_64-linux-gnu/libdvdcss.so.2.2.0.bak && \
+    apt-get clean && \
+    apt-get purge -y apt-transport-https wget libdvd-pkg && \
+    apt-get autoremove -y && \
+	rm -rf /var/lib/apt/lists/* && \
     cd /usr/lib/x86_64-linux-gnu && \
-    ln -s libmmbd.so.0 libaacs.so.0 && \
-    ln -s libmmbd.so.0 libbdplus.so.0 && \
+    mv libdvdcss.so.2.2.0.bak libdvdcss.so.2.2.0 && \
+    ln -s libdvdcss.so.2.2.0 libdvdcss.so && \
     cp /etc/pulse/client.conf \
        /etc/pulse/client-noshm.conf && \
     sed -i "s/; enable-shm = yes/enable-shm = no/g" \
