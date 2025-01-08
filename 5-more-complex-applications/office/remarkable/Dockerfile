@@ -17,31 +17,32 @@
 # under the License.
 #
 
-FROM debian:stretch-slim
+#FROM debian:stretch-slim # Deprecated
+FROM ubuntu:24.04
 
 ENV LANG=en_GB.UTF-8
 ENV TZ=Europe/London
 
 # http://remarkableapp.github.io/files/remarkable_1.87_all.deb
+# https://remarkableapp.github.io/files/remarkable_1.95.deb
 
-RUN sed -i 's/main/main contrib/' \
-        /etc/apt/sources.list && \
-    apt-get update && DEBIAN_FRONTEND=noninteractive \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
     curl ca-certificates locales tzdata python3 \
-    python3-lxml python3-markdown python3-bs4 python3-gi \
-    python3-gtkspellcheck python librsvg2-common \
+    python3-all python3-setuptools python3-bs4 python3-gi \
+    python3-gtkspellcheck python3-markdown librsvg2-common \
     dconf-gsettings-backend yelp wkhtmltopdf \
-    gir1.2-glib-2.0 gir1.2-webkit-3.0 \
+    gir1.2-glib-2.0 gir1.2-webkit2-4.1 \
     gir1.2-gtk-3.0 gir1.2-gtksource-3.0 \
     fonts-symbola fonts-lmodern fonts-freefont-ttf \
-    fonts-liberation fonts-dejavu ttf-mscorefonts-installer && \
-    VERSION=1.87 && \
-    # Given the version download and install remarkable
-    curl -sSL http://remarkableapp.github.io/files/remarkable_${VERSION}_all.deb -o remarkable_${VERSION}_all.deb && \
-    dpkg -i remarkable_${VERSION}_all.deb && \
+    fonts-liberation fonts-dejavu ttf-mscorefonts-installer \
+    # No libgl1-mesa-glx in ubuntu:24.04, explicitly install libglx-mesa0 libgl1
+	mesa-utils libglx-mesa0 libgl1 libgl1-mesa-dri && \
+    # Download and install remarkable
+    curl -sSL https://remarkableapp.github.io/files/remarkable_1.95.deb -o remarkable_1.95.deb && \
+    dpkg -i remarkable_1.95.deb && \
     # Tidy up packages only used for installing remarkable.
-    rm remarkable_${VERSION}_all.deb && \
+    rm remarkable_1.95.deb && \
     apt-get clean && \
     apt-get purge -y curl && \
     apt-get autoremove -y && \

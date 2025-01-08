@@ -19,8 +19,8 @@
 #
 
 BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
-. $BIN/docker-command.sh
 . $BIN/docker-xauth.sh
+. $BIN/docker-gpu.sh
 . $BIN/docker-dbus-all.sh
 
 mkdir -p $(id -un)/.config/dconf
@@ -31,5 +31,6 @@ $DOCKER_COMMAND run --rm \
     $APPARMOR_FLAGS \
     $DCONF_FLAGS \
     $X11_FLAGS \
+    $GPU_FLAGS \
     remarkable $@
 
