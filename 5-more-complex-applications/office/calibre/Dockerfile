@@ -17,13 +17,11 @@
 # under the License.
 #
 
-FROM debian:stretch-slim
+#FROM debian:stretch-slim # Deprecated
+FROM ubuntu:24.04
 
 ENV LANG=en_GB.UTF-8
 ENV TZ=Europe/London
-
-# nvidia-docker hooks (Only needed for Nvidia Docker V1)
-LABEL com.nvidia.volumes.needed=nvidia_driver
 
 # Install calibre
 RUN sed -i 's/main/main contrib/' \

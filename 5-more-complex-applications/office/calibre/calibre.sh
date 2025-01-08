@@ -34,5 +34,6 @@ $DOCKER_COMMAND run --rm \
     $DCONF_FLAGS \
     $X11_FLAGS \
     $GPU_FLAGS \
+    -e XDG_RUNTIME_DIR=/tmp/$(id -un) \
     calibre $@
 
