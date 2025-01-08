@@ -17,17 +17,29 @@
 # under the License.
 #
 
-FROM debian:stretch-slim
+#FROM debian:stretch-slim # Deprecated
+FROM ubuntu:24.04
 
+ENV THUNDERBIRD_VERSION=thunderbird-128.5.2esr-SSL
+ENV THUNDERBIRD_LANG=en-GB
 ENV LANG=en_GB.UTF-8
 ENV TZ=Europe/London
 
 # Install Thunderbird
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-    thunderbird thunderbird-l10n-en-gb \
+	wget bzip2 ca-certificates gnupg dirmngr procps \
+    fonts-symbola fonts-lmodern fonts-freefont-ttf \
+    fonts-liberation fonts-dejavu gsfonts librsvg2-common \
+    libgtk-3-0 libgtk2.0-0 libnss3 libxt6 libxtst6 libavcodec-extra60 \
+    libpci3 libvpx9 libdbus-glib-1-2 libcanberra-gtk3-module \
+    # No libgl1-mesa-glx in ubuntu:24.04, explicitly install libglx-mesa0 libgl1
+    libpulse0 libv4l-0 libglx-mesa0 libgl1 libgl1-mesa-dri \
+    libegl1 libgles2 libvdpau1 \
     locales tzdata hunspell-en-gb && \
     rm -rf /var/lib/apt/lists/* && \
+    # Ubuntu Thunderbird uses snap, so download and install latest Thunderbird.
+    wget -qO - "https://download.mozilla.org/?product=${THUNDERBIRD_VERSION}&os=linux64&lang=${THUNDERBIRD_LANG}" | tar -xjv -C /usr/lib && \
     # Generate locales
     sed -i "s/^# *\($LANG\)/\1/" /etc/locale.gen && \
     locale-gen && \
@@ -36,7 +48,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     DEBIAN_FRONTEND=noninteractive dpkg-reconfigure tzdata
 
-ENTRYPOINT ["/usr/bin/thunderbird", "--no-remote"]
+ENTRYPOINT ["/usr/lib/thunderbird/thunderbird", "--no-remote"]
 
 #-------------------------------------------------------------------------------
 # 
