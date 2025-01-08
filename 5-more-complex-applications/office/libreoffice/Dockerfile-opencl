@@ -17,25 +17,21 @@
 # under the License.
 #
 
-FROM debian:stretch-slim
+FROM ubuntu:24.04
 
 ENV LANG=en_GB.UTF-8
 ENV TZ=Europe/London
 
-# nvidia-docker hooks (Only needed for Nvidia Docker V1)
-LABEL com.nvidia.volumes.needed=nvidia_driver
-
-RUN sed -i 's/main/main contrib/' \
-        /etc/apt/sources.list && \
-    mkdir -p /usr/share/man/man1 && \
+RUN mkdir -p /usr/share/man/man1 && \
     apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-    libreoffice libreoffice-pdfimport \
-    libreoffice-ogltrans libreoffice-gtk3 \
+    libreoffice libreoffice-ogltrans libreoffice-gtk3 \
+    libreoffice-java-common \
     ca-certificates locales tzdata default-jre fonts-noto \
     fonts-symbola fonts-lmodern fonts-freefont-ttf \
     fonts-liberation fonts-dejavu ttf-mscorefonts-installer \
-    libpulse0 libgl1-mesa-glx libgl1-mesa-dri \
+    # No libgl1-mesa-glx in ubuntu:24.04, explicitly install libglx-mesa0 libgl1
+    librsvg2-common libpulse0 libglx-mesa0 libgl1 libgl1-mesa-dri \
     ocl-icd-libopencl1 ocl-icd-opencl-dev && \
     # Add the Nvidia OpenCL Installable Client Driver
     mkdir -p /etc/OpenCL/vendors && \
