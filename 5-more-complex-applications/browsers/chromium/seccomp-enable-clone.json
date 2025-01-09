@@ -1,5 +1,6 @@
 {
 	"defaultAction": "SCMP_ACT_ERRNO",
+	"defaultErrnoRet": 1,
 	"archMap": [
 		{
 			"architecture": "SCMP_ARCH_X86_64",
@@ -47,12 +48,16 @@
 			"subArchitectures": [
 				"SCMP_ARCH_S390"
 			]
+		},
+		{
+			"architecture": "SCMP_ARCH_RISCV64",
+			"subArchitectures": null
 		}
 	],
 	"syscalls": [
 		{
 			"names": [
-                "clone", "clone3", "unshare",
+				"clone", "unshare",
 				"accept",
 				"accept4",
 				"access",
@@ -60,6 +65,7 @@
 				"alarm",
 				"bind",
 				"brk",
+				"cachestat",
 				"capget",
 				"capset",
 				"chdir",
@@ -75,6 +81,7 @@
 				"clock_nanosleep",
 				"clock_nanosleep_time64",
 				"close",
+				"close_range",
 				"connect",
 				"copy_file_range",
 				"creat",
@@ -86,6 +93,7 @@
 				"epoll_ctl",
 				"epoll_ctl_old",
 				"epoll_pwait",
+				"epoll_pwait2",
 				"epoll_wait",
 				"epoll_wait_old",
 				"eventfd",
@@ -103,6 +111,7 @@
 				"fchdir",
 				"fchmod",
 				"fchmodat",
+				"fchmodat2",
 				"fchown",
 				"fchown32",
 				"fchownat",
@@ -124,7 +133,11 @@
 				"ftruncate",
 				"ftruncate64",
 				"futex",
+				"futex_requeue",
 				"futex_time64",
+				"futex_wait",
+				"futex_waitv",
+				"futex_wake",
 				"futimesat",
 				"getcpu",
 				"getcwd",
@@ -176,11 +189,11 @@
 				"ioprio_set",
 				"io_setup",
 				"io_submit",
-				"io_uring_enter",
-				"io_uring_register",
-				"io_uring_setup",
 				"ipc",
 				"kill",
+				"landlock_add_rule",
+				"landlock_create_ruleset",
+				"landlock_restrict_self",
 				"lchown",
 				"lchown32",
 				"lgetxattr",
@@ -196,8 +209,10 @@
 				"lstat",
 				"lstat64",
 				"madvise",
+				"map_shadow_stack",
 				"membarrier",
 				"memfd_create",
+				"memfd_secret",
 				"mincore",
 				"mkdir",
 				"mkdirat",
@@ -226,6 +241,7 @@
 				"munlock",
 				"munlockall",
 				"munmap",
+				"name_to_handle_at",
 				"nanosleep",
 				"newfstatat",
 				"_newselect",
@@ -237,6 +253,9 @@
 				"pidfd_send_signal",
 				"pipe",
 				"pipe2",
+				"pkey_alloc",
+				"pkey_free",
+				"pkey_mprotect",
 				"poll",
 				"ppoll",
 				"ppoll_time64",
@@ -245,6 +264,7 @@
 				"preadv",
 				"preadv2",
 				"prlimit64",
+				"process_mrelease",
 				"pselect6",
 				"pselect6_time64",
 				"pwrite64",
@@ -341,7 +361,6 @@
 				"signalfd4",
 				"sigprocmask",
 				"sigreturn",
-				"socket",
 				"socketcall",
 				"socketpair",
 				"splice",
@@ -392,23 +411,31 @@
 				"write",
 				"writev"
 			],
-			"action": "SCMP_ACT_ALLOW",
-			"args": [],
-			"comment": "",
-			"includes": {},
-			"excludes": {}
+			"action": "SCMP_ACT_ALLOW"
 		},
 		{
 			"names": [
+				"process_vm_readv",
+				"process_vm_writev",
 				"ptrace"
 			],
 			"action": "SCMP_ACT_ALLOW",
-			"args": null,
-			"comment": "",
 			"includes": {
 				"minKernel": "4.8"
-			},
-			"excludes": {}
+			}
+		},
+		{
+			"names": [
+				"socket"
+			],
+			"action": "SCMP_ACT_ALLOW",
+			"args": [
+				{
+					"index": 0,
+					"value": 40,
+					"op": "SCMP_CMP_NE"
+				}
+			]
 		},
 		{
 			"names": [
@@ -421,10 +448,7 @@
 					"value": 0,
 					"op": "SCMP_CMP_EQ"
 				}
-			],
-			"comment": "",
-			"includes": {},
-			"excludes": {}
+			]
 		},
 		{
 			"names": [
@@ -437,10 +461,7 @@
 					"value": 8,
 					"op": "SCMP_CMP_EQ"
 				}
-			],
-			"comment": "",
-			"includes": {},
-			"excludes": {}
+			]
 		},
 		{
 			"names": [
@@ -453,10 +474,7 @@
 					"value": 131072,
 					"op": "SCMP_CMP_EQ"
 				}
-			],
-			"comment": "",
-			"includes": {},
-			"excludes": {}
+			]
 		},
 		{
 			"names": [
@@ -469,10 +487,7 @@
 					"value": 131080,
 					"op": "SCMP_CMP_EQ"
 				}
-			],
-			"comment": "",
-			"includes": {},
-			"excludes": {}
+			]
 		},
 		{
 			"names": [
@@ -485,24 +500,19 @@
 					"value": 4294967295,
 					"op": "SCMP_CMP_EQ"
 				}
-			],
-			"comment": "",
-			"includes": {},
-			"excludes": {}
+			]
 		},
 		{
 			"names": [
-				"sync_file_range2"
+				"sync_file_range2",
+				"swapcontext"
 			],
 			"action": "SCMP_ACT_ALLOW",
-			"args": [],
-			"comment": "",
 			"includes": {
 				"arches": [
 					"ppc64le"
 				]
-			},
-			"excludes": {}
+			}
 		},
 		{
 			"names": [
@@ -514,46 +524,37 @@
 				"set_tls"
 			],
 			"action": "SCMP_ACT_ALLOW",
-			"args": [],
-			"comment": "",
 			"includes": {
 				"arches": [
 					"arm",
 					"arm64"
 				]
-			},
-			"excludes": {}
+			}
 		},
 		{
 			"names": [
 				"arch_prctl"
 			],
 			"action": "SCMP_ACT_ALLOW",
-			"args": [],
-			"comment": "",
 			"includes": {
 				"arches": [
 					"amd64",
 					"x32"
 				]
-			},
-			"excludes": {}
+			}
 		},
 		{
 			"names": [
 				"modify_ldt"
 			],
 			"action": "SCMP_ACT_ALLOW",
-			"args": [],
-			"comment": "",
 			"includes": {
 				"arches": [
 					"amd64",
 					"x32",
 					"x86"
 				]
-			},
-			"excludes": {}
+			}
 		},
 		{
 			"names": [
@@ -562,40 +563,53 @@
 				"s390_runtime_instr"
 			],
 			"action": "SCMP_ACT_ALLOW",
-			"args": [],
-			"comment": "",
 			"includes": {
 				"arches": [
 					"s390",
 					"s390x"
 				]
-			},
-			"excludes": {}
+			}
+		},
+		{
+			"names": [
+				"riscv_flush_icache"
+			],
+			"action": "SCMP_ACT_ALLOW",
+			"includes": {
+				"arches": [
+					"riscv64"
+				]
+			}
 		},
 		{
 			"names": [
 				"open_by_handle_at"
 			],
 			"action": "SCMP_ACT_ALLOW",
-			"args": [],
-			"comment": "",
 			"includes": {
 				"caps": [
 					"CAP_DAC_READ_SEARCH"
 				]
-			},
-			"excludes": {}
+			}
 		},
 		{
 			"names": [
 				"bpf",
 				"clone",
+				"clone3",
 				"fanotify_init",
+				"fsconfig",
+				"fsmount",
+				"fsopen",
+				"fspick",
 				"lookup_dcookie",
 				"mount",
-				"name_to_handle_at",
+				"mount_setattr",
+				"move_mount",
+				"open_tree",
 				"perf_event_open",
 				"quotactl",
+				"quotactl_fd",
 				"setdomainname",
 				"sethostname",
 				"setns",
@@ -605,14 +619,11 @@
 				"unshare"
 			],
 			"action": "SCMP_ACT_ALLOW",
-			"args": [],
-			"comment": "",
 			"includes": {
 				"caps": [
 					"CAP_SYS_ADMIN"
 				]
-			},
-			"excludes": {}
+			}
 		},
 		{
 			"names": [
@@ -626,8 +637,6 @@
 					"op": "SCMP_CMP_MASKED_EQ"
 				}
 			],
-			"comment": "",
-			"includes": {},
 			"excludes": {
 				"caps": [
 					"CAP_SYS_ADMIN"
@@ -665,31 +674,37 @@
 		},
 		{
 			"names": [
+				"clone3"
+			],
+			"action": "SCMP_ACT_ERRNO",
+			"errnoRet": 38,
+			"excludes": {
+				"caps": [
+					"CAP_SYS_ADMIN"
+				]
+			}
+		},
+		{
+			"names": [
 				"reboot"
 			],
 			"action": "SCMP_ACT_ALLOW",
-			"args": [],
-			"comment": "",
 			"includes": {
 				"caps": [
 					"CAP_SYS_BOOT"
 				]
-			},
-			"excludes": {}
+			}
 		},
 		{
 			"names": [
 				"chroot"
 			],
 			"action": "SCMP_ACT_ALLOW",
-			"args": [],
-			"comment": "",
 			"includes": {
 				"caps": [
 					"CAP_SYS_CHROOT"
 				]
-			},
-			"excludes": {}
+			}
 		},
 		{
 			"names": [
@@ -698,46 +713,38 @@
 				"finit_module"
 			],
 			"action": "SCMP_ACT_ALLOW",
-			"args": [],
-			"comment": "",
 			"includes": {
 				"caps": [
 					"CAP_SYS_MODULE"
 				]
-			},
-			"excludes": {}
+			}
 		},
 		{
 			"names": [
 				"acct"
 			],
 			"action": "SCMP_ACT_ALLOW",
-			"args": [],
-			"comment": "",
 			"includes": {
 				"caps": [
 					"CAP_SYS_PACCT"
 				]
-			},
-			"excludes": {}
+			}
 		},
 		{
 			"names": [
 				"kcmp",
 				"pidfd_getfd",
+				"process_madvise",
 				"process_vm_readv",
 				"process_vm_writev",
 				"ptrace"
 			],
 			"action": "SCMP_ACT_ALLOW",
-			"args": [],
-			"comment": "",
 			"includes": {
 				"caps": [
 					"CAP_SYS_PTRACE"
 				]
-			},
-			"excludes": {}
+			}
 		},
 		{
 			"names": [
@@ -745,74 +752,83 @@
 				"ioperm"
 			],
 			"action": "SCMP_ACT_ALLOW",
-			"args": [],
-			"comment": "",
 			"includes": {
 				"caps": [
 					"CAP_SYS_RAWIO"
 				]
-			},
-			"excludes": {}
+			}
 		},
 		{
 			"names": [
 				"settimeofday",
 				"stime",
-				"clock_settime"
+				"clock_settime",
+				"clock_settime64"
 			],
 			"action": "SCMP_ACT_ALLOW",
-			"args": [],
-			"comment": "",
 			"includes": {
 				"caps": [
 					"CAP_SYS_TIME"
 				]
-			},
-			"excludes": {}
+			}
 		},
 		{
 			"names": [
 				"vhangup"
 			],
 			"action": "SCMP_ACT_ALLOW",
-			"args": [],
-			"comment": "",
 			"includes": {
 				"caps": [
 					"CAP_SYS_TTY_CONFIG"
 				]
-			},
-			"excludes": {}
+			}
 		},
 		{
 			"names": [
 				"get_mempolicy",
 				"mbind",
-				"set_mempolicy"
+				"set_mempolicy",
+				"set_mempolicy_home_node"
 			],
 			"action": "SCMP_ACT_ALLOW",
-			"args": [],
-			"comment": "",
 			"includes": {
 				"caps": [
 					"CAP_SYS_NICE"
 				]
-			},
-			"excludes": {}
+			}
 		},
 		{
 			"names": [
 				"syslog"
 			],
 			"action": "SCMP_ACT_ALLOW",
-			"args": [],
-			"comment": "",
 			"includes": {
 				"caps": [
 					"CAP_SYSLOG"
 				]
-			},
-			"excludes": {}
+			}
+		},
+		{
+			"names": [
+				"bpf"
+			],
+			"action": "SCMP_ACT_ALLOW",
+			"includes": {
+				"caps": [
+					"CAP_BPF"
+				]
+			}
+		},
+		{
+			"names": [
+				"perf_event_open"
+			],
+			"action": "SCMP_ACT_ALLOW",
+			"includes": {
+				"caps": [
+					"CAP_PERFMON"
+				]
+			}
 		}
 	]
 }
