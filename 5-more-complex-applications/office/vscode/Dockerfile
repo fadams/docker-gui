@@ -26,7 +26,9 @@
 #
 # The download URL used below was grokked from a manual download.
 # https://az764295.vo.msecnd.net/stable/ea3859d4ba2f3e577a159bc91e3074c5d85c0523/code_1.52.1-1608136922_amd64.deb
-
+# Jan 2025 Update:
+# https://vscode.download.prss.microsoft.com/dbazure/download/stable/fabdb6a30b49f79a7aba0f2ad9df9b399473380f/code_1.96.2-1734607745_amd64.deb
+#
 # Visual Studio Code allows for remote development in containers.
 # The Visual Studio Code Remote Containers extension lets you use a Docker
 # container as a full-featured development environment. It allows you to open
@@ -41,7 +43,7 @@
 # https://code.visualstudio.com/docs/remote/containers-tutorial
 # https://www.docker.com/blog/how-to-develop-inside-a-container-using-visual-studio-code-remote-containers/
 #
-# Note that the above tutorials assume vscode IDE is installed on desktop
+# Note that the above tutorials assume the vscode IDE is installed on desktop
 # not in a container, so the instruction "Once the process starts, navigate
 # to http://localhost:3000 and you should see the simple Node.js server
 # running!" will fail. To resolve this use the IP of either the
@@ -50,40 +52,45 @@
 # Alternatively, launch the container in the host's network namespace
 # by adding --network=host to the launch script.
 #
-# To enable this capability we install the docker CLI in this image
-# and bind-mount the docker socket in the container.
+# To enable vscode's remote development in containers capability we install the
+# docker CLI in this image and bind-mount the docker socket in the container.
 
-FROM debian:bullseye-slim
+FROM ubuntu:24.04
 
 # Install vscode Desktop IDE
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Add the packages used
     apt-get install -y --no-install-recommends \
 	apt-transport-https wget gnupg ca-certificates \
-    libgl1-mesa-glx libgl1-mesa-dri \
+    # No libgl1-mesa-glx in ubuntu:24.04, explicitly install libglx-mesa0 libgl1
+    libglx-mesa0 libgl1 libgl1-mesa-dri \
+    libvdpau1 mesa-vdpau-drivers \
+    nvidia-vaapi-driver libvdpau-va-gl1 \
     libnss3 libxkbfile1 libsecret-1-0 libgtk-3-0 \
     libxss1 libgbm1 libx11-xcb1 libxcb-dri3-0 \
-    libxtst6 libasound2 pulseaudio librsvg2-common \
+    libxtst6 libasound2t64 pulseaudio librsvg2-common \
     fonts-symbola fonts-lmodern fonts-freefont-ttf \
-    fonts-liberation fonts-dejavu gsfonts git && \
+    fonts-liberation fonts-dejavu gsfonts git xdg-utils && \
     # Download and install vscode.
-    VERSION=code_1.52.1-1608136922 && \
+    VERSION=code_1.96.2-1734607745 && \
     PACKAGE=${VERSION}_amd64.deb && \
-    DOWNLOAD_URL=https://az764295.vo.msecnd.net/stable/ea3859d4ba2f3e577a159bc91e3074c5d85c0523/${PACKAGE} && \
+    DOWNLOAD_URL=https://vscode.download.prss.microsoft.com/dbazure/download/stable/fabdb6a30b49f79a7aba0f2ad9df9b399473380f/${PACKAGE} && \
     wget -O ${PACKAGE} ${DOWNLOAD_URL} && \
-    dpkg -i ${PACKAGE} && rm ${PACKAGE} && \
+    apt-get update && DEBIAN_FRONTEND=noninteractive \
+    apt-get install -y ./${PACKAGE} && rm ${PACKAGE} && \
     #---------------------------------------------------------------------------
     # Adding Docker CLI to enable vscode remote development
     # in containers feature. Remove this block if support for
     # this feaure is not required.
     # Add Docker’s official GPG key:
-    wget -O /usr/share/keyrings/docker-archive.key \
-            https://download.docker.com/linux/debian/gpg && \
+    wget -O /etc/apt/keyrings/docker.asc \
+            https://download.docker.com/linux/ubuntu/gpg && \
     # Add Docker repository. Note we're using buster here
     # as bullseye repo isn't yet available.
-    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive.key] https://download.docker.com/linux/debian buster stable main" > /etc/apt/sources.list.d/docker.list && \
-    apt-get update && \
-    apt-get install docker-ce-cli && \
+    echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu noble stable" > /etc/apt/sources.list.d/docker.list && \
+    apt-get update && DEBIAN_FRONTEND=noninteractive \
+    apt-get install -y docker-ce docker-ce-cli containerd.io \
+    docker-buildx-plugin docker-compose-plugin && \
     #---------------------------------------------------------------------------
 	rm -rf /var/lib/apt/lists/* && \
     cp /etc/pulse/client.conf \

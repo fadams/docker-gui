@@ -29,11 +29,22 @@ BIN=$(cd $(dirname $0); echo ${PWD%docker-gui*})docker-gui/bin
 mkdir -p $(id -un)/.config/pulse
 mkdir -p $(id -un)/.config/dconf
 
-# Important note. The first two lines below add the docker group
-# to the container and bind-mount the docker Unix domain socket.
+# The default Docker seccomp profile defined at:
+# https://github.com/moby/moby/blob/master/profiles/seccomp/default.json
+# requires CAP_SYS_ADMIN to run clone with the CLONE_NEWUSER flag
+# in other words by default CAP_SYS_ADMIN is needed for a process in a
+# container to be able to create user namespaces.
+# The seccomp-enable-clone.json profile minimally changes the default
+# profile to allow "clone". Using a modified seccomp seems a better approach
+# than --cap-add SYS_ADMIN.
+#
+# Important note. We add the docker group to the container and bind-mount
+# the docker Unix domain socket /var/run/docker.sock below.
 # This is so we can support the vscode Remote Containers extension.
 # Remove those lines if support for this feaure is not required.
-$DOCKER_COMMAND run --rm \
+#    --security-opt seccomp=$PWD/seccomp-enable-clone.json \
+$DOCKER_COMMAND run --rm -it \
+    --security-opt seccomp=$PWD/seccomp-enable-clone.json \
     --group-add $(cut -d: -f3 < <(getent group docker)) \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -u $(id -u):$(id -g) \
