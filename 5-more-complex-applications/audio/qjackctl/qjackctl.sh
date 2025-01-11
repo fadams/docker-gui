@@ -21,6 +21,9 @@
 # Replace with real device name
 #ALSA_DEVICE=hw:CARD=NVidia,DEV=7
 
+# Works for built in audio card
+#ALSA_DEVICE=hw:CARD=PCH,DEV=0
+
 # This seems to work with VMWare VM Virtual Audio Device
 #ALSA_DEVICE=hw:CARD=AudioPCI,DEV=1
 
@@ -41,6 +44,7 @@ $DOCKER_COMMAND run --rm \
     $DCONF_FLAGS \
     $JACKD_FLAGS \
     $X11_FLAGS \
+    -e XDG_RUNTIME_DIR=/tmp/$(id -un) \
     $GPU_FLAGS \
     qjackctl $@
 

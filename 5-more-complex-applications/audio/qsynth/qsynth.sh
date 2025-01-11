@@ -32,6 +32,7 @@ $DOCKER_COMMAND run --rm \
     -v /etc/passwd:/etc/passwd:ro \
     $JACK_FLAGS \
     $X11_FLAGS \
+    -e XDG_RUNTIME_DIR=/tmp/$(id -un) \
     $GPU_FLAGS \
     qsynth $@
 

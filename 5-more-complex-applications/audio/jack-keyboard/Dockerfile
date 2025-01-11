@@ -17,7 +17,8 @@
 # under the License.
 #
 
-FROM debian:stretch-slim
+#FROM debian:stretch-slim # Deprecated
+FROM ubuntu:24.04
 
 # Install jack-keyboard
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
