@@ -17,7 +17,8 @@
 # under the License.
 #
 
-FROM debian:stretch-slim
+#FROM debian:stretch-slim # Deprecated
+FROM ubuntu:24.04
 
 # Install ardour, binutils is included because ardour startup uses nm
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
@@ -27,7 +28,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     # Tidy up
 	rm -rf /var/lib/apt/lists/*
 
-ENTRYPOINT ["ardour5"]
+ENTRYPOINT ["ardour"]
 
 #-------------------------------------------------------------------------------
 # 
